@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+
+{% block title %}Academics - AcademiaPro{% endblock %}
+{% block page_title %}Academic Administration & Grading{% endblock %}
+{% block page_subtitle %}Departments, Degree Programs, Course Sections, Transcripts and Examination Eligibility{% endblock %}
+
+{% block content %}
+<ul class="nav nav-tabs mb-4" id="academicTabs" role="tablist">
+    <li class="nav-item">
+        <button class="nav-link active" id="students-tab" data-bs-toggle="tab" data-bs-target="#students" type="button">
+            <i class="fa-solid fa-user-graduate me-1"></i> Students Directory ({{ students|length }})
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="courses-tab" data-bs-toggle="tab" data-bs-target="#courses" type="button">
+            <i class="fa-solid fa-book-open me-1"></i> Courses & Sections
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="transcripts-tab" data-bs-toggle="tab" data-bs-target="#transcripts" type="button">
+            <i class="fa-solid fa-scroll me-1"></i> Official Transcripts
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="attendance-tab" data-bs-toggle="tab" data-bs-target="#attendance" type="button">
+            <i class="fa-solid fa-clipboard-user me-1 text-danger"></i> 75% Attendance Check
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="dept-tab" data-bs-toggle="tab" data-bs-target="#dept" type="button">
+            <i class="fa-solid fa-building-columns me-1"></i> Departments & Programs
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="academicTabContent">
+    <!-- Tab 1: Students Directory -->
+    <div class="tab-pane fade show active" id="students" role="tabpanel">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-body p-0">
+                <div class="table-responsive border-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Roll Number</th>
+                                <th>Student Name</th>
+                                <th>Program</th>
+                                <th>Email</th>
+                                <th>CNIC</th>
+                                <th>Semester</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in students %}
+                            <tr>
+                                <td class="fw-bold text-primary">{{ s.roll_number }}</td>
+                                <td>{{ s.first_name }} {{ s.last_name }}</td>
+                                <td><span class="badge bg-secondary">{{ s.program_code }}</span></td>
+                                <td>{{ s.email }}</td>
+                                <td>{{ s.cnic }}</td>
+                                <td>Semester {{ s.current_semester_num }}</td>
+                                <td>
+                                    {% if s.status == 'Active' %}
+                                    <span class="badge bg-success">Active</span>
+                                    {% elif s.status == 'Probation' %}
+                                    <span class="badge bg-warning text-dark">Probation</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">{{ s.status }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 2: Courses & Sections -->
+    <div class="tab-pane fade" id="courses" role="tabpanel">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm rounded-3">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h6 class="mb-0 fw-bold"><i class="fa-solid fa-book text-primary me-2"></i>Course Catalog</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive border-0">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Title</th>
+                                        <th>Credits</th>
+                                        <th>Lab Required</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for c in courses %}
+                                    <tr>
+                                        <td class="fw-bold">{{ c.course_code }}</td>
+                                        <td>{{ c.title }}</td>
+                                        <td>{{ c.credit_hours }} Cr</td>
+                                        <td>
+                                            {% if c.is_lab_required %}
+                                            <span class="badge bg-info-subtle text-info border">Yes (Lab)</span>
+                                            {% else %}
+                                            <span class="badge bg-light text-muted border">Theory Only</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm rounded-3">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h6 class="mb-0 fw-bold"><i class="fa-solid fa-users-rectangle text-success me-2"></i>Active Sections & Faculty Allocation</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive border-0">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Section</th>
+                                        <th>Course</th>
+                                        <th>Instructor</th>
+                                        <th>Capacity</th>
+                                        <th>Room</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for sec in sections %}
+                                    <tr>
+                                        <td class="fw-bold">Sec {{ sec.section_name }}</td>
+                                        <td>{{ sec.course_code }}</td>
+                                        <td>{{ sec.teacher_name }}</td>
+                                        <td>{{ sec.enrolled_count }} / {{ sec.max_capacity }}</td>
+                                        <td><small class="text-muted">{{ sec.room_number }}</small></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 3: Transcripts -->
+    <div class="tab-pane fade" id="transcripts" role="tabpanel">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-body p-0">
+                <div class="table-responsive border-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Roll No</th>
+                                <th>Student</th>
+                                <th>Course</th>
+                                <th>Credits</th>
+                                <th>Section</th>
+                                <th>Grade</th>
+                                <th>GPA Points</th>
+                                <th>Quality Points</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in transcripts %}
+                            <tr>
+                                <td class="fw-bold">{{ t.roll_number }}</td>
+                                <td>{{ t.student_name }}</td>
+                                <td>{{ t.course_code }} - {{ t.course_title }}</td>
+                                <td>{{ t.credit_hours }}</td>
+                                <td>{{ t.section_name }}</td>
+                                <td>
+                                    <span class="badge {% if t.final_grade == 'A' %}bg-success{% elif t.final_grade == 'F' %}bg-danger{% else %}bg-primary{% endif %}">
+                                        {{ t.final_grade or 'Pending' }}
+                                    </span>
+                                </td>
+                                <td>{{ t.gpa_points if t.gpa_points is not none else '-' }}</td>
+                                <td class="fw-semibold">{{ t.quality_points if t.quality_points is not none else '-' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 4: Attendance 75% Shortage -->
+    <div class="tab-pane fade" id="attendance" role="tabpanel">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-white border-bottom py-3">
+                <h6 class="mb-0 fw-bold text-danger">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>Institutional 75% Minimum Attendance Enforcement (BR-03)
+                </h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive border-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Roll Number</th>
+                                <th>Student Name</th>
+                                <th>Course Title</th>
+                                <th>Held Lectures</th>
+                                <th>Attended</th>
+                                <th>Percentage</th>
+                                <th>Exam Eligibility</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for a in attendance_report %}
+                            <tr>
+                                <td class="fw-bold">{{ a.roll_number }}</td>
+                                <td>{{ a.student_name }}</td>
+                                <td>{{ a.course_code }} - {{ a.course_title }}</td>
+                                <td>{{ a.total_lectures_held }}</td>
+                                <td>{{ a.attended_lectures }}</td>
+                                <td class="fw-bold {% if a.examination_eligibility == 'DEBARRED_FROM_FINAL_EXAM' %}text-danger{% else %}text-success{% endif %}">
+                                    {{ a.attendance_percentage }}%
+                                </td>
+                                <td>
+                                    {% if a.examination_eligibility == 'DEBARRED_FROM_FINAL_EXAM' %}
+                                    <span class="badge bg-danger"><i class="fa-solid fa-ban me-1"></i> DEBARRED</span>
+                                    {% else %}
+                                    <span class="badge bg-success"><i class="fa-solid fa-check me-1"></i> ELIGIBLE</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 5: Departments & Programs -->
+    <div class="tab-pane fade" id="dept" role="tabpanel">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm rounded-3">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h6 class="mb-0 fw-bold"><i class="fa-solid fa-building me-2 text-primary"></i>Academic Departments</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive border-0">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Department Name</th>
+                                        <th>Office Location</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for d in departments %}
+                                    <tr>
+                                        <td class="fw-bold">{{ d.dept_code }}</td>
+                                        <td>{{ d.dept_name }}</td>
+                                        <td>{{ d.office_location }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm rounded-3">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h6 class="mb-0 fw-bold"><i class="fa-solid fa-graduation-cap me-2 text-success"></i>Degree Programs</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive border-0">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Program Code</th>
+                                        <th>Program Name</th>
+                                        <th>Department</th>
+                                        <th>Semesters</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for p in programs %}
+                                    <tr>
+                                        <td class="fw-bold">{{ p.program_code }}</td>
+                                        <td>{{ p.program_name }}</td>
+                                        <td>{{ p.dept_name }}</td>
+                                        <td>{{ p.total_semesters }} Sem / {{ p.total_credits }} Cr</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

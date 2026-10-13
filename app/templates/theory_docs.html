@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block title %}Relational Theory & Normalization - AcademiaPro{% endblock %}
+{% block page_title %}Relational Theory, Functional Dependencies & Normalization Proof{% endblock %}
+{% block page_subtitle %}Comprehensive Academic Analysis: Keys, FDs, Anomalies and 1NF to BCNF Transformation{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Quick Jump Sidebar -->
+    <div class="col-lg-3">
+        <div class="card border-0 shadow-sm rounded-3 sticky-top" style="top: 20px;">
+            <div class="card-header bg-white border-bottom py-3">
+                <h6 class="mb-0 fw-bold"><i class="fa-solid fa-list-ol text-primary me-2"></i>Documentation Index</h6>
+            </div>
+            <div class="list-group list-group-flush small">
+                <a href="#sec-keys" class="list-group-item list-group-item-action py-2">
+                    <i class="fa-solid fa-key me-2 text-warning"></i> 1. Keys Classification
+                </a>
+                <a href="#sec-fds" class="list-group-item list-group-item-action py-2">
+                    <i class="fa-solid fa-arrow-right-arrow-left me-2 text-primary"></i> 2. Functional Dependencies
+                </a>
+                <a href="#sec-anomalies" class="list-group-item list-group-item-action py-2">
+                    <i class="fa-solid fa-triangle-exclamation me-2 text-danger"></i> 3. Database Anomalies (UNF)
+                </a>
+                <a href="#sec-normalization" class="list-group-item list-group-item-action py-2">
+                    <i class="fa-solid fa-cubes me-2 text-success"></i> 4. Normalization Proof (1NF to BCNF)
+                </a>
+                <a href="#sec-math" class="list-group-item list-group-item-action py-2">
+                    <i class="fa-solid fa-calculator me-2 text-info"></i> 5. Mathematical Relational Model
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="col-lg-9">
+        <!-- 1. Keys Classification -->
+        <div class="card border-0 shadow-sm rounded-3 mb-4" id="sec-keys">
+            <div class="card-header bg-white border-bottom py-3">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-key text-warning me-2"></i>1. Relational Keys Specification</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">In relational DBMS design, keys guarantee tuple identity and enforce referential integrity across schemas.</p>
+                
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Entity / Table</th>
+                                <th>Primary Key (PK)</th>
+                                <th>Candidate Keys (CK)</th>
+                                <th>Alternate Keys (AK)</th>
+                                <th>Foreign Keys (FK) & Parent Reference</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="fw-bold">academics.student</td>
+                                <td><code>student_id</code></td>
+                                <td>{student_id}, {roll_number}, {cnic}, {email}, {user_id}</td>
+                                <td>roll_number, cnic, email</td>
+                                <td><code>user_id &rarr; user_account</code><br><code>program_id &rarr; program</code></td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">academics.section</td>
+                                <td><code>section_id</code></td>
+                                <td>{section_id}, {course_id, semester_id, section_name}</td>
+                                <td>(course_id, semester_id, section_name)</td>
+                                <td><code>course_id &rarr; course</code><br><code>semester_id &rarr; semester</code><br><code>teacher_id &rarr; teacher</code></td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">academics.enrollment</td>
+                                <td><code>enrollment_id</code></td>
+                                <td>{enrollment_id}, {student_id, section_id}</td>
+                                <td>(student_id, section_id)</td>
+                                <td><code>student_id &rarr; student</code><br><code>section_id &rarr; section</code></td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">finance.student_invoice</td>
+                                <td><code>invoice_id</code></td>
+                                <td>{invoice_id}, {invoice_number}, {student_id, semester_id}</td>
+                                <td>invoice_number, (student_id, semester_id)</td>
+                                <td><code>student_id &rarr; student</code><br><code>semester_id &rarr; semester</code><br><code>fee_structure_id &rarr; fee_structure</code></td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">library.book_copy</td>
+                                <td><code>copy_id</code></td>
+                                <td>{copy_id}, {barcode}</td>
+                                <td>barcode</td>
+                                <td><code>book_id &rarr; book</code></td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">inventory.room_lab</td>
+                                <td><code>room_id</code></td>
+                                <td>{room_id}, {dept_id, room_number}</td>
+                                <td>(dept_id, room_number)</td>
+                                <td><code>dept_id &rarr; department</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Functional Dependencies -->
+        <div class="card border-0 shadow-sm rounded-3 mb-4" id="sec-fds">
+            <div class="card-header bg-white border-bottom py-3">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-arrow-right-arrow-left text-primary me-2"></i>2. Explicit Functional Dependencies (FDs)</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">An attribute $Y$ is functionally dependent on $X$ ($X \rightarrow Y$) if each value of $X$ determines exactly one value of $Y$.</p>
+                
+                <div class="bg-light p-3 rounded-3 mb-3 border">
+                    <h6 class="fw-bold text-dark">Academics Schema Functional Dependencies:</h6>
+                    <ul class="mb-0 font-monospace small">
+                        <li><strong>Department:</strong> dept_id &rarr; {dept_code, dept_name, office_location, contact_email}</li>
+                        <li><strong>Program:</strong> program_id &rarr; {dept_id, program_code, program_name, total_semesters, total_credits}</li>
+                        <li><strong>Semester:</strong> semester_id &rarr; {term_name, academic_year, start_date, end_date}</li>
+                        <li><strong>Student:</strong> student_id &rarr; {roll_number, user_id, program_id, first_name, last_name, email, cnic, phone, admission_date}</li>
+                        <li><strong>Section:</strong> section_id &rarr; {course_id, semester_id, teacher_id, section_name, max_capacity, room_number}</li>
+                        <li><strong>Enrollment:</strong> {student_id, section_id} &rarr; {enrollment_id, enrollment_date, status, final_grade, gpa_points}</li>
+                        <li><strong>Assessment:</strong> assessment_id &rarr; {section_id, title, assessment_type, max_marks, weightage_percent}</li>
+                        <li><strong>Result:</strong> {assessment_id, enrollment_id} &rarr; {marks_obtained, remarks, graded_at}</li>
+                    </ul>
+                </div>
+
+                <div class="bg-light p-3 rounded-3 border">
+                    <h6 class="fw-bold text-dark">Finance & Inventory Functional Dependencies:</h6>
+                    <ul class="mb-0 font-monospace small">
+                        <li><strong>Fee Structure:</strong> {program_id, semester_id} &rarr; {tuition_fee, lab_fee, library_fund, exam_fee}</li>
+                        <li><strong>Invoice:</strong> invoice_id &rarr; {student_id, semester_id, fee_structure_id, total_amount, balance_due}</li>
+                        <li><strong>Book Copy:</strong> barcode &rarr; {copy_id, book_id, edition, shelf_location, status}</li>
+                        <li><strong>Room/Lab:</strong> {dept_id, room_number} &rarr; {room_id, room_name, room_type, capacity}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Database Anomalies -->
+        <div class="card border-0 shadow-sm rounded-3 mb-4" id="sec-anomalies">
+            <div class="card-header bg-white border-bottom py-3">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-triangle-exclamation text-danger me-2"></i>3. Anomalies in Unnormalized Design</h5>
+            </div>
+            <div class="card-body">
+                <p>If college data were stored in a single flat table <code>FLAT_ENROLLMENT(roll_no, student_name, dept_name, course_code, teacher_name, teacher_office)</code>, three anomalies occur:</p>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="p-3 bg-danger-subtle rounded-3 border border-danger h-100">
+                            <h6 class="fw-bold text-danger"><i class="fa-solid fa-circle-plus me-1"></i> Insertion Anomaly</h6>
+                            <p class="small mb-0">Cannot add a newly hired Teacher or a new Department until at least one Student enrolls in their course, because the composite key <code>(roll_no, course_code)</code> cannot be NULL.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 bg-warning-subtle rounded-3 border border-warning h-100">
+                            <h6 class="fw-bold text-dark"><i class="fa-solid fa-circle-minus me-1"></i> Deletion Anomaly</h6>
+                            <p class="small mb-0">If the only student enrolled in a specialized course drops out and their row is deleted, the course description, teacher record, and office details are accidentally wiped from the database.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 bg-info-subtle rounded-3 border border-info h-100">
+                            <h6 class="fw-bold text-dark"><i class="fa-solid fa-pen-to-square me-1"></i> Update Anomaly</h6>
+                            <p class="small mb-0">If Professor changes office room, it must be updated across thousands of enrollment tuples. Any missed update produces contradictory records.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Normalization Proof -->
+        <div class="card border-0 shadow-sm rounded-3 mb-4" id="sec-normalization">
+            <div class="card-header bg-white border-bottom py-3">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-cubes text-success me-2"></i>4. Step-by-Step Normalization Proof (1NF &rarr; BCNF)</h5>
+            </div>
+            <div class="card-body">
+                <div class="accordion" id="normAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#norm1nf">
+                                <strong>Step 1: First Normal Form (1NF)</strong> &mdash; Eliminating Multi-valued Attributes & Non-Atomic Data
+                            </button>
+                        </h2>
+                        <div id="norm1nf" class="accordion-collapse collapse show">
+                            <div class="accordion-body">
+                                <ul>
+                                    <li><strong>Condition:</strong> All column attributes contain atomic (indivisible) domain values. No comma-separated strings or arrays.</li>
+                                    <li><strong>Applied:</strong> Multi-valued student phone numbers and multiple courses enrolled are exploded into atomic relations with unique scalar keys.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#norm2nf">
+                                <strong>Step 2: Second Normal Form (2NF)</strong> &mdash; Eliminating Partial Functional Dependencies
+                            </button>
+                        </h2>
+                        <div id="norm2nf" class="accordion-collapse collapse">
+                            <div class="accordion-body">
+                                <ul>
+                                    <li><strong>Condition:</strong> Relation is in 1NF and no non-prime attribute is partially dependent on a proper subset of any candidate key.</li>
+                                    <li><strong>Applied:</strong> In <code>ENROLLMENT(student_id, section_id, grade, section_capacity)</code>, <code>section_capacity</code> depends only on <code>section_id</code> (partial dependency). We split into <code>ENROLLMENT</code> and <code>SECTION</code>.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#norm3nf">
+                                <strong>Step 3: Third Normal Form (3NF)</strong> &mdash; Eliminating Transitive Dependencies
+                            </button>
+                        </h2>
+                        <div id="norm3nf" class="accordion-collapse collapse">
+                            <div class="accordion-body">
+                                <ul>
+                                    <li><strong>Condition:</strong> Relation is in 2NF and has no transitive dependencies ($X \rightarrow Y$ and $Y \rightarrow Z$).</li>
+                                    <li><strong>Applied:</strong> Student contains <code>student_id &rarr; program_id</code> and <code>program_id &rarr; dept_id &rarr; dept_name</code>. Transitive chain is removed by separating into <code>student</code>, <code>program</code>, and <code>department</code>.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#normBcnf">
+                                <strong>Step 4: Boyce-Codd Normal Form (BCNF)</strong> &mdash; Determinants Must Be Superkeys
+                            </button>
+                        </h2>
+                        <div id="normBcnf" class="accordion-collapse collapse">
+                            <div class="accordion-body">
+                                <ul>
+                                    <li><strong>Condition:</strong> For every non-trivial functional dependency $X \rightarrow Y$, $X$ must be a superkey of the relation.</li>
+                                    <li><strong>Applied:</strong> All 25 relations in AcademiaPro strictly adhere to BCNF because every determinant is an explicit surrogate or natural candidate superkey.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Mathematical Model -->
+        <div class="card border-0 shadow-sm rounded-3 mb-4" id="sec-math">
+            <div class="card-header bg-white border-bottom py-3">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-calculator text-info me-2"></i>5. Formal Relational Mathematical Model</h5>
+            </div>
+            <div class="card-body">
+                <p>Relational operations are formally Cartesian products filtered by selection ($\sigma$) and projection ($\pi$):</p>
+                <div class="code-snippet mb-3">
+                    STUDENT &sube; D_ID &times; D_ROLL &times; D_NAME &times; D_EMAIL &times; D_STATUS<br>
+                    ENROLLMENT &sube; STUDENT &times; SECTION &rarr; GRADE &times; STATUS<br>
+                    ASSESSMENT_RESULT &sube; ENROLLMENT &times; ASSESSMENT &rarr; SCORE
+                </div>
+                <p class="text-muted small mb-0">Referential Integrity Constraint: &forall; e &isin; ENROLLMENT, &exist; s &isin; STUDENT such that e.student_id = s.student_id.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

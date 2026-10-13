@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}SQL Sandbox - AcademiaPro{% endblock %}
+{% block page_title %}Interactive Relational SQL Query Playground{% endblock %}
+{% block page_subtitle %}Live Query Execution Sandbox for Relational Division, Difference, HAVING and Analytical Views{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-12">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold">
+                    <i class="fa-solid fa-code text-primary me-2"></i>SQL Statement Editor
+                </h6>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary btn-sm px-3" id="runSqlBtn">
+                        <i class="fa-solid fa-play me-1"></i> Execute Query
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" id="clearBtn">
+                        <i class="fa-solid fa-trash-can me-1"></i> Clear
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <!-- Preset Buttons -->
+                <label class="form-label fw-semibold small text-muted">Load Demonstration Query Preset:</label>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <button class="btn btn-outline-primary btn-sm preset-sql-btn" data-sql="SELECT s.student_id, s.roll_number, s.first_name || ' ' || s.last_name as student_name FROM student s WHERE NOT EXISTS (SELECT c.course_id FROM course c WHERE c.course_code IN ('CS-201', 'CS-202') EXCEPT SELECT sec.course_id FROM enrollment e JOIN section sec ON e.section_id = sec.section_id WHERE e.student_id = s.student_id);">
+                        &divide; Relational Division (Enrolled in All CS Core)
+                    </button>
+                    <button class="btn btn-outline-primary btn-sm preset-sql-btn" data-sql="SELECT student_id, roll_number, first_name || ' ' || last_name as name FROM student WHERE status = 'Active' EXCEPT SELECT s.student_id, s.roll_number, s.first_name || ' ' || s.last_name FROM student s JOIN library_member lm ON s.user_id = lm.user_id JOIN book_issue bi ON lm.member_id = bi.member_id;">
+                        &minus; Set Difference (Students with No Library Borrows)
+                    </button>
+                    <button class="btn btn-outline-primary btn-sm preset-sql-btn" data-sql="SELECT c.course_code, c.title, a.title as assessment_name, COUNT(ar.result_id) as graded_students, ROUND(AVG(ar.marks_obtained), 2) as average_marks FROM assessment a JOIN section sec ON a.section_id = sec.section_id JOIN course c ON sec.course_id = c.course_id JOIN assessment_result ar ON a.assessment_id = ar.assessment_id GROUP BY c.course_code, c.title, a.title, a.max_marks HAVING COUNT(ar.result_id) >= 3;">
+                        &sum; Aggregation with HAVING
+                    </button>
+                    <button class="btn btn-outline-primary btn-sm preset-sql-btn" data-sql="SELECT roll_number, student_name, course_code, attendance_percentage, examination_eligibility FROM v_attendance_shortage WHERE examination_eligibility = 'DEBARRED_FROM_FINAL_EXAM';">
+                        ⚠️ 75% Attendance Shortage View
+                    </button>
+                    <button class="btn btn-outline-primary btn-sm preset-sql-btn" data-sql="SELECT * FROM v_defaulters;">
+                        💰 Outstanding Fee Defaulters View
+                    </button>
+                    <button class="btn btn-outline-primary btn-sm preset-sql-btn" data-sql="SELECT * FROM v_low_stock;">
+                        📦 Inventory Low Stock Thresholds
+                    </button>
+                    <button class="btn btn-outline-primary btn-sm preset-sql-btn" data-sql="SELECT * FROM v_overdue_books;">
+                        📚 Overdue Books with Fine Calculation
+                    </button>
+                </div>
+
+                <!-- Textarea Editor -->
+                <div class="mb-3">
+                    <textarea class="form-control sql-editor-textarea" id="sqlEditor" rows="6">SELECT roll_number, student_name, course_code, final_grade, gpa_points FROM v_student_transcript LIMIT 10;</textarea>
+                </div>
+
+                <!-- Live Results Table -->
+                <div id="resultsCard" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="fw-bold mb-0 text-success">
+                            <i class="fa-solid fa-table me-1"></i> Result Dataset (<span id="rowCount">0</span> rows)
+                        </h6>
+                        <span class="badge bg-success" id="execStatus">OK</span>
+                    </div>
+
+                    <div id="tableOutput" class="table-responsive border" style="max-height: 450px; overflow-y: auto;">
+                        <!-- Dynamic output -->
+                    </div>
+                </div>
+
+                <div id="errorAlert" class="alert alert-danger mt-3" style="display: none;">
+                    <strong>Execution Error:</strong> <span id="errorMsg"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const sqlEditor = document.getElementById("sqlEditor");
+    const runSqlBtn = document.getElementById("runSqlBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const resultsCard = document.getElementById("resultsCard");
+    const tableOutput = document.getElementById("tableOutput");
+    const rowCount = document.getElementById("rowCount");
+    const errorAlert = document.getElementById("errorAlert");
+    const errorMsg = document.getElementById("errorMsg");
+
+    document.querySelectorAll(".preset-sql-btn").forEach(btn => {
+        btn.addEventListener("click", function() {
+            sqlEditor.value = this.getAttribute("data-sql");
+        });
+    });
+
+    clearBtn.addEventListener("click", function() {
+        sqlEditor.value = "";
+        resultsCard.style.display = "none";
+        errorAlert.style.display = "none";
+    });
+
+    runSqlBtn.addEventListener("click", async function() {
+        const sql = sqlEditor.value.trim();
+        if (!sql) {
+            alert("SQL query cannot be empty.");
+            return;
+        }
+
+        runSqlBtn.disabled = true;
+        runSqlBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Running...';
+        resultsCard.style.display = "none";
+        errorAlert.style.display = "none";
+
+        try {
+            const res = await fetch("/api/execute-sql", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ sql: sql })
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                rowCount.innerText = data.row_count;
+                resultsCard.style.display = "block";
+
+                if (data.rows && data.rows.length > 0) {
+                    const cols = data.columns || Object.keys(data.rows[0]);
+                    let html = `<table class="table table-hover table-striped table-bordered align-middle mb-0"><thead class="table-dark"><tr>`;
+                    cols.forEach(c => html += `<th>${c}</th>`);
+                    html += `</tr></thead><tbody>`;
+
+                    data.rows.forEach(r => {
+                        html += `<tr>`;
+                        cols.forEach(c => html += `<td>${r[c] !== null && r[c] !== undefined ? r[c] : '<span class="text-muted">NULL</span>'}</td>`);
+                        html += `</tr>`;
+                    });
+                    html += `</tbody></table>`;
+                    tableOutput.innerHTML = html;
+                } else {
+                    tableOutput.innerHTML = `<div class="p-3 text-center text-muted">Query executed successfully, returning 0 rows.</div>`;
+                }
+            } else {
+                errorAlert.style.display = "block";
+                errorMsg.innerText = data.error;
+            }
+        } catch (err) {
+            errorAlert.style.display = "block";
+            errorMsg.innerText = "Network / Request failed: " + err;
+        } finally {
+            runSqlBtn.disabled = false;
+            runSqlBtn.innerHTML = '<i class="fa-solid fa-play me-1"></i> Execute Query';
+        }
+    });
+});
+</script>
+{% endblock %}

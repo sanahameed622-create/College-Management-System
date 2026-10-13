@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}AI Assistant - AcademiaPro{% endblock %}
+{% block page_title %}AI Relational Query Assistant & Audit Monitor{% endblock %}
+{% block page_subtitle %}Strictly sandboxed read-only query generator operating exclusively on secure analytical views{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Left Column: Interactive Chat & Query Simulator -->
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold">
+                    <i class="fa-solid fa-robot text-primary me-2"></i>Natural Language Query Console
+                </h6>
+                <span class="badge bg-success-subtle text-success border border-success">
+                    <i class="fa-solid fa-lock me-1"></i> Read-Only SELECT Sandbox Enforced
+                </span>
+            </div>
+
+            <div class="card-body">
+                <!-- User Persona Selection -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">Active Persona / User</label>
+                        <select class="form-select form-select-sm" id="userSelect">
+                            <option value="10" data-role="Student">Ali Khan (Student - BSCS-22-01)</option>
+                            <option value="11" data-role="Student">Bilal Ahmed (Student - BSCS-22-02)</option>
+                            <option value="2" data-role="Teacher">Dr. Tariq Mahmood (Teacher)</option>
+                            <option value="1" data-role="Admin">Engr. Shahbaz Ahmed (Administrator)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">User Role</label>
+                        <input type="text" class="form-control form-control-sm bg-light" id="roleDisplay" value="Student" readonly>
+                    </div>
+                </div>
+
+                <!-- Pre-built Question Presets -->
+                <label class="form-label fw-semibold small">Quick Inquiry Prompts (Lecture Presets)</label>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <button class="btn btn-outline-secondary btn-sm preset-btn" data-query="What is my current semester fee status and balance?">
+                        💰 Fee Status
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm preset-btn" data-query="Show my official transcript grades and GPA.">
+                        🎓 My Transcript
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm preset-btn" data-query="Check my attendance and examination eligibility.">
+                        📋 My Attendance
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm preset-btn" data-query="List all overdue books across the library.">
+                        📚 Overdue Books
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm preset-btn" data-query="Show me all low stock inventory items below reorder level.">
+                        📦 Low Stock Items
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm preset-btn text-danger" data-query="DELETE FROM student WHERE student_id = 1;">
+                        ⚠️ Malicious Query Test (Simulate Attack)
+                    </button>
+                </div>
+
+                <!-- Query Input Box -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Natural Language Prompt or SQL Test</label>
+                    <textarea class="form-control" id="queryInput" rows="3" placeholder="e.g. Meri attendance kitni hai? Or ask about fees, courses..."></textarea>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted"><i class="fa-solid fa-shield-halved text-success"></i> Strict non-SELECT prevention enabled</small>
+                    <button class="btn btn-primary px-4" id="submitBtn">
+                        <i class="fa-solid fa-paper-plane me-1"></i> Synthesize & Query
+                    </button>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Execution Result Display -->
+                <div id="resultContainer" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="fw-bold mb-0">Execution Result & Audit Footprint</h6>
+                        <span id="statusBadge" class="badge bg-success">SUCCESS</span>
+                    </div>
+
+                    <div class="mb-2">
+                        <small class="text-muted d-block fw-semibold">Generated Read-Only SQL:</small>
+                        <div class="code-snippet p-2 mt-1" id="generatedSqlDisplay">SELECT * FROM ...</div>
+                    </div>
+
+                    <div id="queryOutputTable" class="table-responsive mt-3" style="max-height: 250px; overflow-y: auto;">
+                        <!-- Dynamic Result Table -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Audit Log of AI Inquiries -->
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-white border-bottom py-3">
+                <h6 class="mb-0 fw-bold">
+                    <i class="fa-solid fa-list-check text-secondary me-2"></i>ai.message Audit Log (Live)
+                </h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive border-0" style="max-height: 580px; overflow-y: auto;">
+                    <table class="table table-hover align-middle mb-0" id="aiLogTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>User</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Summary / SQL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for m in messages %}
+                            <tr>
+                                <td class="fw-bold">{{ m.full_name }}</td>
+                                <td><span class="badge bg-secondary">{{ m.user_role }}</span></td>
+                                <td>
+                                    {% if m.execution_status == 'SUCCESS' %}
+                                    <span class="badge bg-success">SUCCESS</span>
+                                    {% elif m.execution_status == 'REJECTED_SECURITY' %}
+                                    <span class="badge bg-danger">SECURITY_REJECT</span>
+                                    {% else %}
+                                    <span class="badge bg-warning text-dark">{{ m.execution_status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="small fw-semibold text-truncate" style="max-width: 180px;">{{ m.user_query }}</div>
+                                    <small class="text-muted d-block">{{ m.response_summary }}</small>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const userSelect = document.getElementById("userSelect");
+    const roleDisplay = document.getElementById("roleDisplay");
+    const queryInput = document.getElementById("queryInput");
+    const submitBtn = document.getElementById("submitBtn");
+    const resultContainer = document.getElementById("resultContainer");
+    const statusBadge = document.getElementById("statusBadge");
+    const generatedSqlDisplay = document.getElementById("generatedSqlDisplay");
+    const queryOutputTable = document.getElementById("queryOutputTable");
+
+    userSelect.addEventListener("change", function() {
+        const selectedOpt = userSelect.options[userSelect.selectedIndex];
+        roleDisplay.value = selectedOpt.getAttribute("data-role");
+    });
+
+    document.querySelectorAll(".preset-btn").forEach(btn => {
+        btn.addEventListener("click", function() {
+            queryInput.value = this.getAttribute("data-query");
+        });
+    });
+
+    submitBtn.addEventListener("click", async function() {
+        const queryText = queryInput.value.trim();
+        if (!queryText) {
+            alert("Please type an inquiry or select a preset.");
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Processing...';
+
+        try {
+            const res = await fetch("/api/ai-query", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    user_id: userSelect.value,
+                    user_role: roleDisplay.value,
+                    query_text: queryText
+                })
+            });
+            const data = await res.json();
+
+            resultContainer.style.display = "block";
+            generatedSqlDisplay.innerText = data.sql || "N/A";
+
+            if (data.success) {
+                statusBadge.className = "badge bg-success";
+                statusBadge.innerText = "SUCCESS (ALLOWED)";
+
+                if (data.rows && data.rows.length > 0) {
+                    const cols = Object.keys(data.rows[0]);
+                    let tableHtml = `<table class="table table-bordered table-sm"><thead><tr class="table-light">`;
+                    cols.forEach(c => tableHtml += `<th>${c}</th>`);
+                    tableHtml += `</tr></thead><tbody>`;
+
+                    data.rows.forEach(r => {
+                        tableHtml += `<tr>`;
+                        cols.forEach(c => tableHtml += `<td>${r[c] !== null ? r[c] : '-'}</td>`);
+                        tableHtml += `</tr>`;
+                    });
+                    tableHtml += `</tbody></table>`;
+                    queryOutputTable.innerHTML = tableHtml;
+                } else {
+                    queryOutputTable.innerHTML = `<div class="alert alert-info py-2">Query returned 0 rows.</div>`;
+                }
+            } else {
+                statusBadge.className = "badge bg-danger";
+                statusBadge.innerText = data.status || "REJECTED";
+                queryOutputTable.innerHTML = `<div class="alert alert-danger py-2"><strong>Security Interception:</strong> ${data.error}</div>`;
+            }
+        } catch (err) {
+            alert("Error sending query: " + err);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane me-1"></i> Synthesize & Query';
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+
+{% block title %}Inventory & Labs - AcademiaPro{% endblock %}
+{% block page_title %}College Inventory, Lab Assets & Store Management{% endblock %}
+{% block page_subtitle %}Departmental Labs, Hardware Allocation, Reorder Deficit Warning and Asset Tracking{% endblock %}
+
+{% block content %}
+<ul class="nav nav-tabs mb-4" id="inventoryTabs" role="tablist">
+    <li class="nav-item">
+        <button class="nav-link active" id="lowstock-tab" data-bs-toggle="tab" data-bs-target="#lowstock" type="button">
+            <i class="fa-solid fa-triangle-exclamation me-1 text-warning"></i> Low Stock Alerts ({{ low_stock|length }})
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="items-tab" data-bs-toggle="tab" data-bs-target="#items" type="button">
+            <i class="fa-solid fa-boxes-stacked me-1"></i> Inventory Stock Items
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="rooms-tab" data-bs-toggle="tab" data-bs-target="#rooms" type="button">
+            <i class="fa-solid fa-flask-vial me-1"></i> Department Rooms & Labs
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="issuances-tab" data-bs-toggle="tab" data-bs-target="#issuances" type="button">
+            <i class="fa-solid fa-dolly me-1"></i> Asset Issuances
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="categories-tab" data-bs-toggle="tab" data-bs-target="#categories" type="button">
+            <i class="fa-solid fa-tags me-1"></i> Asset Categories
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="inventoryTabContent">
+    <!-- Low Stock Alert View -->
+    <div class="tab-pane fade show active" id="lowstock" role="tabpanel">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-warning text-dark py-3 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold"><i class="fa-solid fa-triangle-exclamation me-2"></i>Critical Reorder Threshold Alerts (v_low_stock)</h6>
+                <span class="badge bg-dark text-white">Action: Generate Purchase Order</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive border-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Item Code</th>
+                                <th>Item Name</th>
+                                <th>Category</th>
+                                <th>Total Stock</th>
+                                <th>Available</th>
+                                <th>Min Reorder Level</th>
+                                <th>Shortage Quantity</th>
+                                <th>Deployed Locations</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for itm in low_stock %}
+                            <tr>
+                                <td class="fw-bold"><code>{{ itm.item_code }}</code></td>
+                                <td>{{ itm.item_name }}</td>
+                                <td><span class="badge bg-secondary">{{ itm.category_name }}</span></td>
+                                <td>{{ itm.total_stock }} {{ itm.unit_of_measure }}</td>
+                                <td class="text-danger fw-bold">{{ itm.available_stock }} {{ itm.unit_of_measure }}</td>
+                                <td>{{ itm.min_reorder_level }} {{ itm.unit_of_measure }}</td>
+                                <td class="fw-bold text-danger">{{ itm.reorder_shortage_quantity }} {{ itm.unit_of_measure }} Short</td>
+                                <td><small class="text-muted">{{ itm.deployed_locations }}</small></td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="8" class="text-center text-muted py-3">All inventory is above safe threshold levels.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Items -->
+    <div class="tab-pane fade" id="items" role="tabpanel">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-body p-0">
+                <div class="table-responsive border-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Item Code</th>
+                                <th>Item Name</th>
+                                <th>Category</th>
+                                <th>Unit</th>
+                                <th>Total Stock</th>
+                                <th>Available Stock</th>
+                                <th>Reorder Level</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for itm in items %}
+                            <tr>
+                                <td class="fw-bold"><code>{{ itm.item_code }}</code></td>
+                                <td>{{ itm.item_name }}</td>
+                                <td><span class="badge bg-secondary">{{ itm.category_name }}</span></td>
+                                <td>{{ itm.unit_of_measure }}</td>
+                                <td>{{ itm.total_stock }}</td>
+                                <td class="fw-bold {% if itm.available_stock <= itm.min_reorder_level %}text-danger{% else %}text-success{% endif %}">
+                                    {{ itm.available_stock }}
+                                </td>
+                                <td>{{ itm.min_reorder_level }}</td>
+                                <td>
+                                    {% if itm.available_stock <= itm.min_reorder_level %}
+                                    <span class="badge bg-warning text-dark">Low Stock</span>
+                                    {% else %}
+                                    <span class="badge bg-success">Optimal</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rooms & Labs -->
+    <div class="tab-pane fade" id="rooms" role="tabpanel">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-white border-bottom py-3">
+                <h6 class="mb-0 fw-bold"><i class="fa-solid fa-flask-vial me-2 text-primary"></i>Department Rooms & Labs</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive border-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Room Number</th>
+                                <th>Room / Lab Name</th>
+                                <th>Department</th>
+                                <th>Room Type</th>
+                                <th>Capacity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in rooms %}
+                            <tr>
+                                <td class="fw-bold">{{ r.room_number }}</td>
+                                <td>{{ r.room_name }}</td>
+                                <td><span class="badge bg-info-subtle text-info border">{{ r.dept_code }} - {{ r.dept_name }}</span></td>
+                                <td><span class="badge bg-dark">{{ r.room_type }}</span></td>
+                                <td>{{ r.capacity }} Stations</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Issuances -->
+    <div class="tab-pane fade" id="issuances" role="tabpanel">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-body p-0">
+                <div class="table-responsive border-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Issuance #</th>
+                                <th>Item Code</th>
+                                <th>Item Name</th>
+                                <th>Allocated Room</th>
+                                <th>Quantity</th>
+                                <th>Custodian User</th>
+                                <th>Issue Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for isi in issuances %}
+                            <tr>
+                                <td class="fw-bold">#{{ isi.issuance_id }}</td>
+                                <td><code>{{ isi.item_code }}</code></td>
+                                <td>{{ isi.item_name }}</td>
+                                <td><span class="badge bg-primary-subtle text-primary border">{{ isi.room_number }}</span></td>
+                                <td class="fw-bold">{{ isi.quantity }}</td>
+                                <td>{{ isi.issued_to_name }}</td>
+                                <td>{{ isi.issue_date }}</td>
+                                <td><span class="badge bg-success">{{ isi.status }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="tab-pane fade" id="categories" role="tabpanel">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-body p-0">
+                <div class="table-responsive border-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Category ID</th>
+                                <th>Category Name</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cat in categories %}
+                            <tr>
+                                <td>#{{ cat.category_id }}</td>
+                                <td class="fw-bold text-primary">{{ cat.category_name }}</td>
+                                <td>{{ cat.description }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - AcademiaPro{% endblock %}
+{% block page_title %}Institutional Dashboard Overview{% endblock %}
+{% block page_subtitle %}Real-time synchronized relational indicators across 5 core modules{% endblock %}
+
+{% block content %}
+<!-- KPI Metrics Row -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="card-stat">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stat-label">Active Students</div>
+                    <div class="stat-value text-primary">{{ kpis.active_students }}</div>
+                </div>
+                <div class="stat-icon bg-primary-subtle text-primary">
+                    <i class="fa-solid fa-user-graduate"></i>
+                </div>
+            </div>
+            <small class="text-success mt-2 d-block"><i class="fa-solid fa-arrow-up"></i> 100% active in current term</small>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="card-stat">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stat-label">Fee Collections</div>
+                    <div class="stat-value text-success">{{ kpis.fee_collected }}</div>
+                </div>
+                <div class="stat-icon bg-success-subtle text-success">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+            </div>
+            <small class="text-muted mt-2 d-block">Receivable: {{ kpis.fee_receivable }}</small>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="card-stat">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stat-label">Fee Defaulters</div>
+                    <div class="stat-value text-danger">{{ kpis.defaulters }}</div>
+                </div>
+                <div class="stat-icon bg-danger-subtle text-danger">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                </div>
+            </div>
+            <small class="text-danger mt-2 d-block"><i class="fa-solid fa-triangle-exclamation"></i> Financial hold applied</small>
+        </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+        <div class="card-stat">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stat-label">Low Stock Items</div>
+                    <div class="stat-value text-warning">{{ kpis.low_stock_alerts }}</div>
+                </div>
+                <div class="stat-icon bg-warning-subtle text-warning">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+            </div>
+            <small class="text-warning mt-2 d-block">Below reorder threshold</small>
+        </div>
+    </div>
+</div>
+
+<!-- Alert Tables Grid -->
+<div class="row g-4">
+    <!-- Fee Defaulters View Preview -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold text-danger">
+                    <i class="fa-solid fa-ban me-2"></i>Fee Defaulters View (v_defaulters)
+                </h6>
+                <a href="{{ url_for('finance') }}" class="btn btn-outline-danger btn-sm">Full View</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive border-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Roll No</th>
+                                <th>Student</th>
+                                <th>Balance Due</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for d in defaulters %}
+                            <tr>
+                                <td class="fw-bold">{{ d.roll_number }}</td>
+                                <td>{{ d.student_name }}</td>
+                                <td class="text-danger fw-bold">PKR {{ "{:,.2f}".format(d.total_outstanding_liability) }}</td>
+                                <td>
+                                    <span class="badge bg-danger-subtle text-danger">{{ d.defaulter_status }}</span>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="4" class="text-center text-muted py-3">No pending defaulters found.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attendance Shortage Alert Preview -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold text-danger">
+                    <i class="fa-solid fa-person-circle-exclamation me-2"></i>Attendance Shortage (&lt;75% Barred)
+                </h6>
+                <a href="{{ url_for('academics') }}" class="btn btn-outline-primary btn-sm">View Academics</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive border-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Roll No</th>
+                                <th>Student</th>
+                                <th>Course</th>
+                                <th>Attendance %</th>
+                                <th>Exam Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for a in attendance_alerts %}
+                            <tr>
+                                <td class="fw-bold">{{ a.roll_number }}</td>
+                                <td>{{ a.student_name }}</td>
+                                <td>{{ a.course_code }}</td>
+                                <td class="text-danger fw-bold">{{ a.attendance_percentage }}%</td>
+                                <td>
+                                    <span class="badge bg-danger">DEBARRED</span>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="5" class="text-center text-muted py-3">No students below 75% attendance threshold.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Low Stock Inventory Alert -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold text-warning">
+                    <i class="fa-solid fa-box-open me-2"></i>Inventory Low Stock (v_low_stock)
+                </h6>
+                <a href="{{ url_for('inventory') }}" class="btn btn-outline-warning btn-sm">Manage Inventory</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive border-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Item Code</th>
+                                <th>Item Name</th>
+                                <th>Category</th>
+                                <th>Available / Reorder</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in low_stock %}
+                            <tr>
+                                <td class="fw-semibold">{{ item.item_code }}</td>
+                                <td>{{ item.item_name }}</td>
+                                <td><span class="badge bg-secondary">{{ item.category_name }}</span></td>
+                                <td class="text-danger fw-bold">{{ item.available_stock }} / {{ item.min_reorder_level }} {{ item.unit_of_measure }}</td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="4" class="text-center text-muted py-3">All inventory stock is optimal.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overdue Library Books -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold text-info">
+                    <i class="fa-solid fa-clock me-2"></i>Overdue Library Returns (v_overdue_books)
+                </h6>
+                <a href="{{ url_for('library') }}" class="btn btn-outline-info btn-sm">Library Desk</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive border-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Book Title</th>
+                                <th>Borrower</th>
+                                <th>Due Date</th>
+                                <th>Fine Calculated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for b in overdue_books %}
+                            <tr>
+                                <td class="fw-semibold">{{ b.book_title }}</td>
+                                <td>{{ b.borrower_name }}</td>
+                                <td class="text-muted">{{ b.due_date }}</td>
+                                <td class="text-danger fw-bold">PKR {{ "{:,.2f}".format(b.calculated_fine) }}</td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="4" class="text-center text-muted py-3">No overdue borrowings currently.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

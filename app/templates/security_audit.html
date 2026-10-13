@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}Security & Audit - AcademiaPro{% endblock %}
+{% block page_title %}Security Access Control (DCL) & System Audit Logs{% endblock %}
+{% block page_subtitle %}Role-Based Access Control (RBAC), Privilege Matrices, and Immutable Audit Trail Logs{% endblock %}
+
+{% block content %}
+<ul class="nav nav-tabs mb-4" id="securityTabs" role="tablist">
+    <li class="nav-item">
+        <button class="nav-link active" id="audit-tab" data-bs-toggle="tab" data-bs-target="#audit" type="button">
+            <i class="fa-solid fa-clock-rotate-left me-1 text-primary"></i> System Audit Trail (audit_log)
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button">
+            <i class="fa-solid fa-users-gear me-1"></i> User Accounts & Credentials
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="roles-tab" data-bs-toggle="tab" data-bs-target="#roles" type="button">
+            <i class="fa-solid fa-user-shield me-1"></i> RBAC Matrix & DCL Grants
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="securityTabContent">
+    <!-- Audit Log -->
+    <div class="tab-pane fade show active" id="audit" role="tabpanel">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold"><i class="fa-solid fa-fingerprint me-2 text-danger"></i>Transaction & DML Audit Log</h6>
+                <span class="badge bg-dark">Immutable Forensic Trail</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive border-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Log ID</th>
+                                <th>Action Type</th>
+                                <th>Schema</th>
+                                <th>Table</th>
+                                <th>Record ID</th>
+                                <th>Details / Snapshot</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in audit_logs %}
+                            <tr>
+                                <td class="fw-bold">#{{ log.log_id }}</td>
+                                <td>
+                                    <span class="badge {% if log.action_type == 'INSERT' %}bg-success{% elif log.action_type == 'UPDATE' %}bg-warning text-dark{% elif log.action_type == 'DELETE' %}bg-danger{% else %}bg-primary{% endif %}">
+                                        {{ log.action_type }}
+                                    </span>
+                                </td>
+                                <td><code>{{ log.schema_name }}</code></td>
+                                <td><code>{{ log.table_name }}</code></td>
+                                <td>{{ log.record_id or '-' }}</td>
+                                <td><small class="text-muted">{{ log.new_data or log.old_data or 'Standard transaction recorded' }}</small></td>
+                                <td><small>{{ log.timestamp }}</small></td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-3">
+                                    Audit logging system active. Triggers monitor academics, finance, and inventory transactions.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Accounts -->
+    <div class="tab-pane fade" id="users" role="tabpanel">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-body p-0">
+                <div class="table-responsive border-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>User ID</th>
+                                <th>Username</th>
+                                <th>Full Name</th>
+                                <th>Assigned Role</th>
+                                <th>Official Email</th>
+                                <th>Account Status</th>
+                                <th>Created At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in users %}
+                            <tr>
+                                <td class="fw-bold">#{{ u.user_id }}</td>
+                                <td><code>{{ u.username }}</code></td>
+                                <td class="fw-semibold">{{ u.full_name }}</td>
+                                <td>
+                                    <span class="badge {% if u.role_name == 'Admin' %}bg-danger{% elif u.role_name == 'Teacher' %}bg-primary{% elif u.role_name == 'Student' %}bg-info text-dark{% elif u.role_name == 'Accountant' %}bg-success{% else %}bg-secondary{% endif %}">
+                                        {{ u.role_name }}
+                                    </span>
+                                </td>
+                                <td>{{ u.email }}</td>
+                                <td>
+                                    {% if u.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Disabled</span>
+                                    {% endif %}
+                                </td>
+                                <td><small class="text-muted">{{ u.created_at }}</small></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Roles & RBAC Matrix -->
+    <div class="tab-pane fade" id="roles" role="tabpanel">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-white border-bottom py-3">
+                <h6 class="mb-0 fw-bold"><i class="fa-solid fa-table-cells me-2 text-primary"></i>DCL Role Permissions Matrix</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive border-0">
+                    <table class="table table-bordered align-middle mb-0 text-center">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="text-start">Schema / Entity Module</th>
+                                <th>Admin Role</th>
+                                <th>Teacher Role</th>
+                                <th>Student Role</th>
+                                <th>Accountant</th>
+                                <th>Librarian</th>
+                                <th>StoreKeeper</th>
+                                <th>AI Sandbox</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-start fw-semibold">academics.*</td>
+                                <td class="text-success fw-bold">ALL</td>
+                                <td class="text-primary">SELECT / GRADE</td>
+                                <td class="text-info">SELECT (Own)</td>
+                                <td class="text-muted">SELECT</td>
+                                <td class="text-muted">NONE</td>
+                                <td class="text-muted">NONE</td>
+                                <td class="text-warning">VIEWS ONLY</td>
+                            </tr>
+                            <tr>
+                                <td class="text-start fw-semibold">finance.*</td>
+                                <td class="text-success fw-bold">ALL</td>
+                                <td class="text-muted">NONE</td>
+                                <td class="text-info">SELECT (Own)</td>
+                                <td class="text-success fw-bold">ALL</td>
+                                <td class="text-primary">FINES ONLY</td>
+                                <td class="text-muted">NONE</td>
+                                <td class="text-warning">VIEWS ONLY</td>
+                            </tr>
+                            <tr>
+                                <td class="text-start fw-semibold">library.*</td>
+                                <td class="text-success fw-bold">ALL</td>
+                                <td class="text-info">SELECT</td>
+                                <td class="text-info">SELECT</td>
+                                <td class="text-muted">NONE</td>
+                                <td class="text-success fw-bold">ALL</td>
+                                <td class="text-muted">NONE</td>
+                                <td class="text-warning">VIEWS ONLY</td>
+                            </tr>
+                            <tr>
+                                <td class="text-start fw-semibold">inventory.*</td>
+                                <td class="text-success fw-bold">ALL</td>
+                                <td class="text-info">VIEW LABS</td>
+                                <td class="text-muted">NONE</td>
+                                <td class="text-muted">NONE</td>
+                                <td class="text-muted">NONE</td>
+                                <td class="text-success fw-bold">ALL</td>
+                                <td class="text-warning">VIEWS ONLY</td>
+                            </tr>
+                            <tr>
+                                <td class="text-start fw-semibold">system_core.audit_log</td>
+                                <td class="text-success fw-bold">ALL</td>
+                                <td class="text-muted">NONE</td>
+                                <td class="text-muted">NONE</td>
+                                <td class="text-muted">NONE</td>
+                                <td class="text-muted">NONE</td>
+                                <td class="text-muted">NONE</td>
+                                <td class="text-muted">NONE</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

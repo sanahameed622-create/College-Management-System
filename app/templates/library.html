@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}Library - AcademiaPro{% endblock %}
+{% block page_title %}Library Circulation & Catalog Management{% endblock %}
+{% block page_subtitle %}Books, Physical Barcoded Copies, Member Borrowing Quotas and Overdue Fine Generation{% endblock %}
+
+{% block content %}
+<ul class="nav nav-tabs mb-4" id="libraryTabs" role="tablist">
+    <li class="nav-item">
+        <button class="nav-link active" id="overdue-tab" data-bs-toggle="tab" data-bs-target="#overdue" type="button">
+            <i class="fa-solid fa-clock me-1 text-danger"></i> Overdue Issues ({{ overdue_books|length }})
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="catalog-tab" data-bs-toggle="tab" data-bs-target="#catalog" type="button">
+            <i class="fa-solid fa-book me-1"></i> Books Catalog
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="copies-tab" data-bs-toggle="tab" data-bs-target="#copies" type="button">
+            <i class="fa-solid fa-barcode me-1"></i> Physical Copies & Shelves
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="issues-tab" data-bs-toggle="tab" data-bs-target="#issues" type="button">
+            <i class="fa-solid fa-hand-holding-hand me-1"></i> Circulation History
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link" id="members-tab" data-bs-toggle="tab" data-bs-target="#members" type="button">
+            <i class="fa-solid fa-id-card me-1"></i> Library Members
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="libraryTabContent">
+    <!-- Overdue Issues -->
+    <div class="tab-pane fade show active" id="overdue" role="tabpanel">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-danger text-white py-3 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold"><i class="fa-solid fa-bell me-2"></i>Overdue Borrowings View (v_overdue_books)</h6>
+                <small>Auto fine formula: Days Overdue &times; PKR 10.00/day</small>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive border-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Issue #</th>
+                                <th>Book Title</th>
+                                <th>Barcode</th>
+                                <th>Borrower</th>
+                                <th>Issue Date</th>
+                                <th>Due Date</th>
+                                <th>Days Overdue</th>
+                                <th>Accrued Fine</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for b in overdue_books %}
+                            <tr>
+                                <td class="fw-bold">#{{ b.issue_id }}</td>
+                                <td>{{ b.book_title }}</td>
+                                <td><code>{{ b.barcode }}</code></td>
+                                <td>{{ b.borrower_name }} ({{ b.member_type }})</td>
+                                <td>{{ b.issue_date }}</td>
+                                <td class="text-danger fw-semibold">{{ b.due_date }}</td>
+                                <td><span class="badge bg-danger">{{ b.days_overdue }} Days</span></td>
+                                <td class="text-danger fw-bold">PKR {{ "{:,.2f}".format(b.calculated_fine) }}</td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="8" class="text-center text-muted py-3">No overdue books at this time.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Books Catalog -->
+    <div class="tab-pane fade" id="catalog" role="tabpanel">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-body p-0">
+                <div class="table-responsive border-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ISBN</th>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Publisher</th>
+                                <th>Year</th>
+                                <th>Category</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for bk in books %}
+                            <tr>
+                                <td class="fw-bold"><code>{{ bk.isbn }}</code></td>
+                                <td>{{ bk.title }}</td>
+                                <td>{{ bk.author }}</td>
+                                <td>{{ bk.publisher }}</td>
+                                <td>{{ bk.publication_year }}</td>
+                                <td><span class="badge bg-secondary">{{ bk.category }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Physical Copies -->
+    <div class="tab-pane fade" id="copies" role="tabpanel">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-body p-0">
+                <div class="table-responsive border-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Barcode</th>
+                                <th>Book Title</th>
+                                <th>Edition</th>
+                                <th>Shelf Location</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in copies %}
+                            <tr>
+                                <td class="fw-bold"><code>{{ c.barcode }}</code></td>
+                                <td>{{ c.book_title }}</td>
+                                <td>{{ c.edition }}</td>
+                                <td><i class="fa-solid fa-location-dot text-primary me-1"></i> {{ c.shelf_location }}</td>
+                                <td>
+                                    {% if c.status == 'Available' %}
+                                    <span class="badge bg-success">Available</span>
+                                    {% elif c.status == 'Issued' %}
+                                    <span class="badge bg-warning text-dark">Issued</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{{ c.status }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Circulation History -->
+    <div class="tab-pane fade" id="issues" role="tabpanel">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-body p-0">
+                <div class="table-responsive border-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Issue #</th>
+                                <th>Book Title</th>
+                                <th>Barcode</th>
+                                <th>Borrower</th>
+                                <th>Issue Date</th>
+                                <th>Due Date</th>
+                                <th>Return Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for iss in issues %}
+                            <tr>
+                                <td class="fw-bold">#{{ iss.issue_id }}</td>
+                                <td>{{ iss.book_title }}</td>
+                                <td><code>{{ iss.barcode }}</code></td>
+                                <td>{{ iss.member_name }}</td>
+                                <td>{{ iss.issue_date }}</td>
+                                <td>{{ iss.due_date }}</td>
+                                <td>{{ iss.return_date or 'Not Returned' }}</td>
+                                <td>
+                                    {% if iss.status == 'Returned' %}
+                                    <span class="badge bg-success">Returned</span>
+                                    {% elif iss.status == 'Issued' %}
+                                    <span class="badge bg-primary">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">{{ iss.status }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Members -->
+    <div class="tab-pane fade" id="members" role="tabpanel">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-body p-0">
+                <div class="table-responsive border-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Membership #</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Type</th>
+                                <th>Max Allowed Books</th>
+                                <th>Member Since</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for m in members %}
+                            <tr>
+                                <td class="fw-bold text-primary">{{ m.membership_number }}</td>
+                                <td>{{ m.full_name }}</td>
+                                <td>{{ m.email }}</td>
+                                <td><span class="badge bg-info-subtle text-info border">{{ m.member_type }}</span></td>
+                                <td>{{ m.max_allowed_books }} Books</td>
+                                <td>{{ m.joined_date }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
