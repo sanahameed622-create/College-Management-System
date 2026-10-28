@@ -37,6 +37,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="{{ url_for('student_desk') }}" target="_blank" class="nav-link {% if request.path == '/student-desk' %}active{% endif %}" style="color: #38bdf8;">
+                            <i class="fa-solid fa-graduation-cap text-info"></i> Student Self-Service Desk
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="{{ url_for('academics') }}" class="nav-link {% if request.path == '/academics' %}active{% endif %}">
                             <i class="fa-solid fa-chalkboard-user"></i> Academics (Inter & BS)
                         </a>

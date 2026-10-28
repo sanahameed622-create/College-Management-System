@@ -507,6 +507,139 @@ class DatabaseEngine:
             "courses": courses
         }
 
+    def get_student_portal_data(self, identifier: str) -> Optional[Dict[str, Any]]:
+        """Fetches comprehensive student records by roll number, cnic, or ID for the self-service portal."""
+        clean_id = identifier.strip()
+        if not clean_id:
+            return None
+
+        sql = """
+        SELECT s.*, p.program_name, p.program_code, p.degree_level, d.dept_name
+        FROM student s
+        JOIN program p ON s.program_id = p.program_id
+        JOIN department d ON p.dept_id = d.dept_id
+        WHERE LOWER(s.roll_number) = LOWER(?) OR s.cnic = ? OR CAST(s.student_id AS TEXT) = ?
+        LIMIT 1;
+        """
+        rows = self.query(sql, (clean_id, clean_id, clean_id))
+        if not rows:
+            return None
+
+        student = rows[0]
+        student_id = student["student_id"]
+
+        invoices = self.query("""
+            SELECT inv.*, sem.term_name || ' ' || sem.academic_year as semester_term
+            FROM student_invoice inv
+            LEFT JOIN semester sem ON inv.semester_id = sem.semester_id
+            WHERE inv.student_id = ?
+            ORDER BY inv.invoice_id DESC;
+        """, (student_id,))
+
+        transcripts = self.query("""
+            SELECT * FROM v_student_transcript
+            WHERE student_id = ?
+            ORDER BY course_code ASC;
+        """, (student_id,))
+
+        attendance = self.query("""
+            SELECT * FROM v_attendance_shortage
+            WHERE student_id = ?;
+        """, (student_id,))
+
+        payments = self.query("""
+            SELECT p.*, inv.invoice_number
+            FROM fee_payment p
+            JOIN student_invoice inv ON p.invoice_id = inv.invoice_id
+            WHERE inv.student_id = ?
+            ORDER BY p.payment_id DESC;
+        """, (student_id,))
+
+        college = self.get_college_profile()
+
+        total_fee = sum(inv["total_amount"] for inv in invoices) if invoices else 0.0
+        paid_fee = sum(inv["paid_amount"] for inv in invoices) if invoices else 0.0
+        balance_due = sum(inv["balance_due"] for inv in invoices) if invoices else 0.0
+
+        valid_grades = [t["gpa_points"] for t in transcripts if t["gpa_points"] is not None]
+        avg_gpa = round(sum(valid_grades) / len(valid_grades), 2) if valid_grades else 0.0
+
+        valid_att = [a["attendance_percentage"] for a in attendance if a["attendance_percentage"] is not None]
+        avg_att = round(sum(valid_att) / len(valid_att), 1) if valid_att else 100.0
+
+        return {
+            "student": student,
+            "invoices": invoices,
+            "transcripts": transcripts,
+            "attendance": attendance,
+            "payments": payments,
+            "college": college,
+            "summary": {
+                "total_fee": total_fee,
+                "paid_fee": paid_fee,
+                "balance_due": balance_due,
+                "gpa": avg_gpa,
+                "attendance_percentage": avg_att,
+                "invoice_count": len(invoices),
+                "course_count": len(transcripts)
+            }
+        }
+
+    def process_student_ai_inquiry(self, student_id: int, query_text: str) -> Dict[str, Any]:
+        """Offline AI assistant for student self-service queries."""
+        query_lower = query_text.lower().strip()
+        portal_data = self.get_student_portal_data(str(student_id))
+        if not portal_data:
+            return {"success": False, "answer": "Student record not found in system."}
+
+        student = portal_data["student"]
+        summary = portal_data["summary"]
+        transcripts = portal_data["transcripts"]
+        attendance = portal_data["attendance"]
+
+        if any(w in query_lower for w in ["fee", "dues", "balance", "challan", "pay", "voucher", "invoice"]):
+            if summary["balance_due"] > 0:
+                answer = (f"Hello {student['first_name']}! You currently have an outstanding fee balance of "
+                          f"PKR {summary['balance_due']:,.2f} (Total Billed: PKR {summary['total_fee']:,.2f}, "
+                          f"Paid: PKR {summary['paid_fee']:,.2f}). You can download your official 3-Part Bank Challan "
+                          f"directly using the green download button above.")
+            else:
+                answer = (f"Congratulations {student['first_name']}! Your college fees are 100% CLEAR with "
+                          f"PKR 0.00 balance due. All registered invoices have been settled.")
+            return {"success": True, "answer": answer, "topic": "Fee Status"}
+
+        elif any(w in query_lower for w in ["exam", "eligible", "eligibility", "admit", "slip", "roll no"]):
+            debarred = [a for a in attendance if a.get("examination_eligibility") == "DEBARRED_FROM_FINAL_EXAM"]
+            if debarred:
+                debarred_courses = ", ".join([d["course_code"] for d in debarred])
+                answer = (f"Notice for {student['first_name']}: Your overall attendance is {summary['attendance_percentage']}%. "
+                          f"You have an attendance shortage in: {debarred_courses}. Please consult your department head immediately.")
+            else:
+                answer = (f"Good news {student['first_name']}! You are ELIGIBLE to appear in the final examinations. "
+                          f"Your average attendance is {summary['attendance_percentage']}%. You can download your official "
+                          f"Roll Number Slip from the top button.")
+            return {"success": True, "answer": answer, "topic": "Exam Eligibility"}
+
+        elif any(w in query_lower for w in ["grade", "gpa", "transcript", "result", "marks", "course"]):
+            if transcripts:
+                course_list = ", ".join([f"{t['course_code']} ({t['final_grade'] or 'In Progress'})" for t in transcripts])
+                answer = (f"{student['first_name']}, your current Cumulative GPA is {summary['gpa']}. "
+                          f"Enrolled courses: {course_list}.")
+            else:
+                answer = f"{student['first_name']}, you are currently enrolled in {student['program_name']}. Exam grades are currently being compiled."
+            return {"success": True, "answer": answer, "topic": "Academic Performance"}
+
+        elif any(w in query_lower for w in ["id", "card", "profile", "father", "blood"]):
+            answer = (f"Student: {student['first_name']} {student['last_name']} | Roll No: {student['roll_number']} | "
+                      f"Father Name: {student['father_name']} | Program: {student['program_name']} ({student['part_or_year']}) | "
+                      f"Blood Group: {student['blood_group']}. You can download your printable PVC ID card from this portal.")
+            return {"success": True, "answer": answer, "topic": "Profile & ID"}
+
+        else:
+            answer = (f"Hello {student['first_name']}! I am your 24/7 AI Academic Assistant. "
+                      f"You can ask me about your fee dues, exam eligibility, GPA results, or download your ID card & challan!")
+            return {"success": True, "answer": answer, "topic": "General"}
+
     # ==========================================
     # SAFE AI QUERY ENGINE
     # ==========================================

@@ -22,12 +22,17 @@ def inject_global_context():
 @app.before_request
 def require_authentication():
     # Public endpoints that do not require login
-    public_endpoints = ['login', 'static']
+    public_endpoints = [
+        'login', 'logout', 'static',
+        'student_desk', 'api_student_ai',
+        'student_id_card', 'fee_challan', 'roll_number_slip'
+    ]
     if request.endpoint in public_endpoints:
         return
     # Check session
     if not session.get("logged_in"):
         return redirect(url_for("login"))
+
 
 # ==========================================
 # AUTHENTICATION & ACCESS CONTROL
@@ -58,6 +63,47 @@ def logout():
     session.clear()
     flash("You have successfully logged out of the ERP portal.", "info")
     return redirect(url_for("login"))
+
+# ==========================================
+# STUDENT SELF-SERVICE DESK (NO PASSWORD REQUIRED)
+# ==========================================
+@app.route("/student-desk", methods=["GET", "POST"])
+def student_desk():
+    query = request.args.get("roll_number", "").strip() or request.form.get("roll_number", "").strip()
+    student_data = None
+    not_found = False
+
+    if query:
+        student_data = db.get_student_portal_data(query)
+        if not student_data:
+            not_found = True
+
+    # Provide sample roll numbers for quick testing
+    sample_students = db.query("""
+        SELECT roll_number, first_name || ' ' || last_name as full_name, academic_tier, part_or_year
+        FROM student
+        ORDER BY student_id DESC
+        LIMIT 6;
+    """)
+
+    return render_template(
+        "student_desk.html",
+        student_data=student_data,
+        search_query=query,
+        not_found=not_found,
+        sample_students=sample_students
+    )
+
+@app.route("/api/student-ai", methods=["POST"])
+def api_student_ai():
+    data = request.get_json() or {}
+    student_id = data.get("student_id")
+    query_text = data.get("query_text", "")
+    if not student_id or not query_text:
+        return jsonify({"success": False, "answer": "Please provide a valid question."})
+
+    res = db.process_student_ai_inquiry(int(student_id), query_text)
+    return jsonify(res)
 
 # ==========================================
 # INSTITUTION WHITE-LABEL SETTINGS
