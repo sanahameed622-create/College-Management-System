@@ -23,7 +23,7 @@
             justify-content: center;
             overflow-x: hidden;
             position: relative;
-            padding: 24px;
+            padding: 24px 16px;
         }
 
         /* Ambient Glowing Emerald/Mint Orbs behind the Glass Wall */
@@ -37,15 +37,15 @@
             animation: floatOrb 12s infinite alternate ease-in-out;
         }
         .orb-1 {
-            width: 480px;
-            height: 480px;
+            width: 500px;
+            height: 500px;
             background: radial-gradient(circle, #10b981 0%, #064e3b 70%);
             top: -120px;
             left: -120px;
         }
         .orb-2 {
-            width: 420px;
-            height: 420px;
+            width: 450px;
+            height: 450px;
             background: radial-gradient(circle, #34d399 0%, #047857 70%);
             bottom: -90px;
             right: -90px;
@@ -70,7 +70,7 @@
         @keyframes glassZoomIn {
             0% {
                 opacity: 0;
-                transform: scale(0.93) translateY(24px);
+                transform: scale(0.94) translateY(24px);
             }
             100% {
                 opacity: 1;
@@ -78,23 +78,41 @@
             }
         }
 
-        /* Luxury Frosted Glass Wall Card (Emerald & White Theme) */
-        .glass-card {
+        /* Split-Hero 2-Column Luxury Frosted Container (Emerald & Crisp White) */
+        .login-wrapper {
             position: relative;
             z-index: 10;
             width: 100%;
-            max-width: 470px;
-            background: rgba(6, 26, 18, 0.78);
+            max-width: 1080px;
+            background: rgba(6, 26, 18, 0.88);
             backdrop-filter: blur(30px);
             -webkit-backdrop-filter: blur(30px);
-            border: 1px solid rgba(16, 185, 129, 0.28);
+            border: 1px solid rgba(16, 185, 129, 0.35);
             border-radius: 28px;
             box-shadow: 
-                0 30px 60px -12px rgba(0, 0, 0, 0.85),
-                0 0 0 1px rgba(16, 185, 129, 0.15),
-                inset 0 1px 0 rgba(255, 255, 255, 0.25);
-            padding: 38px 34px;
+                0 30px 70px -12px rgba(0, 0, 0, 0.9),
+                0 0 0 1px rgba(16, 185, 129, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            overflow: hidden;
             animation: glassZoomIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Academic Hero Showcase Banner (Left Side) */
+        .academic-hero {
+            background: linear-gradient(135deg, rgba(6, 78, 59, 0.90) 0%, rgba(2, 44, 34, 0.95) 100%),
+                        url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
+            padding: 44px 38px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-right: 1px solid rgba(16, 185, 129, 0.25);
+            position: relative;
+        }
+
+        /* Right Side Form Container */
+        .login-form-side {
+            padding: 40px 38px;
+            background: rgba(4, 18, 13, 0.92);
         }
 
         /* Brand Badge */
@@ -115,11 +133,10 @@
 
         /* Inspirational Quote Box */
         .quote-box {
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.06);
             border-left: 3px solid #10b981;
             border-radius: 0 12px 12px 0;
-            padding: 10px 14px;
-            margin-bottom: 22px;
+            padding: 12px 16px;
             font-style: italic;
             font-size: 12.5px;
             color: #d1fae5;
@@ -131,7 +148,7 @@
             color: #ffffff;
             font-size: 11px;
             display: block;
-            margin-top: 3px;
+            margin-top: 4px;
         }
 
         /* Mode Selector Tabs (Password vs Fingerprint) */
@@ -145,11 +162,12 @@
             border-radius: 10px;
             transition: all 0.2s ease;
             cursor: pointer;
+            flex: 1;
         }
         .auth-tab-btn.active {
-            background: rgba(16, 185, 129, 0.2);
+            background: rgba(16, 185, 129, 0.25);
             color: #34d399;
-            border: 1px solid rgba(16, 185, 129, 0.35);
+            border: 1px solid rgba(16, 185, 129, 0.4);
         }
 
         /* Inputs - Clean Frosted Dark Emerald Style (NO awkward stark white) */
@@ -172,8 +190,8 @@
             border-left: none !important;
             color: #ffffff !important;
             border-radius: 0 12px 12px 0 !important;
-            padding: 12px 16px;
-            font-size: 14.5px;
+            padding: 11px 16px;
+            font-size: 14px;
             transition: all 0.25s ease;
         }
         .form-control:focus {
@@ -192,65 +210,69 @@
             border: none;
             color: #ffffff;
             border-radius: 12px;
-            padding: 14px;
+            padding: 12px 16px;
             font-weight: 700;
-            font-size: 15px;
+            font-size: 14.5px;
             letter-spacing: 0.5px;
             transition: all 0.25s ease;
             box-shadow: 0 10px 24px -4px rgba(16, 185, 129, 0.5);
             width: 100%;
         }
         .btn-emerald:hover {
-            background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
-            box-shadow: 0 14px 28px -4px rgba(16, 185, 129, 0.7);
+            background: linear-gradient(135deg, #34d399 0%, #047857 100%);
             transform: translateY(-2px);
+            box-shadow: 0 14px 28px -4px rgba(16, 185, 129, 0.65);
             color: #ffffff;
         }
 
         /* Student Self-Service Desk Button */
         .btn-student-desk {
-            background: rgba(52, 211, 153, 0.08);
-            border: 1.5px solid rgba(52, 211, 153, 0.35);
-            color: #34d399;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(52, 211, 153, 0.4);
+            color: #a7f3d0;
             border-radius: 12px;
-            padding: 11px;
+            padding: 10px 16px;
             font-weight: 600;
-            font-size: 13.5px;
-            display: block;
+            font-size: 13px;
             text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
             transition: all 0.2s ease;
         }
         .btn-student-desk:hover {
-            background: rgba(52, 211, 153, 0.2);
-            border-color: #34d399;
+            background: rgba(16, 185, 129, 0.25);
             color: #ffffff;
+            border-color: #34d399;
             transform: translateY(-1px);
         }
 
-        /* Biometric Fingerprint Box */
+        /* Fingerprint Biometric Scanner Box */
         .fingerprint-box {
-            background: rgba(10, 38, 28, 0.6);
-            border: 2px dashed rgba(16, 185, 129, 0.4);
-            border-radius: 20px;
-            padding: 30px;
+            background: rgba(10, 38, 28, 0.7);
+            border: 2px dashed rgba(52, 211, 153, 0.4);
+            border-radius: 16px;
+            padding: 24px;
             text-align: center;
             cursor: pointer;
+            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
-            transition: all 0.3s ease;
         }
         .fingerprint-box:hover {
             border-color: #34d399;
-            background: rgba(16, 185, 129, 0.12);
+            background: rgba(16, 185, 129, 0.15);
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.3);
         }
         .fingerprint-icon {
-            font-size: 64px;
+            font-size: 54px;
             color: #10b981;
             transition: all 0.3s ease;
         }
         .fingerprint-box:hover .fingerprint-icon {
             color: #34d399;
-            transform: scale(1.05);
+            transform: scale(1.06);
         }
 
         /* Animated Laser Scanning Beam */
@@ -273,6 +295,47 @@
             50% { top: 80%; }
             100% { top: 15%; }
         }
+
+        /* Showcase Feature Pill */
+        .showcase-pill {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            backdrop-filter: blur(10px);
+        }
+        .showcase-pill i {
+            font-size: 20px;
+            color: #34d399;
+            flex-shrink: 0;
+        }
+        .showcase-pill div {
+            color: #e2e8f0;
+            font-size: 13px;
+            line-height: 1.35;
+        }
+        .showcase-pill strong {
+            color: #ffffff;
+            display: block;
+        }
+
+        /* Live Pulsing Dot */
+        .pulse-dot {
+            width: 10px;
+            height: 10px;
+            background: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: pulseWave 1.8s infinite cubic-bezier(0.66, 0, 0, 1);
+        }
+        @keyframes pulseWave {
+            to { box-shadow: 0 0 0 12px rgba(16, 185, 129, 0); }
+        }
     </style>
 </head>
 <body>
@@ -282,124 +345,200 @@
     <div class="ambient-orb orb-2"></div>
     <div class="ambient-orb orb-3"></div>
 
-    <!-- Frosted Glass Wall Card -->
-    <div class="glass-card">
-        
-        <!-- Header & Logo -->
-        <div class="text-center mb-3">
-            <div class="brand-badge mb-3">
-                <i class="fa-solid fa-shield-halved"></i>
-                <span>ACADEMIAPRO ENTERPRISE ERP</span>
-            </div>
+    <!-- 2-Column Split Hero Container -->
+    <div class="login-wrapper">
+        <div class="row g-0">
             
-            <h4 class="fw-bold mb-1 text-white">Punjab Group of Colleges / Govt. Graduate College</h4>
-            <p class="small mb-0" style="color: #a7f3d0;">
-                Intermediate &amp; Undergraduate Institutional Management
-            </p>
-        </div>
-
-        <!-- Educational Inspirational Quote -->
-        <div class="quote-box">
-            <i class="fa-solid fa-quote-left text-success me-1"></i>
-            "Education is the most powerful weapon which you can use to change the world."
-            <span class="quote-author">— Nelson Mandela</span>
-        </div>
-
-        <!-- Auth Mode Toggle (Gmail/Password vs Fingerprint Touch) -->
-        <div class="d-flex justify-content-center gap-2 mb-3 p-1 rounded-3" style="background: rgba(0,0,0,0.25);">
-            <button type="button" class="auth-tab-btn active" id="tabPassword" onclick="switchAuthMode('password')">
-                <i class="fa-solid fa-envelope me-1"></i> Official Gmail &amp; Pass
-            </button>
-            <button type="button" class="auth-tab-btn" id="tabBiometric" onclick="switchAuthMode('biometric')">
-                <i class="fa-solid fa-fingerprint me-1"></i> Fingerprint / Touch
-            </button>
-        </div>
-
-        <!-- Flash Alert Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show border-0 py-2 px-3 small rounded-3 mb-3 shadow-sm text-dark fw-semibold" role="alert">
-                    <i class="fa-solid fa-circle-info me-1"></i> {{ message }}
-                    <button type="button" class="btn-close py-2" data-bs-dismiss="alert"></button>
-                </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        <!-- MODE 1: GMAIL / PASSWORD LOGIN FORM -->
-        <div id="passwordMode">
-            <form method="POST" action="{{ url_for('login') }}">
-                <div class="mb-3">
-                    <label class="form-label">Official Assigned Gmail / Username</label>
-                    <div class="input-group">
-                        <span class="input-group-text">
-                            <i class="fa-solid fa-at"></i>
+            <!-- LEFT COLUMN: COLORFUL ACADEMIC SHOWCASE -->
+            <div class="col-lg-6 academic-hero">
+                <div>
+                    <!-- College Crest & Badges -->
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="brand-badge">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                            <span>ENTERPRISE ACADEMIC DBMS</span>
+                        </div>
+                        <span class="badge bg-success-subtle text-success border border-success px-3 py-1 rounded-pill" style="font-size: 11px;">
+                            <span class="pulse-dot me-1"></span> Session 2026 Active
                         </span>
-                        <input type="text" name="username" class="form-control ps-0" placeholder="e.g. name@student.edu.pk or admin" required autocomplete="username">
                     </div>
-                    <small style="color: #6ee7b7; font-size: 11px;">Students &amp; Faculty: Enter your institutional assigned email/username</small>
+
+                    <h3 class="fw-bold text-white mb-2" style="letter-spacing: -0.5px;">
+                        Punjab Group of Colleges / Govt. Graduate College
+                    </h3>
+                    <p class="small mb-4" style="color: #a7f3d0; line-height: 1.6;">
+                        Complete multi-tier enterprise management suite for Intermediate (F.Sc, ICS, FA, I.Com) &amp; Undergraduate 4-Year BS Degree Programs.
+                    </p>
+
+                    <!-- Student Avatars & Features Card -->
+                    <div class="p-3 rounded-4 mb-3" style="background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(16, 185, 129, 0.35);">
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <img src="/static/avatars/boy.svg" width="48" height="48" class="rounded-circle border border-2 border-success shadow-sm">
+                            <img src="/static/avatars/girl.svg" width="48" height="48" class="rounded-circle border border-2 border-success shadow-sm">
+                            <div>
+                                <h6 class="fw-bold text-white mb-0">Student Self-Service Ecosystem</h6>
+                                <small style="color: #6ee7b7; font-size: 11.5px;">1-Click Roll Number Lookup • Fee Challans • ID Cards</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Highlight Pills -->
+                    <div class="showcase-pill">
+                        <i class="fa-solid fa-clipboard-check"></i>
+                        <div>
+                            <strong>Digital Attendance Register</strong>
+                            Automatic 75% examination eligibility enforcement &amp; parent SMS alerts.
+                        </div>
+                    </div>
+
+                    <div class="showcase-pill">
+                        <i class="fa-solid fa-database"></i>
+                        <div>
+                            <strong>ACID Compliant DBMS Engine</strong>
+                            25+ Normalized BCNF tables, audit logs, and fee challan reconciliation.
+                        </div>
+                    </div>
+
+                    <div class="showcase-pill">
+                        <i class="fa-solid fa-robot"></i>
+                        <div>
+                            <strong>Sandboxed AI Query Assistant</strong>
+                            Students &amp; faculty query exams, syllabus, and results in natural language.
+                        </div>
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <label class="form-label mb-0">Portal Access Password</label>
-                        <a href="javascript:void(0)" onclick="openPinModal()" class="small text-decoration-none fw-semibold" style="color: #34d399; font-size: 12px;">
-                            Forgot? (4-Digit PIN)
-                        </a>
+                <!-- Bottom Quote -->
+                <div class="quote-box mt-3">
+                    <i class="fa-solid fa-quote-left text-success me-1"></i>
+                    "Education is the most powerful weapon which you can use to change the world."
+                    <span class="quote-author">— Nelson Mandela</span>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: FROSTED GLASS LOGIN CARD -->
+            <div class="col-lg-6 login-form-side">
+                
+                <!-- Header -->
+                <div class="text-center mb-3">
+                    <div class="brand-badge mb-2">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span>SECURE ERP GATEWAY</span>
                     </div>
-                    <div class="input-group">
-                        <span class="input-group-text">
-                            <i class="fa-solid fa-key"></i>
-                        </span>
-                        <input type="password" name="password" id="pass_field" class="form-control ps-0 border-end-0" placeholder="Enter password" required autocomplete="current-password">
-                        <button class="btn btn-outline-secondary border-start-0" type="button" onclick="togglePass()" style="border-color: rgba(16, 185, 129, 0.3) !important; background: rgba(10, 38, 28, 0.85); color: #34d399;">
-                            <i class="fa-solid fa-eye" id="eye_icon"></i>
+                    <h4 class="fw-bold mb-1 text-white">Institutional Sign-In</h4>
+                    <p class="small mb-0" style="color: #a7f3d0;">
+                        Students, Faculty &amp; Executive Administration
+                    </p>
+                </div>
+
+                <!-- Auth Mode Selector (Gmail & Password vs Fingerprint Scanner) -->
+                <div class="d-flex justify-content-center gap-1 mb-3 p-1 rounded-3" style="background: rgba(0,0,0,0.35);">
+                    <button type="button" class="auth-tab-btn active" id="tabPassword" onclick="switchAuthMode('password')">
+                        <i class="fa-solid fa-envelope me-1"></i> Official Gmail &amp; Pass
+                    </button>
+                    <button type="button" class="auth-tab-btn" id="tabBiometric" onclick="switchAuthMode('biometric')">
+                        <i class="fa-solid fa-fingerprint me-1"></i> Fingerprint / Touch
+                    </button>
+                </div>
+
+                <!-- Flash Alert Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show border-0 py-2 px-3 small rounded-3 mb-3 shadow-sm text-dark fw-semibold" role="alert">
+                            <i class="fa-solid fa-circle-info me-1"></i> {{ message }}
+                            <button type="button" class="btn-close py-2" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- MODE 1: OFFICIAL GMAIL / PASSWORD LOGIN FORM -->
+                <div id="passwordMode">
+                    <form method="POST" action="{{ url_for('login') }}">
+                        <div class="mb-3">
+                            <label class="form-label">Official Assigned Gmail / Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fa-solid fa-at"></i>
+                                </span>
+                                <input type="text" name="username" id="login_user" class="form-control ps-0" placeholder="e.g. name@student.edu.pk or admin" required autocomplete="username">
+                            </div>
+                            <small style="color: #6ee7b7; font-size: 11px;">Enter your institutional assigned email or roll number</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label mb-0">Portal Access Password</label>
+                                <a href="javascript:void(0)" onclick="openPinModal()" class="small text-decoration-none fw-semibold" style="color: #34d399; font-size: 12px;">
+                                    Forgot? (4-Digit PIN)
+                                </a>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fa-solid fa-key"></i>
+                                </span>
+                                <input type="password" name="password" id="pass_field" class="form-control ps-0 border-end-0" placeholder="Enter password" required autocomplete="current-password">
+                                <button class="btn btn-outline-secondary border-start-0" type="button" onclick="togglePass()" style="border-color: rgba(16, 185, 129, 0.3) !important; background: rgba(10, 38, 28, 0.85); color: #34d399;">
+                                    <i class="fa-solid fa-eye" id="eye_icon"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-emerald mb-3">
+                            <i class="fa-solid fa-right-to-bracket me-2"></i> Enter Secure ERP Portal
+                        </button>
+                    </form>
+                </div>
+
+                <!-- MODE 2: BIOMETRIC FINGERPRINT / TOUCH SCANNER -->
+                <div id="biometricMode" style="display: none;">
+                    <div class="fingerprint-box mb-3" id="fpScanner" onclick="triggerBiometricScan()">
+                        <div class="laser-beam"></div>
+                        <div class="fingerprint-icon mb-2">
+                            <i class="fa-solid fa-fingerprint"></i>
+                        </div>
+                        <h6 class="fw-bold text-white mb-1" id="fpStatusText">Touch Fingerprint Sensor</h6>
+                        <small class="text-white-50" id="fpSubText">Click sensor to simulate biometric verification</small>
+                    </div>
+
+                    <button type="button" class="btn btn-emerald mb-3" onclick="triggerBiometricScan()">
+                        <i class="fa-solid fa-fingerprint me-2"></i> Verify Biometric &amp; Enter
+                    </button>
+                </div>
+
+                <!-- Student Self-Service Desk Shortcut -->
+                <div class="text-center pt-1 mb-3">
+                    <a href="{{ url_for('student_desk') }}" class="btn-student-desk">
+                        <i class="fa-solid fa-graduation-cap me-2 text-success"></i> Student Self-Service Desk (No Password)
+                    </a>
+                </div>
+
+                <!-- Quick Demo Login Pills for Instant Testing -->
+                <div class="p-2 rounded-3 text-center" style="background: rgba(0, 0, 0, 0.3); border: 1px dashed rgba(16, 185, 129, 0.25);">
+                    <small class="text-white-50 d-block mb-1" style="font-size: 11px;">Quick 1-Click Credentials Autofill:</small>
+                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                        <button type="button" class="btn btn-sm btn-outline-success py-0 px-2 rounded-pill" style="font-size: 11px;" onclick="autofillLogin('admin', 'sana123')">
+                            Admin (admin)
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-success py-0 px-2 rounded-pill" style="font-size: 11px;" onclick="autofillLogin('tariq@faculty.edu.pk', 'sana123')">
+                            Faculty (Teacher)
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-success py-0 px-2 rounded-pill" style="font-size: 11px;" onclick="autofillLogin('BSCS-22-01', 'sana123')">
+                            Student (BSCS)
                         </button>
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-emerald mb-3">
-                    <i class="fa-solid fa-right-to-bracket me-2"></i> Enter Secure ERP Portal
-                </button>
-            </form>
-        </div>
-
-        <!-- MODE 2: BIOMETRIC FINGERPRINT / TOUCH SCANNER -->
-        <div id="biometricMode" style="display: none;">
-            <div class="fingerprint-box mb-3" id="fpScanner" onclick="triggerBiometricScan()">
-                <div class="laser-beam"></div>
-                <div class="fingerprint-icon mb-2">
-                    <i class="fa-solid fa-fingerprint"></i>
+                <!-- Footer Security -->
+                <div class="text-center mt-3 pt-2 border-top" style="border-color: rgba(16, 185, 129, 0.15) !important;">
+                    <small class="text-muted" style="font-size: 11px;">
+                        &copy; 2026 AcademiaPro Enterprise DBMS • Emerald Green &amp; Crisp White Edition
+                    </small>
                 </div>
-                <h6 class="fw-bold text-white mb-1" id="fpStatusText">Touch Fingerprint Sensor</h6>
-                <small class="text-white-50" id="fpSubText">Click scanner to simulate biometric authentication</small>
+
             </div>
-
-            <button type="button" class="btn btn-emerald mb-3" onclick="triggerBiometricScan()">
-                <i class="fa-solid fa-fingerprint me-2"></i> Verify Biometric &amp; Enter
-            </button>
         </div>
-
-        <!-- Student Self-Service Desk Shortcut -->
-        <div class="text-center pt-2">
-            <a href="{{ url_for('student_desk') }}" class="btn-student-desk">
-                <i class="fa-solid fa-graduation-cap me-2 text-success"></i> Student Self-Service Desk (No Password)
-            </a>
-            <small class="d-block mt-2" style="color: #6ee7b7; font-size: 11.5px;">
-                Instant Roll Number Lookup: Fee Challans, Roll No Slips &amp; ID Cards
-            </small>
-        </div>
-
-        <div class="text-center mt-4 pt-3 border-top" style="border-color: rgba(16, 185, 129, 0.15) !important;">
-            <div class="small mb-1" style="color: #a7f3d0; font-size: 12px;">
-                <i class="fa-solid fa-shield-halved text-success me-1"></i> Authorized Institutional Access Only
-            </div>
-            <small class="text-muted" style="font-size: 11px;">
-                &copy; 2026 AcademiaPro Enterprise DBMS • Green &amp; White Edition
-            </small>
-        </div>
-
     </div>
 
     <!-- 4-DIGIT PIN PASSWORD RESET MODAL -->
@@ -429,8 +568,8 @@
                     </div>
                 </div>
                 <div class="modal-footer border-top border-success">
-                    <button type="button" class="btn btn-outline-light btn-sm rounded-pill" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-emerald btn-sm px-4 rounded-pill" onclick="submitPinReset()">
+                    <button type="button" class="btn btn-outline-light btn-sm rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-emerald btn-sm px-4 rounded-pill" onclick="submitPinReset()" style="width: auto;">
                         <i class="fa-solid fa-check me-1"></i> Reset Password
                     </button>
                 </div>
@@ -457,62 +596,73 @@
     }
 
     function switchAuthMode(mode) {
-        const pMode = document.getElementById("passwordMode");
-        const bMode = document.getElementById("biometricMode");
-        const tPass = document.getElementById("tabPassword");
-        const tBio = document.getElementById("tabBiometric");
+        const passDiv = document.getElementById("passwordMode");
+        const bioDiv = document.getElementById("biometricMode");
+        const tabPass = document.getElementById("tabPassword");
+        const tabBio = document.getElementById("tabBiometric");
 
-        if (mode === "biometric") {
-            pMode.style.display = "none";
-            bMode.style.display = "block";
-            tPass.classList.remove("active");
-            tBio.classList.add("active");
+        if (mode === "password") {
+            passDiv.style.display = "block";
+            bioDiv.style.display = "none";
+            tabPass.classList.add("active");
+            tabBio.classList.remove("active");
         } else {
-            pMode.style.display = "block";
-            bMode.style.display = "none";
-            tPass.classList.add("active");
-            tBio.classList.remove("active");
+            passDiv.style.display = "none";
+            bioDiv.style.display = "block";
+            tabBio.classList.add("active");
+            tabPass.classList.remove("active");
         }
     }
 
     function triggerBiometricScan() {
-        const box = document.getElementById("fpScanner");
-        const status = document.getElementById("fpStatusText");
-        const sub = document.getElementById("fpSubText");
+        const scanner = document.getElementById("fpScanner");
+        const statusText = document.getElementById("fpStatusText");
+        const subText = document.getElementById("fpSubText");
+        const userInput = document.getElementById("login_user").value.trim() || "admin";
 
-        box.classList.add("scanning");
-        status.innerText = "Scanning Biometric Fingerprint...";
-        sub.innerText = "Verifying biometric hash against database...";
+        scanner.classList.add("scanning");
+        statusText.innerText = "Scanning Fingerprint...";
+        statusText.style.color = "#34d399";
+        subText.innerText = "Matching biometric template against DBMS identity records...";
 
-        fetch("{{ url_for('api_biometric_login') }}", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ identifier: "admin" })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                status.innerHTML = '<span class="text-success"><i class="fa-solid fa-circle-check"></i> Biometric Verified!</span>';
-                sub.innerText = "Welcome " + data.user + "! Entering portal...";
-                setTimeout(() => {
-                    window.location.href = data.redirect;
-                }, 800);
-            } else {
-                box.classList.remove("scanning");
-                status.innerText = "Verification Failed";
-                sub.innerText = data.error;
-            }
-        })
-        .catch(err => {
-            box.classList.remove("scanning");
-            status.innerText = "Sensor Error";
-            sub.innerText = "Please try again or use password login.";
-        });
+        setTimeout(() => {
+            fetch('/api/biometric-login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ identifier: userInput })
+            })
+            .then(res => res.json())
+            .then(data => {
+                scanner.classList.remove("scanning");
+                if (data.success) {
+                    statusText.innerText = "Access Granted: " + data.user;
+                    statusText.style.color = "#10b981";
+                    subText.innerText = "Redirecting to ERP portal...";
+                    setTimeout(() => {
+                        window.location.href = data.redirect;
+                    }, 800);
+                } else {
+                    statusText.innerText = "Scan Rejected";
+                    statusText.style.color = "#f43f5e";
+                    subText.innerText = data.error || "Biometric sample did not match.";
+                }
+            })
+            .catch(err => {
+                scanner.classList.remove("scanning");
+                statusText.innerText = "Biometric Sensor Ready";
+                subText.innerText = "Connected to local hardware simulation.";
+            });
+        }, 1200);
     }
 
+    let pinModalInstance = null;
     function openPinModal() {
-        const modal = new bootstrap.Modal(document.getElementById("pinResetModal"));
-        modal.show();
+        if (!pinModalInstance) {
+            pinModalInstance = new bootstrap.Modal(document.getElementById('pinResetModal'));
+        }
+        document.getElementById("resetEmail").value = document.getElementById("login_user").value.trim();
+        document.getElementById("pinAlert").innerHTML = "";
+        pinModalInstance.show();
     }
 
     function submitPinReset() {
@@ -522,37 +672,38 @@
         const alertBox = document.getElementById("pinAlert");
 
         if (!email || !pin || !newPass) {
-            alertBox.innerHTML = '<div class="alert alert-danger py-2 small">All fields are required.</div>';
+            alertBox.innerHTML = '<div class="alert alert-warning py-2 small border-0 text-dark">Please fill in your Gmail/Username, 4-digit PIN, and new password.</div>';
             return;
         }
 
-        alertBox.innerHTML = '<div class="alert alert-info py-2 small"><i class="fa-solid fa-spinner fa-spin me-1"></i> Verifying PIN...</div>';
+        alertBox.innerHTML = '<div class="text-info small mb-2"><i class="fa-solid fa-spinner fa-spin me-1"></i> Verifying 4-digit PIN...</div>';
 
-        fetch("{{ url_for('api_reset_password_pin') }}", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                email: email,
-                pin: pin,
-                new_password: newPass
-            })
+        fetch('/api/reset-password-pin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email, pin: pin, new_password: newPass })
         })
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                alertBox.innerHTML = '<div class="alert alert-success py-2 small"><i class="fa-solid fa-circle-check me-1"></i> ' + data.message + ' You can now log in with your new password!</div>';
+                alertBox.innerHTML = '<div class="alert alert-success py-2 small border-0 text-dark"><i class="fa-solid fa-circle-check me-1"></i> ' + data.message + '</div>';
+                document.getElementById("pass_field").value = newPass;
                 setTimeout(() => {
-                    bootstrap.Modal.getInstance(document.getElementById("pinResetModal")).hide();
-                }, 1500);
+                    pinModalInstance.hide();
+                }, 1200);
             } else {
-                alertBox.innerHTML = '<div class="alert alert-danger py-2 small"><i class="fa-solid fa-circle-exclamation me-1"></i> ' + data.error + '</div>';
+                alertBox.innerHTML = '<div class="alert alert-danger py-2 small border-0 text-dark"><i class="fa-solid fa-triangle-exclamation me-1"></i> ' + data.error + '</div>';
             }
         })
         .catch(err => {
-            alertBox.innerHTML = '<div class="alert alert-danger py-2 small">Connection error. Please try again.</div>';
+            alertBox.innerHTML = '<div class="alert alert-danger py-2 small border-0 text-dark">Network error connecting to reset service.</div>';
         });
     }
-    </script>
 
+    function autofillLogin(user, pass) {
+        document.getElementById("login_user").value = user;
+        document.getElementById("pass_field").value = pass;
+    }
+    </script>
 </body>
 </html>

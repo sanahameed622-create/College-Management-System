@@ -897,4 +897,95 @@ class DatabaseEngine:
         except Exception as err:
             print(f"[!] Warning logging AI message: {err}")
 
+    def update_student_grade(self, enrollment_id: int, final_grade: str, gpa_points: float = None) -> Dict[str, Any]:
+        """Updates a student's final grade and calculates GPA points."""
+        try:
+            grade_map = {
+                "A+": 4.0, "A": 4.0, "A-": 3.7,
+                "B+": 3.33, "B": 3.0, "B-": 2.7,
+                "C+": 2.3, "C": 2.0, "C-": 1.7,
+                "D": 1.0, "F": 0.0
+            }
+            clean_grade = final_grade.strip().upper()
+            calc_gpa = gpa_points if gpa_points is not None else grade_map.get(clean_grade, 3.0)
+            self.execute(
+                "UPDATE enrollment SET final_grade = ?, gpa_points = ? WHERE enrollment_id = ?",
+                (clean_grade, calc_gpa, enrollment_id)
+            )
+            return {"success": True, "final_grade": clean_grade, "gpa_points": calc_gpa}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    def update_course_syllabus(self, course_id: int, description: str) -> Dict[str, Any]:
+        """Updates syllabus and course description."""
+        try:
+            self.execute("UPDATE course SET description = ? WHERE course_id = ?", (description.strip(), course_id))
+            return {"success": True, "message": "Course syllabus & subject notes updated successfully."}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    def get_student_growth_tracker(self, section_id: int = None) -> List[Dict[str, Any]]:
+        """Returns student subject academic growth, grades, and performance percentiles."""
+        filter_sql = "WHERE e.section_id = ?" if section_id else ""
+        params = (section_id,) if section_id else ()
+        sql = f"""
+            SELECT e.enrollment_id, e.student_id, e.section_id, e.final_grade, e.gpa_points,
+                   s.first_name || ' ' || s.last_name as student_name, s.roll_number, s.photo_url,
+                   s.academic_tier, s.part_or_year, s.gender,
+                   c.course_id, c.course_code, c.title as course_title,
+                   t.first_name || ' ' || t.last_name as teacher_name,
+                   sec.section_name
+            FROM enrollment e
+            JOIN student s ON e.student_id = s.student_id
+            JOIN section sec ON e.section_id = sec.section_id
+            JOIN course c ON sec.course_id = c.course_id
+            LEFT JOIN teacher t ON sec.teacher_id = t.teacher_id
+            {filter_sql}
+            ORDER BY c.course_code, s.roll_number ASC
+        """
+        rows = self.query(sql, params)
+        for r in rows:
+            gpa = r.get("gpa_points") or 3.0
+            pct = int(min(100, max(45, (gpa / 4.0) * 100)))
+            r["percentage"] = pct
+            if pct >= 85:
+                r["growth_badge"] = "Exceptional Growth (A+)"
+                r["badge_color"] = "success"
+            elif pct >= 70:
+                r["growth_badge"] = "Steady Progress (B)"
+                r["badge_color"] = "info"
+            elif pct >= 50:
+                r["growth_badge"] = "Average Growth (C)"
+                r["badge_color"] = "warning"
+            else:
+                r["growth_badge"] = "Needs Faculty Guidance"
+                r["badge_color"] = "danger"
+        return rows
+
+    def get_teacher_performance_overview(self) -> List[Dict[str, Any]]:
+        """Calculates faculty performance metrics for Admin oversight."""
+        sql = """
+            SELECT t.teacher_id, t.employee_code, t.first_name || ' ' || t.last_name as teacher_name,
+                   t.email, t.designation, t.qualification, d.dept_name,
+                   COUNT(DISTINCT sec.section_id) as assigned_sections,
+                   COUNT(DISTINCT c.course_id) as assigned_courses,
+                   COUNT(e.enrollment_id) as total_students_taught,
+                   ROUND(AVG(COALESCE(e.gpa_points, 3.0)), 2) as avg_class_gpa,
+                   SUM(CASE WHEN e.final_grade != 'F' THEN 1 ELSE 0 END) as passed_students,
+                   COUNT(e.enrollment_id) as total_graded
+            FROM teacher t
+            JOIN department d ON t.dept_id = d.dept_id
+            LEFT JOIN section sec ON t.teacher_id = sec.teacher_id
+            LEFT JOIN course c ON sec.course_id = c.course_id
+            LEFT JOIN enrollment e ON sec.section_id = e.section_id
+            GROUP BY t.teacher_id
+            ORDER BY t.first_name ASC
+        """
+        rows = self.query(sql)
+        for r in rows:
+            tot = r.get("total_graded") or 0
+            passed = r.get("passed_students") or 0
+            r["pass_rate"] = int((passed / tot * 100)) if tot > 0 else 95
+        return rows
+
 db = DatabaseEngine()

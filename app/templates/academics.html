@@ -7,35 +7,47 @@
 {% block content %}
 <ul class="nav nav-tabs mb-4" id="academicTabs" role="tablist">
     <li class="nav-item">
-        <button class="nav-link active" id="students-tab" data-bs-toggle="tab" data-bs-target="#students" type="button">
-            <i class="fa-solid fa-user-graduate me-1"></i> Students Directory ({{ students|length }})
+        <button class="nav-link {% if logged_role != 'Teacher' %}active{% endif %}" id="students-tab" data-bs-toggle="tab" data-bs-target="#students" type="button">
+            <i class="fa-solid fa-user-graduate me-1 text-success"></i> Students Directory ({{ students|length }})
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link {% if logged_role == 'Teacher' %}active{% endif %}" id="growth-tab" data-bs-toggle="tab" data-bs-target="#growth" type="button">
+            <i class="fa-solid fa-chart-line me-1 text-success"></i> Student Growth & Marks Desk
         </button>
     </li>
     <li class="nav-item">
         <button class="nav-link" id="courses-tab" data-bs-toggle="tab" data-bs-target="#courses" type="button">
-            <i class="fa-solid fa-book-open me-1"></i> Courses & Sections
+            <i class="fa-solid fa-book-open me-1 text-success"></i> Courses & Sections
         </button>
     </li>
     <li class="nav-item">
         <button class="nav-link" id="transcripts-tab" data-bs-toggle="tab" data-bs-target="#transcripts" type="button">
-            <i class="fa-solid fa-scroll me-1"></i> Official Transcripts
+            <i class="fa-solid fa-scroll me-1 text-success"></i> Official Transcripts
         </button>
     </li>
     <li class="nav-item">
         <button class="nav-link" id="attendance-tab" data-bs-toggle="tab" data-bs-target="#attendance" type="button">
-            <i class="fa-solid fa-clipboard-user me-1 text-danger"></i> 75% Attendance Check
+            <i class="fa-solid fa-clipboard-user me-1 text-warning"></i> 75% Attendance Check
+        </button>
+    </li>
+    {% if logged_role != 'Teacher' %}
+    <li class="nav-item">
+        <button class="nav-link" id="faculty-tab" data-bs-toggle="tab" data-bs-target="#faculty" type="button">
+            <i class="fa-solid fa-chalkboard-user me-1 text-success"></i> Faculty Performance (Admin)
         </button>
     </li>
     <li class="nav-item">
         <button class="nav-link" id="dept-tab" data-bs-toggle="tab" data-bs-target="#dept" type="button">
-            <i class="fa-solid fa-building-columns me-1"></i> Departments & Programs
+            <i class="fa-solid fa-building-columns me-1 text-success"></i> Departments & Programs
         </button>
     </li>
+    {% endif %}
 </ul>
 
 <div class="tab-content" id="academicTabContent">
     <!-- Tab 1: Students Directory -->
-    <div class="tab-pane fade show active" id="students" role="tabpanel">
+    <div class="tab-pane fade {% if logged_role != 'Teacher' %}show active{% endif %}" id="students" role="tabpanel">
         <div class="card border-0 shadow-sm rounded-3">
             <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                 <div class="fw-bold text-dark"><i class="fa-solid fa-users me-2 text-primary"></i>Enrolled Students ({{ students|length }})</div>
@@ -334,6 +346,259 @@
                 </div>
             </div>
         </div>
+    <!-- Tab 6: Student Subject Academic Growth & Marks Tracker (Faculty & Admin) -->
+    <div class="tab-pane fade {% if logged_role == 'Teacher' %}show active{% endif %}" id="growth" role="tabpanel">
+        <div class="card border-0 shadow-sm rounded-3 mb-4">
+            <div class="card-header bg-white border-bottom py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div>
+                    <h5 class="fw-bold mb-0 text-success">
+                        <i class="fa-solid fa-chart-line me-2"></i>Student Subject Growth &amp; Marks Register
+                    </h5>
+                    <small class="text-muted">Digital Faculty Portal: Track how each student is growing in your subject, update grades, and monitor GPA trajectory.</small>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-success-subtle text-success border border-success px-3 py-2">
+                        <i class="fa-solid fa-users-viewfinder me-1"></i> {{ growth_records|length }} Student Enrollments
+                    </span>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="p-3 bg-light border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <div class="input-group input-group-sm" style="max-width: 320px;">
+                        <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                        <input type="text" id="growthSearch" class="form-control" placeholder="Search student name, roll # or subject..." onkeyup="filterGrowthTable()">
+                    </div>
+                    <small class="text-muted"><i class="fa-solid fa-circle-info text-success me-1"></i> Changes save instantly to the ACID DBMS engine without full page reload.</small>
+                </div>
+
+                <div class="table-responsive border-0">
+                    <table class="table table-hover align-middle mb-0" id="growthTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 250px;">Student Information</th>
+                                <th>Subject &amp; Section</th>
+                                <th>Academic Tier</th>
+                                <th style="min-width: 220px;">Academic Growth &amp; GPA</th>
+                                <th style="width: 140px;">Current Grade</th>
+                                <th class="text-end pe-3" style="width: 160px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in growth_records %}
+                            <tr id="growth-row-{{ r.enrollment_id }}">
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="{% if r.gender == 'Female' %}/static/avatars/girl.svg{% else %}/static/avatars/boy.svg{% endif %}" width="38" height="38" class="rounded-circle border border-success flex-shrink-0">
+                                        <div>
+                                            <div class="fw-bold text-dark">{{ r.student_name }}</div>
+                                            <small class="font-monospace text-success fw-bold">{{ r.roll_number }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold text-dark">{{ r.course_title }}</div>
+                                    <small class="text-muted">{{ r.course_code }} • Sec {{ r.section_name }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge {% if r.academic_tier == 'Intermediate' %}bg-success-subtle text-success border border-success{% else %}bg-dark text-white{% endif %}">
+                                        {{ r.academic_tier or 'BS' }}
+                                    </span>
+                                    <small class="d-block text-muted" style="font-size: 11px;">{{ r.part_or_year or 'Semester' }}</small>
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <small class="fw-bold text-dark" id="growth-badge-{{ r.enrollment_id }}">
+                                            {{ r.growth_badge }}
+                                        </small>
+                                        <small class="fw-bold text-success font-monospace" id="growth-pct-{{ r.enrollment_id }}">{{ r.percentage }}%</small>
+                                    </div>
+                                    <div class="progress" style="height: 9px; border-radius: 999px; background: rgba(0,0,0,0.08);">
+                                        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" id="growth-bar-{{ r.enrollment_id }}" style="width: {{ r.percentage }}%;"></div>
+                                    </div>
+                                    <small class="text-muted" style="font-size: 11px;">GPA: <span class="fw-bold text-dark" id="growth-gpa-{{ r.enrollment_id }}">{{ '%.2f'|format(r.gpa_points or 3.0) }}</span> / 4.00</small>
+                                </td>
+                                <td>
+                                    <select class="form-select form-select-sm fw-bold border-success" id="grade-sel-{{ r.enrollment_id }}">
+                                        <option value="A+" {% if r.final_grade == 'A+' %}selected{% endif %}>A+ (4.00)</option>
+                                        <option value="A" {% if r.final_grade == 'A' %}selected{% endif %}>A (4.00)</option>
+                                        <option value="A-" {% if r.final_grade == 'A-' %}selected{% endif %}>A- (3.70)</option>
+                                        <option value="B+" {% if r.final_grade == 'B+' %}selected{% endif %}>B+ (3.33)</option>
+                                        <option value="B" {% if r.final_grade == 'B' %}selected{% endif %}>B (3.00)</option>
+                                        <option value="B-" {% if r.final_grade == 'B-' %}selected{% endif %}>B- (2.70)</option>
+                                        <option value="C+" {% if r.final_grade == 'C+' %}selected{% endif %}>C+ (2.30)</option>
+                                        <option value="C" {% if r.final_grade == 'C' %}selected{% endif %}>C (2.00)</option>
+                                        <option value="D" {% if r.final_grade == 'D' %}selected{% endif %}>D (1.00)</option>
+                                        <option value="F" {% if r.final_grade == 'F' %}selected{% endif %}>F (0.00)</option>
+                                    </select>
+                                </td>
+                                <td class="text-end pe-3">
+                                    <button type="button" class="btn btn-sm btn-outline-success fw-bold px-3 rounded-pill" onclick="saveStudentGrade({{ r.enrollment_id }})" id="btn-grade-{{ r.enrollment_id }}">
+                                        <i class="fa-solid fa-floppy-disk me-1"></i> Update
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 7: Faculty Performance & Teaching Metrics (Admin Overview) -->
+    <div class="tab-pane fade" id="faculty" role="tabpanel">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="fw-bold mb-0 text-success"><i class="fa-solid fa-chalkboard-user me-2"></i>Faculty Academic Performance &amp; Evaluation</h5>
+                    <small class="text-muted">Administrative audit of teacher workloads, pass rates, student average GPAs, and subject coverage.</small>
+                </div>
+                <span class="badge bg-success px-3 py-2">
+                    <i class="fa-solid fa-shield-halved me-1"></i> Executive Admin View
+                </span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive border-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Faculty Member</th>
+                                <th>Department</th>
+                                <th>Designation</th>
+                                <th>Assigned Classes</th>
+                                <th>Students Taught</th>
+                                <th>Avg Class GPA</th>
+                                <th style="min-width: 170px;">Pass Rate %</th>
+                                <th>Performance Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for f in teacher_performance %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="/static/avatars/prof_male.svg" width="36" height="36" class="rounded-circle border border-success">
+                                        <div>
+                                            <div class="fw-bold text-dark">{{ f.teacher_name }}</div>
+                                            <small class="text-muted font-monospace">{{ f.employee_code }} • {{ f.email }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-light text-dark border">{{ f.dept_name }}</span></td>
+                                <td><small class="fw-semibold">{{ f.designation }}</small></td>
+                                <td>
+                                    <span class="badge bg-success-subtle text-success border border-success">
+                                        {{ f.assigned_courses }} Courses / {{ f.assigned_sections }} Sec
+                                    </span>
+                                </td>
+                                <td class="fw-bold">{{ f.total_students_taught }}</td>
+                                <td>
+                                    <span class="fw-bold text-success font-monospace">{{ '%.2f'|format(f.avg_class_gpa or 3.20) }}</span> / 4.0
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-between mb-1" style="font-size: 11px;">
+                                        <span class="fw-bold">{{ f.pass_rate }}% Passed</span>
+                                        <span class="text-muted">{{ f.passed_students }}/{{ f.total_graded }}</span>
+                                    </div>
+                                    <div class="progress" style="height: 8px; border-radius: 999px;">
+                                        <div class="progress-bar bg-success" style="width: {{ f.pass_rate }}%;"></div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="text-warning">
+                                        <i class="fa-solid fa-star"></i>
+                                        <i class="fa-solid fa-star"></i>
+                                        <i class="fa-solid fa-star"></i>
+                                        <i class="fa-solid fa-star"></i>
+                                        <i class="fa-solid fa-star-half-stroke"></i>
+                                    </span>
+                                    <small class="fw-bold text-success d-block" style="font-size: 11px;">Excellent</small>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<!-- Toast Alert for Asynchronous Grade Update -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1080">
+    <div id="gradeToast" class="toast align-items-center text-white bg-success border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body fw-semibold" id="gradeToastBody">
+                <i class="fa-solid fa-check-circle me-2"></i> Grade saved successfully!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<script>
+function filterGrowthTable() {
+    const q = document.getElementById('growthSearch').value.toLowerCase();
+    const rows = document.querySelectorAll('#growthTable tbody tr');
+    rows.forEach(r => {
+        const text = r.innerText.toLowerCase();
+        r.style.display = text.includes(q) ? '' : 'none';
+    });
+}
+
+function saveStudentGrade(enrollmentId) {
+    const sel = document.getElementById('grade-sel-' + enrollmentId);
+    const btn = document.getElementById('btn-grade-' + enrollmentId);
+    const newGrade = sel.value;
+    const oldHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+    btn.disabled = true;
+
+    fetch('/api/academics/update-grade', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enrollment_id: enrollmentId, final_grade: newGrade })
+    })
+    .then(r => r.json())
+    .then(data => {
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Saved';
+        btn.classList.remove('btn-outline-success');
+        btn.classList.add('btn-success');
+
+        const gpa = data.gpa_points || 3.0;
+        const pct = Math.min(100, Math.max(45, Math.round((gpa / 4.0) * 100)));
+
+        const gpaEl = document.getElementById('growth-gpa-' + enrollmentId);
+        const pctEl = document.getElementById('growth-pct-' + enrollmentId);
+        const barEl = document.getElementById('growth-bar-' + enrollmentId);
+        const badgeEl = document.getElementById('growth-badge-' + enrollmentId);
+
+        if (gpaEl) gpaEl.innerText = gpa.toFixed(2);
+        if (pctEl) pctEl.innerText = pct + '%';
+        if (barEl) barEl.style.width = pct + '%';
+
+        let badgeText = "Steady Progress (B)";
+        if (pct >= 85) badgeText = "Exceptional Growth (A+)";
+        else if (pct < 60) badgeText = "Needs Faculty Guidance";
+        if (badgeEl) badgeEl.innerText = badgeText;
+
+        const toastEl = document.getElementById('gradeToast');
+        const toastBody = document.getElementById('gradeToastBody');
+        toastBody.innerHTML = `<i class="fa-solid fa-circle-check me-2"></i> Grade for Enrollment #${enrollmentId} updated to <strong>${newGrade} (${gpa.toFixed(2)} GPA)</strong>!`;
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
+
+        setTimeout(() => {
+            btn.innerHTML = oldHtml;
+            btn.classList.remove('btn-success');
+            btn.classList.add('btn-outline-success');
+            btn.disabled = false;
+        }, 1500);
+    })
+    .catch(err => {
+        btn.innerHTML = 'Error';
+        btn.disabled = false;
+    });
+}
+</script>
 {% endblock %}

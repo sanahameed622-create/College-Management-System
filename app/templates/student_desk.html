@@ -12,8 +12,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
+            --primary: #10b981;
+            --primary-dark: #047857;
             --secondary: #0f172a;
             --bg-light: #f8fafc;
         }
@@ -105,7 +105,7 @@
         .avatar-box {
             width: 90px;
             height: 90px;
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            background: linear-gradient(135deg, #10b981 0%, #047857 100%);
             color: #ffffff;
             border-radius: 50%;
             display: flex;
@@ -122,7 +122,7 @@
         }
         .ai-message-bubble {
             background: #f1f5f9;
-            border-left: 4px solid #2563eb;
+            border-left: 4px solid #10b981;
             border-radius: 0 12px 12px 12px;
             padding: 16px;
             font-size: 14.5px;
@@ -139,8 +139,8 @@
         }
         .prompt-btn:hover {
             background: #e0f2fe;
-            border-color: #38bdf8;
-            color: #0369a1;
+            border-color: #34d399;
+            color: #064e3b;
         }
     </style>
 </head>
@@ -239,7 +239,7 @@
             <div class="row align-items-center g-3">
                 <div class="col-auto">
                     {% if s.photo_url %}
-                    <img src="{{ s.photo_url }}" class="rounded-circle shadow-sm" style="width: 90px; height: 90px; object-fit: cover; border: 3px solid #3b82f6;" alt="Student Photo">
+                    <img src="{{ s.photo_url }}" class="rounded-circle shadow-sm" style="width: 90px; height: 90px; object-fit: cover; border: 3px solid #10b981;" alt="Student Photo">
                     {% elif s.gender == 'Female' %}
                     <!-- Female Student Sketch Avatar -->
                     <div class="avatar-box" style="background: linear-gradient(135deg, #f43f5e 0%, #be123c 100%);" title="Female Student Profile">
@@ -247,7 +247,7 @@
                     </div>
                     {% else %}
                     <!-- Male Student Sketch Avatar -->
-                    <div class="avatar-box" style="background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);" title="Male Student Profile">
+                    <div class="avatar-box" style="background: linear-gradient(135deg, #10b981 0%, #064e3b 100%);" title="Male Student Profile">
                         <i class="fa-solid fa-user-tie"></i>
                     </div>
                     {% endif %}
@@ -615,7 +615,7 @@
                             label: 'GPA Grade Points (Max 4.0)',
                             data: gpaPoints,
                             backgroundColor: 'rgba(37, 99, 235, 0.85)',
-                            borderColor: '#1d4ed8',
+                            borderColor: '#047857',
                             borderWidth: 1,
                             borderRadius: 8
                         }

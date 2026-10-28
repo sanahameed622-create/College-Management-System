@@ -13,10 +13,17 @@ app.secret_key = "academiapro_secret_salt_2026_enterprise_secure"
 
 @app.context_processor
 def inject_global_context():
+    avatar_choice = session.get("user_avatar", "boy")
+    if avatar_choice.startswith("http://") or avatar_choice.startswith("https://"):
+        avatar_src = avatar_choice
+    else:
+        avatar_src = f"/static/avatars/{avatar_choice}.svg"
     return {
         "college": db.get_college_profile(),
         "logged_user": session.get("user_name", "Administrator"),
         "logged_role": session.get("user_role", "Admin"),
+        "logged_avatar": avatar_choice,
+        "avatar_src": avatar_src,
         "is_authenticated": session.get("logged_in", False)
     }
 
@@ -27,13 +34,27 @@ def require_authentication():
         'login', 'logout', 'static',
         'student_desk', 'api_student_ai',
         'student_id_card', 'fee_challan', 'roll_number_slip',
-        'api_biometric_login', 'api_reset_password_pin'
+        'api_biometric_login', 'api_reset_password_pin',
+        'api_update_avatar'
     ]
     if request.endpoint in public_endpoints:
         return
     # Check session
     if not session.get("logged_in"):
         return redirect(url_for("login"))
+
+    user_role = session.get("user_role", "Admin")
+
+    # Role 1: Student (Access restricted strictly to Student Desk & Docs)
+    student_allowed = ['student_desk', 'logout', 'student_id_card', 'fee_challan', 'roll_number_slip', 'api_student_ai', 'static']
+    if user_role == "Student" and request.endpoint not in student_allowed:
+        return redirect(url_for("student_desk", roll_number=session.get("username", "")))
+
+    # Role 2: Teacher (Access restricted from Finance, Settings, Security Audit, Inventory)
+    teacher_blocked = ['finance', 'settings', 'security_audit', 'inventory', 'api_change_password']
+    if user_role == "Teacher" and request.endpoint in teacher_blocked:
+        flash("Access Notice: Financial Balances, System Inventory & White-Label Settings are restricted to Administrative Authorities.", "warning")
+        return redirect(url_for("academics"))
 
 
 # ==========================================
@@ -87,6 +108,20 @@ def api_reset_password_pin():
     new_password = data.get("new_password", "").strip()
     res = db.reset_password_with_pin(email, pin, new_password)
     return jsonify(res)
+
+@app.route("/api/update-avatar", methods=["POST"])
+def api_update_avatar():
+    data = request.get_json() or {}
+    avatar_choice = data.get("avatar", "boy").strip()
+    session["user_avatar"] = avatar_choice
+    user_id = session.get("user_id")
+    if user_id:
+        try:
+            db.execute("UPDATE user_account SET photo_url = ? WHERE user_id = ?", (avatar_choice, user_id))
+        except Exception:
+            pass
+    avatar_src = avatar_choice if avatar_choice.startswith("http") else f"/static/avatars/{avatar_choice}.svg"
+    return jsonify({"success": True, "avatar": avatar_choice, "avatar_src": avatar_src})
 
 @app.route("/logout")
 def logout():
@@ -326,6 +361,9 @@ def academics():
     transcripts = db.query("SELECT * FROM v_student_transcript ORDER BY student_id, course_code")
     attendance_report = db.query("SELECT * FROM v_attendance_shortage")
 
+    growth_records = db.get_student_growth_tracker()
+    teacher_performance = db.get_teacher_performance_overview()
+
     return render_template("academics.html",
                            departments=departments,
                            programs=programs,
@@ -334,7 +372,25 @@ def academics():
                            students=students,
                            transcripts=transcripts,
                            attendance_report=attendance_report,
+                           growth_records=growth_records,
+                           teacher_performance=teacher_performance,
                            active_tier=tier_filter)
+
+@app.route("/api/academics/update-grade", methods=["POST"])
+def api_academics_update_grade():
+    data = request.get_json() or {}
+    enrollment_id = int(data.get("enrollment_id", 0))
+    final_grade = data.get("final_grade", "A").strip()
+    res = db.update_student_grade(enrollment_id, final_grade)
+    return jsonify(res)
+
+@app.route("/api/academics/update-course-info", methods=["POST"])
+def api_academics_update_course_info():
+    data = request.get_json() or {}
+    course_id = int(data.get("course_id", 0))
+    description = data.get("description", "").strip()
+    res = db.update_course_syllabus(course_id, description)
+    return jsonify(res)
 
 # ==========================================
 # 4B. DIGITAL ATTENDANCE REGISTER
