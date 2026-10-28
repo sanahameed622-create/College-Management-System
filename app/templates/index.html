@@ -1,134 +1,381 @@
 {% extends "base.html" %}
 
 {% block title %}Dashboard - AcademiaPro{% endblock %}
-{% block page_title %}Institutional Dashboard Overview{% endblock %}
-{% block page_subtitle %}Real-time synchronized relational indicators across 5 core modules{% endblock %}
+{% block page_title %}Institutional Executive Dashboard{% endblock %}
+{% block page_subtitle %}Real-time multi-tier academic analytics, cashflow trajectories & digital registers{% endblock %}
 
 {% block content %}
-<!-- KPI Metrics Row -->
-<div class="row g-3 mb-4">
-    <div class="col-sm-6 col-xl-3">
-        <div class="card-stat">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <div class="stat-label">Enrolled Students</div>
-                    <div class="stat-value text-primary">{{ kpis.active_students }}</div>
+<div class="main-content">
+
+    <!-- 1. COLLEGE CAMPUS HERO SHOWCASE BANNER -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden position-relative" style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);">
+        <div class="row g-0 align-items-center">
+            <div class="col-lg-8 p-4 text-white">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-primary px-3 py-1 rounded-pill small fw-semibold">
+                        <i class="fa-solid fa-building-columns me-1"></i> {{ college.affiliation or "Affiliated with BISE & HEC" }}
+                    </span>
+                    <span class="badge bg-success-subtle text-success border border-success px-2 py-1 rounded-pill small">
+                        <i class="fa-solid fa-circle-check me-1"></i> Dual-Tier Active
+                    </span>
                 </div>
-                <div class="stat-icon bg-primary-subtle text-primary">
-                    <i class="fa-solid fa-user-graduate"></i>
+                <h3 class="fw-bold mb-1">{{ college.college_name }}</h3>
+                <p class="text-white-50 mb-3 small" style="max-width: 600px;">
+                    {{ college.tagline or "Leading institution for Intermediate (F.Sc, ICS, I.Com) and Undergraduate BS Degree Programs." }}
+                </p>
+                
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{{ url_for('admissions') }}" class="btn btn-primary btn-sm fw-bold px-3 py-2 rounded-3 shadow-sm">
+                        <i class="fa-solid fa-user-plus me-1"></i> New Admission Desk
+                    </a>
+                    <a href="{{ url_for('attendance') }}" class="btn btn-light btn-sm fw-bold px-3 py-2 rounded-3 text-dark">
+                        <i class="fa-solid fa-clipboard-user me-1 text-primary"></i> Digital Attendance
+                    </a>
+                    <a href="{{ url_for('student_desk') }}" target="_blank" class="btn btn-outline-light btn-sm fw-semibold px-3 py-2 rounded-3">
+                        <i class="fa-solid fa-graduation-cap me-1 text-info"></i> Public Student Portal
+                    </a>
+                    <a href="{{ url_for('settings') }}" class="btn btn-outline-light btn-sm fw-semibold px-3 py-2 rounded-3 text-white-50">
+                        <i class="fa-solid fa-gear me-1"></i> White-Label Setup
+                    </a>
                 </div>
             </div>
-            <div class="d-flex gap-1 mt-2">
-                <span class="badge bg-info-subtle text-info-emphasis border border-info" style="font-size: 10px;">Inter: {{ kpis.inter_students }}</span>
-                <span class="badge bg-primary-subtle text-primary border border-primary" style="font-size: 10px;">BS: {{ kpis.bs_students }}</span>
+
+            <!-- Campus Image Preview / Photo -->
+            <div class="col-lg-4 d-none d-lg-block position-relative" style="min-height: 200px;">
+                <img src="{{ college.campus_image_url }}" alt="Campus Banner" 
+                     class="w-100 h-100 position-absolute top-0 end-0" 
+                     style="object-fit: cover; opacity: 0.85; mask-image: linear-gradient(to right, transparent 0%, black 35%); -webkit-mask-image: linear-gradient(to right, transparent 0%, black 35%);">
             </div>
         </div>
     </div>
 
-    <div class="col-sm-6 col-xl-3">
-        <div class="card-stat">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <div class="stat-label">Fee Collections</div>
-                    <div class="stat-value text-success">{{ kpis.fee_collected }}</div>
+    <!-- 2. HIGH-IMPACT KPI METRICS (INCLUDING TOTAL STAFF & FACULTY) -->
+    <div class="row g-3 mb-4">
+        <!-- Metric 1: Students -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="card-stat h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-label">Enrolled Students</div>
+                        <div class="stat-value text-primary">{{ kpis.active_students }}</div>
+                    </div>
+                    <div class="stat-icon bg-primary-subtle text-primary">
+                        <i class="fa-solid fa-user-graduate"></i>
+                    </div>
                 </div>
-                <div class="stat-icon bg-success-subtle text-success">
-                    <i class="fa-solid fa-wallet"></i>
+                <div class="d-flex gap-1 mt-2">
+                    <span class="badge bg-info-subtle text-info border border-info" style="font-size: 10.5px;">Inter: {{ kpis.inter_students }}</span>
+                    <span class="badge bg-primary-subtle text-primary border border-primary" style="font-size: 10.5px;">BS: {{ kpis.bs_students }}</span>
                 </div>
             </div>
-            <small class="text-muted mt-2 d-block">Receivable: {{ kpis.fee_receivable }}</small>
+        </div>
+
+        <!-- Metric 2: Total Faculty & Staff -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="card-stat h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-label">Total College Staff</div>
+                        <div class="stat-value text-dark">{{ kpis.total_staff }}</div>
+                    </div>
+                    <div class="stat-icon bg-secondary-subtle text-dark">
+                        <i class="fa-solid fa-users-line"></i>
+                    </div>
+                </div>
+                <div class="d-flex gap-1 mt-2">
+                    <span class="badge bg-warning-subtle text-dark border border-warning" style="font-size: 10.5px;">Faculty: {{ kpis.faculty_members }}</span>
+                    <span class="badge bg-light text-muted border" style="font-size: 10.5px;">Admin: {{ kpis.admin_staff }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metric 3: Fee Collections -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="card-stat h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-label">Fee Realized</div>
+                        <div class="stat-value text-success">{{ kpis.fee_collected }}</div>
+                    </div>
+                    <div class="stat-icon bg-success-subtle text-success">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
+                </div>
+                <small class="text-muted mt-2 d-block">Receivable Dues: <strong class="text-danger">{{ kpis.fee_receivable }}</strong></small>
+            </div>
+        </div>
+
+        <!-- Metric 4: Campus Attendance & Health -->
+        <div class="col-sm-6 col-xl-3">
+            <div class="card-stat h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-label">Attendance Rate</div>
+                        <div class="stat-value {{ 'text-success' if kpis.attendance_rate >= 75 else 'text-warning' }}">{{ kpis.attendance_rate }}%</div>
+                    </div>
+                    <div class="stat-icon bg-info-subtle text-info">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <small class="text-danger"><i class="fa-solid fa-circle-exclamation me-1"></i> {{ kpis.defaulters }} Defaulters</small>
+                    <a href="{{ url_for('attendance') }}" class="small text-primary text-decoration-none fw-semibold">Mark Roll &rarr;</a>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="col-sm-6 col-xl-3">
-        <div class="card-stat">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <div class="stat-label">Fee Defaulters</div>
-                    <div class="stat-value text-danger">{{ kpis.defaulters }}</div>
+    <!-- 3. GRAPHICAL PERFORMANCE DASHBOARD (CHART.JS ANALYTICS) -->
+    <div class="row g-4 mb-4">
+        <!-- Graph 1: Financial Trajectory (Area Gradient Curve) -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-4 bg-white p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h6 class="fw-bold mb-0 text-dark">
+                            <i class="fa-solid fa-chart-area text-primary me-2"></i>Institutional Cashflow & Fee Collections (PKR)
+                        </h6>
+                        <small class="text-muted">Monthly trajectory of billed invoices vs realized fee challans</small>
+                    </div>
+                    <span class="badge bg-success-subtle text-success border border-success">Live Financial Sync</span>
                 </div>
-                <div class="stat-icon bg-danger-subtle text-danger">
-                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                <div style="height: 280px; position: relative;">
+                    <canvas id="financialChart"></canvas>
                 </div>
             </div>
-            <small class="text-danger mt-2 d-block"><i class="fa-solid fa-triangle-exclamation"></i> Financial hold applied</small>
+        </div>
+
+        <!-- Graph 2: Program Enrollment Distribution (Doughnut Chart) -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4 bg-white p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h6 class="fw-bold mb-0 text-dark">
+                            <i class="fa-solid fa-chart-pie text-info me-2"></i>Program Enrollment Share
+                        </h6>
+                        <small class="text-muted">Intermediate Tiers vs BS Degrees</small>
+                    </div>
+                    <span class="badge bg-light text-secondary border">{{ kpis.chart_programs|length }} Programs</span>
+                </div>
+                <div style="height: 280px; position: relative;">
+                    <canvas id="enrollmentChart"></canvas>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="col-sm-6 col-xl-3">
-        <div class="card-stat">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <div class="stat-label">Low Stock Items</div>
-                    <div class="stat-value text-warning">{{ kpis.low_stock_alerts }}</div>
+    <!-- 4. ACADEMIC CALENDAR & UPCOMING EVENTS WIDGET -->
+    <div class="row g-4 mb-4">
+        <!-- Interactive Mini Calendar -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4 bg-white p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold mb-0 text-dark">
+                        <i class="fa-solid fa-calendar-days text-primary me-2"></i>Academic Calendar &mdash; October 2026
+                    </h6>
+                    <span class="badge bg-primary text-white rounded-pill px-2 py-1 small">Term Active</span>
                 </div>
-                <div class="stat-icon bg-warning-subtle text-warning">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-                </div>
-            </div>
-            <small class="text-warning mt-2 d-block">Below reorder threshold</small>
-        </div>
-    </div>
-<!-- Quick Admissions & Program Scope Banner -->
-<div class="card border-0 shadow-sm rounded-4 mb-4 bg-gradient bg-light border p-3">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-        <div class="d-flex align-items-center gap-3">
-            <div class="bg-primary text-white rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
-                <i class="fa-solid fa-graduation-cap fs-5"></i>
-            </div>
-            <div>
-                <h6 class="mb-0 fw-bold text-dark">Multi-Tier Institutional Engine Active</h6>
-                <small class="text-muted">Supports Intermediate Colleges (F.Sc Pre-Med/Eng, I.C.S, I.Com, F.A) & BS Degree Programs (BSCS, BBA, BSAI, BS Math)</small>
-            </div>
-        </div>
-        <div class="d-flex gap-2">
-            <a href="{{ url_for('admissions') }}" class="btn btn-primary btn-sm fw-bold px-3 shadow-sm">
-                <i class="fa-solid fa-user-plus me-1"></i> New Student Admission
-            </a>
-            <a href="{{ url_for('admissions', tier='intermediate') }}" class="btn btn-outline-info text-dark btn-sm fw-semibold">
-                🎓 1st & 2nd Year
-            </a>
-            <a href="{{ url_for('admissions', tier='bs') }}" class="btn btn-outline-primary btn-sm fw-semibold">
-                🏛️ BS Programs
-            </a>
-        </div>
-    </div>
-</div>
 
-<!-- Alert Tables Grid -->
-<div class="row g-4">
-    <!-- Fee Defaulters View Preview -->
-    <div class="col-lg-6">
-        <div class="card border-0 shadow-sm rounded-3">
-            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
-                <h6 class="mb-0 fw-bold text-danger">
-                    <i class="fa-solid fa-ban me-2"></i>Fee Defaulters View (v_defaulters)
-                </h6>
-                <a href="{{ url_for('finance') }}" class="btn btn-outline-danger btn-sm">Full View</a>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive border-0">
-                    <table class="table table-hover align-middle mb-0">
+                <!-- Mini Calendar Table -->
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center align-middle mb-2" style="font-size: 13px;">
                         <thead class="table-light">
                             <tr>
-                                <th>Roll No</th>
-                                <th>Student</th>
-                                <th>Balance Due</th>
-                                <th>Status</th>
+                                <th class="text-danger">Su</th>
+                                <th>Mo</th>
+                                <th>Tu</th>
+                                <th>We</th>
+                                <th>Th</th>
+                                <th>Fr</th>
+                                <th>Sa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-muted">27</td><td class="text-muted">28</td><td class="text-muted">29</td><td class="text-muted">30</td>
+                                <td>1</td><td>2</td><td>3</td>
+                            </tr>
+                            <tr>
+                                <td class="text-danger">4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td>
+                            </tr>
+                            <tr>
+                                <td class="text-danger">11</td><td>12</td><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td>
+                            </tr>
+                            <tr>
+                                <td class="text-danger">18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td>
+                            </tr>
+                            <tr>
+                                <td class="text-danger">25</td><td>26</td><td>27</td>
+                                <td class="bg-primary text-white fw-bold rounded-2 shadow-sm" title="Today">28</td>
+                                <td>29</td><td>30</td><td>31</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <small class="text-muted d-block text-center">
+                    <i class="fa-solid fa-circle-dot text-primary me-1"></i> Today is <strong>28 Oct 2026</strong> • Fall Semester Active Session
+                </small>
+            </div>
+        </div>
+
+        <!-- Upcoming Institutional Events -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-4 bg-white p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold mb-0 text-dark">
+                        <i class="fa-solid fa-bullhorn text-warning me-2"></i>Upcoming Events & Examination Deadlines
+                    </h6>
+                    <span class="badge bg-warning-subtle text-warning border border-warning">4 Alerts</span>
+                </div>
+
+                <div class="list-group list-group-flush">
+                    <!-- Event 1 -->
+                    <div class="list-group-item px-0 py-2 border-bottom">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="d-flex gap-3">
+                                <div class="bg-primary-subtle text-primary rounded-3 p-2 text-center" style="width: 48px; height: 48px;">
+                                    <div class="fw-bold fs-6">05</div>
+                                    <div style="font-size: 10px; text-transform: uppercase;">Nov</div>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark">Mid-Term Examinations & Roll Number Slips</div>
+                                    <small class="text-muted">Mandatory 75% lecture attendance required to download admit cards.</small>
+                                </div>
+                            </div>
+                            <span class="badge bg-primary rounded-pill">Exams</span>
+                        </div>
+                    </div>
+
+                    <!-- Event 2 -->
+                    <div class="list-group-item px-0 py-2 border-bottom">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="d-flex gap-3">
+                                <div class="bg-danger-subtle text-danger rounded-3 p-2 text-center" style="width: 48px; height: 48px;">
+                                    <div class="fw-bold fs-6">10</div>
+                                    <div style="font-size: 10px; text-transform: uppercase;">Nov</div>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark">Bank Fee Challan Submission Final Deadline</div>
+                                    <small class="text-muted">HBL & NBP accounts desk clearance for unpaid semester invoices.</small>
+                                </div>
+                            </div>
+                            <span class="badge bg-danger rounded-pill">Fee Cutoff</span>
+                        </div>
+                    </div>
+
+                    <!-- Event 3 -->
+                    <div class="list-group-item px-0 py-2 border-bottom">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="d-flex gap-3">
+                                <div class="bg-success-subtle text-success rounded-3 p-2 text-center" style="width: 48px; height: 48px;">
+                                    <div class="fw-bold fs-6">18</div>
+                                    <div style="font-size: 10px; text-transform: uppercase;">Nov</div>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark">Annual Inter-Collegiate Science & Robotics Gala</div>
+                                    <small class="text-muted">Main Campus Auditorium • Project exhibition and faculty showcase.</small>
+                                </div>
+                            </div>
+                            <span class="badge bg-success rounded-pill">Campus Gala</span>
+                        </div>
+                    </div>
+
+                    <!-- Event 4 -->
+                    <div class="list-group-item px-0 py-2">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="d-flex gap-3">
+                                <div class="bg-info-subtle text-info rounded-3 p-2 text-center" style="width: 48px; height: 48px;">
+                                    <div class="fw-bold fs-6">25</div>
+                                    <div style="font-size: 10px; text-transform: uppercase;">Nov</div>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark">Spring 2027 Admissions Desk Opening</div>
+                                    <small class="text-muted">Early bird enrollment for F.Sc, I.C.S & BS degree batches.</small>
+                                </div>
+                            </div>
+                            <span class="badge bg-info text-dark rounded-pill">Admissions</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. RECENT ADMISSIONS & DEFAULTERS ROW -->
+    <div class="row g-4 mb-4">
+        <!-- Recent Admissions -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 bg-white p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold mb-0 text-dark">
+                        <i class="fa-solid fa-user-plus text-primary me-2"></i>Latest Student Admissions
+                    </h6>
+                    <a href="{{ url_for('admissions') }}" class="small text-primary fw-semibold text-decoration-none">View All &rarr;</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light small text-muted">
+                            <tr>
+                                <th>Roll Number</th>
+                                <th>Student Name</th>
+                                <th>Program</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in recent_admissions %}
+                            <tr>
+                                <td class="fw-bold font-monospace text-primary">{{ s.roll_number }}</td>
+                                <td>{{ s.first_name }} {{ s.last_name }}</td>
+                                <td><span class="badge bg-light text-dark border">{{ s.program_code }}</span></td>
+                                <td>
+                                    <a href="{{ url_for('student_id_card', student_id=s.student_id) }}" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-2 py-0" style="font-size: 11px;">
+                                        ID Card
+                                    </a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="4" class="text-center py-3 text-muted">No recent admissions.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fee Defaulters Alert -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 bg-white p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold mb-0 text-dark">
+                        <i class="fa-solid fa-file-invoice-dollar text-danger me-2"></i>Fee Defaulters & Balance Pending
+                    </h6>
+                    <a href="{{ url_for('finance') }}" class="small text-danger fw-semibold text-decoration-none">Open Finance &rarr;</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light small text-muted">
+                            <tr>
+                                <th>Roll Number</th>
+                                <th>Student Name</th>
+                                <th>Pending Due</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for d in defaulters %}
                             <tr>
-                                <td class="fw-bold">{{ d.roll_number }}</td>
+                                <td class="fw-bold font-monospace text-danger">{{ d.roll_number }}</td>
                                 <td>{{ d.student_name }}</td>
-                                <td class="text-danger fw-bold">PKR {{ "{:,.2f}".format(d.total_outstanding_liability) }}</td>
+                                <td class="text-danger fw-bold">PKR {{ "{:,.2f}".format(d.total_outstanding_liability or d.invoice_balance_due or 0.0) }}</td>
                                 <td>
-                                    <span class="badge bg-danger-subtle text-danger">{{ d.defaulter_status }}</span>
+                                    <a href="{{ url_for('finance') }}" class="btn btn-outline-danger btn-sm rounded-pill px-2 py-0" style="font-size: 11px;">
+                                        View Dues
+                                    </a>
                                 </td>
                             </tr>
                             {% else %}
-                            <tr><td colspan="4" class="text-center text-muted py-3">No pending defaulters found.</td></tr>
+                            <tr><td colspan="4" class="text-center py-3 text-muted">All fees settled! Zero defaulters.</td></tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -137,122 +384,113 @@
         </div>
     </div>
 
-    <!-- Attendance Shortage Alert Preview -->
-    <div class="col-lg-6">
-        <div class="card border-0 shadow-sm rounded-3">
-            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
-                <h6 class="mb-0 fw-bold text-danger">
-                    <i class="fa-solid fa-person-circle-exclamation me-2"></i>Attendance Shortage (&lt;75% Barred)
-                </h6>
-                <a href="{{ url_for('academics') }}" class="btn btn-outline-primary btn-sm">View Academics</a>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive border-0">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Roll No</th>
-                                <th>Student</th>
-                                <th>Course</th>
-                                <th>Attendance %</th>
-                                <th>Exam Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for a in attendance_alerts %}
-                            <tr>
-                                <td class="fw-bold">{{ a.roll_number }}</td>
-                                <td>{{ a.student_name }}</td>
-                                <td>{{ a.course_code }}</td>
-                                <td class="text-danger fw-bold">{{ a.attendance_percentage }}%</td>
-                                <td>
-                                    <span class="badge bg-danger">DEBARRED</span>
-                                </td>
-                            </tr>
-                            {% else %}
-                            <tr><td colspan="5" class="text-center text-muted py-3">No students below 75% attendance threshold.</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Low Stock Inventory Alert -->
-    <div class="col-lg-6">
-        <div class="card border-0 shadow-sm rounded-3">
-            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
-                <h6 class="mb-0 fw-bold text-warning">
-                    <i class="fa-solid fa-box-open me-2"></i>Inventory Low Stock (v_low_stock)
-                </h6>
-                <a href="{{ url_for('inventory') }}" class="btn btn-outline-warning btn-sm">Manage Inventory</a>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive border-0">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Item Code</th>
-                                <th>Item Name</th>
-                                <th>Category</th>
-                                <th>Available / Reorder</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in low_stock %}
-                            <tr>
-                                <td class="fw-semibold">{{ item.item_code }}</td>
-                                <td>{{ item.item_name }}</td>
-                                <td><span class="badge bg-secondary">{{ item.category_name }}</span></td>
-                                <td class="text-danger fw-bold">{{ item.available_stock }} / {{ item.min_reorder_level }} {{ item.unit_of_measure }}</td>
-                            </tr>
-                            {% else %}
-                            <tr><td colspan="4" class="text-center text-muted py-3">All inventory stock is optimal.</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Overdue Library Books -->
-    <div class="col-lg-6">
-        <div class="card border-0 shadow-sm rounded-3">
-            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
-                <h6 class="mb-0 fw-bold text-info">
-                    <i class="fa-solid fa-clock me-2"></i>Overdue Library Returns (v_overdue_books)
-                </h6>
-                <a href="{{ url_for('library') }}" class="btn btn-outline-info btn-sm">Library Desk</a>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive border-0">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Book Title</th>
-                                <th>Borrower</th>
-                                <th>Due Date</th>
-                                <th>Fine Calculated</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for b in overdue_books %}
-                            <tr>
-                                <td class="fw-semibold">{{ b.book_title }}</td>
-                                <td>{{ b.borrower_name }}</td>
-                                <td class="text-muted">{{ b.due_date }}</td>
-                                <td class="text-danger fw-bold">PKR {{ "{:,.2f}".format(b.calculated_fine) }}</td>
-                            </tr>
-                            {% else %}
-                            <tr><td colspan="4" class="text-center text-muted py-3">No overdue borrowings currently.</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
+
+<!-- 6. CHART.JS SCRIPT INITIALIZATION (HARDWARE ACCELERATED & ANIMATED) -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // 1. Financial Trend Area Chart
+    const ctxFin = document.getElementById("financialChart").getContext("2d");
+    const gradientCollected = ctxFin.createLinearGradient(0, 0, 0, 260);
+    gradientCollected.addColorStop(0, "rgba(37, 99, 235, 0.45)");
+    gradientCollected.addColorStop(1, "rgba(37, 99, 235, 0.02)");
+
+    const gradientInvoiced = ctxFin.createLinearGradient(0, 0, 0, 260);
+    gradientInvoiced.addColorStop(0, "rgba(16, 185, 129, 0.35)");
+    gradientInvoiced.addColorStop(1, "rgba(16, 185, 129, 0.02)");
+
+    new Chart(ctxFin, {
+        type: 'line',
+        data: {
+            labels: {{ kpis.financial_trend.months | tojson }},
+            datasets: [
+                {
+                    label: 'Realized Fee Collections (PKR)',
+                    data: {{ kpis.financial_trend.collected | tojson }},
+                    borderColor: '#2563eb',
+                    backgroundColor: gradientCollected,
+                    fill: true,
+                    tension: 0.35,
+                    borderWidth: 3,
+                    pointBackgroundColor: '#2563eb',
+                    pointRadius: 4
+                },
+                {
+                    label: 'Total Invoiced Assessment (PKR)',
+                    data: {{ kpis.financial_trend.invoiced | tojson }},
+                    borderColor: '#10b981',
+                    backgroundColor: gradientInvoiced,
+                    fill: true,
+                    tension: 0.35,
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointBackgroundColor: '#10b981',
+                    pointRadius: 3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+                duration: 1400,
+                easing: 'easeOutQuart'
+            },
+            plugins: {
+                legend: { position: 'top', labels: { boxWidth: 12, font: { family: 'Plus Jakarta Sans', size: 12 } } },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            return ctx.dataset.label + ': PKR ' + Number(ctx.parsed.y).toLocaleString();
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                    ticks: {
+                        callback: function(value) {
+                            return 'PKR ' + (value >= 1000 ? (value / 1000) + 'k' : value);
+                        }
+                    }
+                },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // 2. Program Enrollment Distribution (Doughnut Chart)
+    const ctxProg = document.getElementById("enrollmentChart").getContext("2d");
+    new Chart(ctxProg, {
+        type: 'doughnut',
+        data: {
+            labels: {{ kpis.chart_programs | tojson }},
+            datasets: [{
+                data: {{ kpis.chart_program_counts | tojson }},
+                backgroundColor: [
+                    '#2563eb', '#38bdf8', '#10b981', '#f59e0b', '#8b5cf6',
+                    '#ec4899', '#64748b', '#14b8a6', '#f97316', '#6366f1'
+                ],
+                borderWidth: 2,
+                borderColor: '#ffffff',
+                hoverOffset: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+                duration: 1600,
+                easing: 'easeOutQuart'
+            },
+            plugins: {
+                legend: { position: 'right', labels: { boxWidth: 10, font: { family: 'Plus Jakarta Sans', size: 11.5 } } }
+            },
+            cutout: '65%'
+        }
+    });
+});
+</script>
 {% endblock %}

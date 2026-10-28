@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}Digital Attendance Register - AcademiaPro{% endblock %}
+{% block page_title %}Digital Attendance Register & Faculty Marking Desk{% endblock %}
+{% block page_subtitle %}Instant electronic lecture attendance, real-time calculation of 75% exam board threshold{% endblock %}
+
+{% block content %}
+<div class="main-content">
+
+    <!-- Top Filter & Action Bar -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white p-3">
+        <form method="GET" action="{{ url_for('attendance') }}" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label class="form-label small fw-bold text-muted">Select Academic Course & Section</label>
+                <select name="section_id" class="form-select border-2" onchange="this.form.submit()">
+                    {% for sec in sections %}
+                    <option value="{{ sec.section_id }}" {% if sec.section_id == selected_section_id %}selected{% endif %}>
+                        {{ sec.course_code }}: {{ sec.course_title }} (Sec {{ sec.section_name }}) — {{ sec.teacher_name }} [{{ sec.enrolled_count }} Students]
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label small fw-bold text-muted">Lecture Date</label>
+                <input type="date" name="lecture_date" class="form-control border-2" value="{{ lecture_date }}" onchange="this.form.submit()">
+            </div>
+
+            <div class="col-md-4 text-md-end">
+                <div class="d-flex gap-2 justify-content-md-end">
+                    <button type="button" class="btn btn-outline-success btn-sm rounded-pill fw-semibold px-3" onclick="bulkSet('Present')">
+                        <i class="fa-solid fa-check-double me-1"></i> Mark All Present
+                    </button>
+                    <button type="button" class="btn btn-outline-danger btn-sm rounded-pill fw-semibold px-3" onclick="bulkSet('Absent')">
+                        <i class="fa-solid fa-xmark me-1"></i> Mark All Absent
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Attendance Live Tally Counters -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm rounded-3 p-3 bg-white text-center">
+                <div class="text-muted small fw-semibold">ENROLLED STUDENTS</div>
+                <div class="fs-4 fw-bold text-primary mt-1" id="tallyTotal">{{ students|length }}</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm rounded-3 p-3 bg-white text-center">
+                <div class="text-muted small fw-semibold">PRESENT TODAY</div>
+                <div class="fs-4 fw-bold text-success mt-1" id="tallyPresent">0</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm rounded-3 p-3 bg-white text-center">
+                <div class="text-muted small fw-semibold">ABSENT TODAY</div>
+                <div class="fs-4 fw-bold text-danger mt-1" id="tallyAbsent">0</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm rounded-3 p-3 bg-white text-center">
+                <div class="text-muted small fw-semibold">ATTENDANCE RATE</div>
+                <div class="fs-4 fw-bold text-info mt-1" id="tallyRate">100%</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Attendance Form -->
+    <form method="POST" action="{{ url_for('attendance') }}" id="attendanceForm">
+        <input type="hidden" name="section_id" value="{{ selected_section_id }}">
+        <input type="hidden" name="lecture_date" value="{{ lecture_date }}">
+
+        <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden mb-4">
+            <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="fw-bold mb-0 text-dark">
+                        <i class="fa-solid fa-clipboard-user text-primary me-2"></i>Class Roll Call & Attendance Sheet
+                    </h6>
+                    <small class="text-muted">Lecture Session Date: <strong>{{ lecture_date }}</strong></small>
+                </div>
+                <button type="submit" class="btn btn-primary fw-bold px-4 rounded-pill shadow-sm">
+                    <i class="fa-solid fa-floppy-disk me-2"></i> Save Digital Register
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light small text-muted">
+                        <tr>
+                            <th style="width: 70px;">Avatar</th>
+                            <th>Roll Number</th>
+                            <th>Student Full Name</th>
+                            <th>Program & Tier</th>
+                            <th style="width: 320px;">Attendance Status</th>
+                            <th>Lecture Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for st in students %}
+                        <tr>
+                            <!-- Boy / Girl Sketch Avatar -->
+                            <td>
+                                {% if st.photo_url %}
+                                <img src="{{ st.photo_url }}" class="rounded-circle" style="width: 44px; height: 44px; object-fit: cover;" alt="Photo">
+                                {% elif st.gender == 'Female' %}
+                                <!-- Elegant Female Student Sketch SVG -->
+                                <div style="width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #f43f5e 0%, #be123c 100%); display: flex; align-items: center; justify-content: center; color: white;">
+                                    <i class="fa-solid fa-user-graduate fs-5"></i>
+                                </div>
+                                {% else %}
+                                <!-- Sharp Male Student Sketch SVG -->
+                                <div style="width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%); display: flex; align-items: center; justify-content: center; color: white;">
+                                    <i class="fa-solid fa-user-tie fs-5"></i>
+                                </div>
+                                {% endif %}
+                            </td>
+
+                            <!-- Roll Number -->
+                            <td>
+                                <span class="fw-bold text-dark font-monospace">{{ st.roll_number }}</span>
+                            </td>
+
+                            <!-- Student Name & Gender Tag -->
+                            <td>
+                                <div class="fw-semibold text-dark">{{ st.first_name }} {{ st.last_name }}</div>
+                                <small class="text-muted">
+                                    <i class="fa-solid {{ 'fa-venus text-danger' if st.gender == 'Female' else 'fa-mars text-primary' }}"></i> {{ st.gender }}
+                                </small>
+                            </td>
+
+                            <!-- Program / Tier -->
+                            <td>
+                                <span class="badge bg-light text-dark border">{{ st.academic_tier }}</span>
+                                <small class="text-muted d-block">{{ st.part_or_year }}</small>
+                            </td>
+
+                            <!-- Interactive Attendance Radio Buttons -->
+                            <td>
+                                <div class="btn-group w-100" role="group">
+                                    <input type="radio" class="btn-check att-radio" name="status_{{ st.enrollment_id }}" id="p_{{ st.enrollment_id }}" value="Present" {% if st.attendance_status == 'Present' %}checked{% endif %} onchange="updateTallies()">
+                                    <label class="btn btn-outline-success btn-sm py-1 fw-semibold" for="p_{{ st.enrollment_id }}">
+                                        <i class="fa-solid fa-check"></i> Present
+                                    </label>
+
+                                    <input type="radio" class="btn-check att-radio" name="status_{{ st.enrollment_id }}" id="a_{{ st.enrollment_id }}" value="Absent" {% if st.attendance_status == 'Absent' %}checked{% endif %} onchange="updateTallies()">
+                                    <label class="btn btn-outline-danger btn-sm py-1 fw-semibold" for="a_{{ st.enrollment_id }}">
+                                        <i class="fa-solid fa-xmark"></i> Absent
+                                    </label>
+
+                                    <input type="radio" class="btn-check att-radio" name="status_{{ st.enrollment_id }}" id="l_{{ st.enrollment_id }}" value="Leave" {% if st.attendance_status == 'Leave' %}checked{% endif %} onchange="updateTallies()">
+                                    <label class="btn btn-outline-warning btn-sm py-1 fw-semibold" for="l_{{ st.enrollment_id }}">
+                                        Leave
+                                    </label>
+
+                                    <input type="radio" class="btn-check att-radio" name="status_{{ st.enrollment_id }}" id="t_{{ st.enrollment_id }}" value="Late" {% if st.attendance_status == 'Late' %}checked{% endif %} onchange="updateTallies()">
+                                    <label class="btn btn-outline-secondary btn-sm py-1 fw-semibold" for="t_{{ st.enrollment_id }}">
+                                        Late
+                                    </label>
+                                </div>
+                            </td>
+
+                            <!-- Remarks -->
+                            <td>
+                                <input type="text" name="remarks_{{ st.enrollment_id }}" class="form-control form-control-sm" placeholder="Optional notes (e.g. sick leave, late by 15 mins)..." value="{{ st.remarks }}">
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="fa-solid fa-users-slash fs-2 mb-2 text-secondary"></i>
+                                <div>No students enrolled in this section. Please select another course or section.</div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if students %}
+            <div class="card-footer bg-light p-3 text-end border-top">
+                <button type="submit" class="btn btn-primary fw-bold px-4 rounded-pill shadow-sm">
+                    <i class="fa-solid fa-floppy-disk me-2"></i> Save Digital Register
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </form>
+
+</div>
+
+<script>
+function bulkSet(status) {
+    const radios = document.querySelectorAll('.att-radio');
+    radios.forEach(r => {
+        if (r.value === status) {
+            r.checked = true;
+        }
+    });
+    updateTallies();
+}
+
+function updateTallies() {
+    const checked = document.querySelectorAll('.att-radio:checked');
+    let present = 0;
+    let absent = 0;
+    let total = checked.length;
+
+    checked.forEach(r => {
+        if (r.value === 'Present' || r.value === 'Late') present++;
+        else if (r.value === 'Absent') absent++;
+    });
+
+    document.getElementById('tallyTotal').innerText = total;
+    document.getElementById('tallyPresent').innerText = present;
+    document.getElementById('tallyAbsent').innerText = absent;
+
+    const rate = total > 0 ? Math.round((present / total) * 100) : 100;
+    document.getElementById('tallyRate').innerText = rate + '%';
+}
+
+document.addEventListener('DOMContentLoaded', updateTallies);
+</script>
+{% endblock %}

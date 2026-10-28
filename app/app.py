@@ -4,6 +4,7 @@ Enterprise Multi-Tier College Management System (Intermediate & BS Programs)
 """
 import os
 import json
+import datetime
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
 from database_engine import db
 
@@ -178,6 +179,7 @@ def dashboard():
         ORDER BY s.student_id DESC LIMIT 5
     """)
     
+    college = db.get_college_profile()
     return render_template("index.html", 
                            kpis=kpis, 
                            defaulters=defaulters, 
@@ -185,7 +187,8 @@ def dashboard():
                            overdue_books=overdue_books,
                            attendance_alerts=attendance_alerts,
                            recent_admissions=recent_admissions,
-                           active_tier=tier_filter)
+                           active_tier=tier_filter,
+                           college=college)
 
 # ==========================================
 # 2. ADMISSIONS & DYNAMIC DATA ENTRY DESK
@@ -303,6 +306,54 @@ def academics():
                            transcripts=transcripts,
                            attendance_report=attendance_report,
                            active_tier=tier_filter)
+
+# ==========================================
+# 4B. DIGITAL ATTENDANCE REGISTER
+# ==========================================
+@app.route("/attendance", methods=["GET", "POST"])
+def attendance():
+    sections = db.get_sections_for_attendance()
+    default_sec = sections[0]["section_id"] if sections else 1
+    selected_section_id = int(request.args.get("section_id", default_sec))
+    lecture_date = request.args.get("lecture_date", datetime.date.today().strftime("%Y-%m-%d"))
+
+    if request.method == "POST":
+        section_id = int(request.form.get("section_id", selected_section_id))
+        date_str = request.form.get("lecture_date", lecture_date)
+        records = []
+        for key, val in request.form.items():
+            if key.startswith("status_"):
+                enrollment_id = int(key.replace("status_", ""))
+                remarks = request.form.get(f"remarks_{enrollment_id}", "Marked by Faculty")
+                records.append({
+                    "enrollment_id": enrollment_id,
+                    "status": val,
+                    "remarks": remarks
+                })
+        res = db.record_digital_attendance(section_id, date_str, records)
+        if res.get("success"):
+            flash(f"Digital attendance register saved successfully for {res.get('count')} student(s) on {date_str}!", "success")
+        else:
+            flash(f"Failed to record attendance: {res.get('error')}", "danger")
+        return redirect(url_for("attendance", section_id=section_id, lecture_date=date_str))
+
+    students = db.get_students_for_attendance(selected_section_id, lecture_date)
+    return render_template(
+        "attendance.html",
+        sections=sections,
+        selected_section_id=selected_section_id,
+        lecture_date=lecture_date,
+        students=students
+    )
+
+@app.route("/api/attendance/mark", methods=["POST"])
+def api_attendance_mark():
+    data = request.get_json() or {}
+    sec_id = int(data.get("section_id", 1))
+    date_str = data.get("lecture_date", datetime.date.today().strftime("%Y-%m-%d"))
+    records = data.get("records", [])
+    res = db.record_digital_attendance(sec_id, date_str, records)
+    return jsonify(res)
 
 # ==========================================
 # 5. FINANCE & FEES MODULE
