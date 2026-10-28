@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Institutional Branding & White-Label Settings - AcademiaPro{% endblock %}
+{% block page_title %}Institution Profile & White-Label Customization{% endblock %}
+{% block page_subtitle %}Re-brand the entire ERP system, ID Cards, and Bank Challans for any College or University{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-header bg-white p-4 border-bottom d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-1 fw-bold text-dark"><i class="fa-solid fa-building-columns text-primary me-2"></i> Client Institution Profile</h5>
+                    <small class="text-muted">Changes saved here will automatically reflect on all Student ID Cards, 3-Part Bank Challans, and Portals.</small>
+                </div>
+                <span class="badge bg-success-subtle text-success border border-success px-3 py-2 fw-semibold">
+                    <i class="fa-solid fa-certificate me-1"></i> White-Label Active
+                </span>
+            </div>
+
+            <div class="card-body p-4 p-md-5">
+                <form action="{{ url_for('settings') }}" method="POST">
+                    
+                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">
+                        <i class="fa-solid fa-school me-2 text-primary"></i> 1. College / Institution Information
+                    </h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold">College / University Full Name <span class="text-danger">*</span></label>
+                            <input type="text" name="college_name" class="form-control" value="{{ college.college_name }}" required>
+                            <small class="text-muted">This name appears on the header of all reports, ID cards, and Challans.</small>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Short Code / Acronym <span class="text-danger">*</span></label>
+                            <input type="text" name="college_short_code" class="form-control" value="{{ college.college_short_code }}" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Official Tagline / Motto</label>
+                            <input type="text" name="tagline" class="form-control" value="{{ college.tagline }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Board / University Affiliation</label>
+                            <input type="text" name="affiliation" class="form-control" value="{{ college.affiliation }}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Official Campus Address</label>
+                            <input type="text" name="address" class="form-control" value="{{ college.address }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Helpdesk Phone</label>
+                            <input type="text" name="phone" class="form-control" value="{{ college.phone }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Admissions Email</label>
+                            <input type="email" name="email" class="form-control" value="{{ college.email }}">
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">
+                        <i class="fa-solid fa-landmark me-2 text-success"></i> 2. Bank Challan Accounts Configuration
+                    </h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-5">
+                            <label class="form-label fw-semibold">Designated Bank Name</label>
+                            <input type="text" name="bank_name" class="form-control" value="{{ college.bank_name }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">College Collection Account Number</label>
+                            <input type="text" name="bank_account_no" class="form-control" value="{{ college.bank_account_no }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Bank Branch Code</label>
+                            <input type="text" name="bank_branch_code" class="form-control" value="{{ college.bank_branch_code }}">
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">
+                        <i class="fa-solid fa-user-tie me-2 text-warning"></i> 3. Executive Authority
+                    </h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Principal / Director Full Name</label>
+                            <input type="text" name="principal_name" class="form-control" value="{{ college.principal_name }}">
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-3 pt-3 border-top">
+                        <button type="submit" class="btn btn-primary px-5 py-2 fw-bold shadow-sm">
+                            <i class="fa-solid fa-save me-2"></i> Save Changes & Update All Documents
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+        <!-- Card 2: Security & Master Password Management -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-header bg-white p-4 border-bottom d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-1 fw-bold text-dark"><i class="fa-solid fa-shield-halved text-danger me-2"></i> Master Access Password</h5>
+                    <small class="text-muted">Change the security password required to log in to the AcademiaPro ERP portal.</small>
+                </div>
+                <span class="badge bg-danger-subtle text-danger border border-danger px-3 py-2 fw-semibold">
+                    <i class="fa-solid fa-lock me-1"></i> Access Protection
+                </span>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                {% if logged_role == 'Evaluator' %}
+                <div class="alert alert-warning border-0 p-4 rounded-3 d-flex align-items-center gap-3">
+                    <div class="bg-warning text-dark rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="fa-solid fa-shield-halved fs-5"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-dark">Demo Evaluation Mode Active</h6>
+                        <p class="mb-0 text-muted small">You are reviewing AcademiaPro in client evaluation mode. Master password modification is restricted to the primary system owner.</p>
+                    </div>
+                </div>
+                {% else %}
+                <form action="{{ url_for('change_password') }}" method="POST">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Current Password <span class="text-danger">*</span></label>
+                            <input type="password" name="current_password" class="form-control" placeholder="e.g. admin123" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">New Password <span class="text-danger">*</span></label>
+                            <input type="password" name="new_password" class="form-control" placeholder="Enter new secret password" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Confirm New Password <span class="text-danger">*</span></label>
+                            <input type="password" name="confirm_password" class="form-control" placeholder="Re-type new password" required>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end gap-3 pt-3 mt-4 border-top">
+                        <button type="submit" class="btn btn-danger px-4 py-2 fw-bold shadow-sm">
+                            <i class="fa-solid fa-key me-2"></i> Update Master Password
+                        </button>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

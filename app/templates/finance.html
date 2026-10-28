@@ -98,14 +98,15 @@
                                 <th>Balance Due</th>
                                 <th>Status</th>
                                 <th>Due Date</th>
+                                <th class="text-end pe-3">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for inv in invoices %}
                             <tr>
-                                <td class="fw-bold">{{ inv.invoice_number }}</td>
-                                <td>{{ inv.roll_number }}</td>
-                                <td>{{ inv.student_name }}</td>
+                                <td class="fw-bold font-monospace">{{ inv.invoice_number }}</td>
+                                <td><span class="badge bg-dark-subtle text-dark border">{{ inv.roll_number }}</span></td>
+                                <td>{{ inv.student_name }} <small class="text-muted">({{ inv.program_code }})</small></td>
                                 <td>PKR {{ "{:,.2f}".format(inv.total_amount) }}</td>
                                 <td class="text-success">PKR {{ "{:,.2f}".format(inv.paid_amount) }}</td>
                                 <td class="fw-bold {% if inv.balance_due > 0 %}text-danger{% else %}text-muted{% endif %}">
@@ -121,6 +122,11 @@
                                     {% endif %}
                                 </td>
                                 <td>{{ inv.due_date }}</td>
+                                <td class="text-end pe-3">
+                                    <a href="{{ url_for('fee_challan', invoice_id=inv.invoice_id) }}" target="_blank" class="btn btn-outline-warning text-dark btn-sm py-0 px-2 fw-semibold" title="Print Official 3-Part Bank Challan">
+                                        <i class="fa-solid fa-receipt me-1"></i> 3-Copy Challan
+                                    </a>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>

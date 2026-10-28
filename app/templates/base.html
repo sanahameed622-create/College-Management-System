@@ -32,13 +32,18 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="{{ url_for('admissions') }}" class="nav-link {% if request.path == '/admissions' %}active{% endif %}" style="background: rgba(37, 99, 235, 0.15); border-left: 3px solid #3b82f6;">
+                            <i class="fa-solid fa-id-card text-info"></i> Admissions & Data Desk
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="{{ url_for('academics') }}" class="nav-link {% if request.path == '/academics' %}active{% endif %}">
-                            <i class="fa-solid fa-chalkboard-user"></i> Academics
+                            <i class="fa-solid fa-chalkboard-user"></i> Academics (Inter & BS)
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="{{ url_for('finance') }}" class="nav-link {% if request.path == '/finance' %}active{% endif %}">
-                            <i class="fa-solid fa-coins"></i> Finance & Fines
+                            <i class="fa-solid fa-coins"></i> Finance & Challans
                         </a>
                     </li>
                     <li class="nav-item">
@@ -67,6 +72,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="{{ url_for('settings') }}" class="nav-link {% if request.path == '/settings' %}active{% endif %}">
+                            <i class="fa-solid fa-sliders text-warning"></i> White-Label & Settings
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="{{ url_for('query_runner') }}" class="nav-link {% if request.path == '/query-runner' %}active{% endif %}">
                             <i class="fa-solid fa-terminal"></i> SQL Query Runner
                         </a>
@@ -75,8 +85,8 @@
 
                 <hr class="border-secondary my-3">
                 <div class="px-2 py-2 bg-dark rounded-3">
-                    <small class="text-white-50 d-block"><i class="fa-solid fa-database text-success me-1"></i> Active DB Mode</small>
-                    <span class="badge bg-success">Dual PostgreSQL / SQLite</span>
+                    <small class="text-white-50 d-block"><i class="fa-solid fa-graduation-cap text-warning me-1"></i> System Scope</small>
+                    <span class="badge bg-primary">Inter (1st/2nd Yr) + BS</span>
                 </div>
             </div>
 
@@ -88,18 +98,25 @@
                         <h4 class="page-title">{% block page_title %}Dashboard{% endblock %}</h4>
                         <small class="page-subtitle">{% block page_subtitle %}Enterprise Academic & Relational DBMS{% endblock %}</small>
                     </div>
-                    <div class="d-flex align-items-center gap-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <a href="{{ url_for('admissions') }}" class="btn btn-primary btn-sm fw-bold px-3 shadow-sm">
+                            <i class="fa-solid fa-plus-circle me-1"></i> New Admission
+                        </a>
                         <span class="badge bg-primary-subtle text-primary border border-primary px-3 py-2">
-                            <i class="fa-regular fa-calendar me-1"></i> Academic Term: Spring 2026
+                            <i class="fa-regular fa-calendar me-1"></i> Session: 2026
                         </span>
                         <div class="dropdown">
                             <button class="btn btn-outline-secondary dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown">
-                                <i class="fa-solid fa-user-circle me-1"></i> Active Role: Admin
+                                <i class="fa-solid fa-user-circle me-1 text-primary"></i> {{ logged_user }}
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user me-2"></i> Shahbaz Ahmed (Admin)</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                                <li class="px-3 py-1">
+                                    <small class="text-muted d-block">Role Permissions</small>
+                                    <span class="badge bg-primary">{{ logged_role }}</span>
+                                </li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-danger" href="#"><i class="fa-solid fa-right-from-bracket me-2"></i> Logout</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('settings') }}"><i class="fa-solid fa-gear me-2 text-warning"></i> College Settings</a></li>
+                                <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}"><i class="fa-solid fa-right-from-bracket me-2"></i> Secure Logout</a></li>
                             </ul>
                         </div>
                     </div>
@@ -107,7 +124,24 @@
 
                 <!-- Page Body -->
                 <div class="p-4">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4 d-flex align-items-center gap-2" role="alert">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <div class="fw-semibold">{{ message }}</div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+
                     {% block content %}{% endblock %}
+
+                    <!-- Enterprise Footer Watermark -->
+                    <div class="mt-5 pt-3 border-top text-center text-muted" style="font-size: 11px;">
+                        <span>AcademiaPro Enterprise ERP v2.4 • Licensed Exclusively to <strong>{{ college.college_name }}</strong> • Proprietary Commercial DBMS</span>
+                    </div>
                 </div>
             </div>
         </div>

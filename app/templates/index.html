@@ -11,14 +11,17 @@
         <div class="card-stat">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <div class="stat-label">Active Students</div>
+                    <div class="stat-label">Enrolled Students</div>
                     <div class="stat-value text-primary">{{ kpis.active_students }}</div>
                 </div>
                 <div class="stat-icon bg-primary-subtle text-primary">
                     <i class="fa-solid fa-user-graduate"></i>
                 </div>
             </div>
-            <small class="text-success mt-2 d-block"><i class="fa-solid fa-arrow-up"></i> 100% active in current term</small>
+            <div class="d-flex gap-1 mt-2">
+                <span class="badge bg-info-subtle text-info-emphasis border border-info" style="font-size: 10px;">Inter: {{ kpis.inter_students }}</span>
+                <span class="badge bg-primary-subtle text-primary border border-primary" style="font-size: 10px;">BS: {{ kpis.bs_students }}</span>
+            </div>
         </div>
     </div>
 
@@ -64,6 +67,30 @@
                 </div>
             </div>
             <small class="text-warning mt-2 d-block">Below reorder threshold</small>
+        </div>
+    </div>
+<!-- Quick Admissions & Program Scope Banner -->
+<div class="card border-0 shadow-sm rounded-4 mb-4 bg-gradient bg-light border p-3">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div class="d-flex align-items-center gap-3">
+            <div class="bg-primary text-white rounded-circle p-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                <i class="fa-solid fa-graduation-cap fs-5"></i>
+            </div>
+            <div>
+                <h6 class="mb-0 fw-bold text-dark">Multi-Tier Institutional Engine Active</h6>
+                <small class="text-muted">Supports Intermediate Colleges (F.Sc Pre-Med/Eng, I.C.S, I.Com, F.A) & BS Degree Programs (BSCS, BBA, BSAI, BS Math)</small>
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('admissions') }}" class="btn btn-primary btn-sm fw-bold px-3 shadow-sm">
+                <i class="fa-solid fa-user-plus me-1"></i> New Student Admission
+            </a>
+            <a href="{{ url_for('admissions', tier='intermediate') }}" class="btn btn-outline-info text-dark btn-sm fw-semibold">
+                🎓 1st & 2nd Year
+            </a>
+            <a href="{{ url_for('admissions', tier='bs') }}" class="btn btn-outline-primary btn-sm fw-semibold">
+                🏛️ BS Programs
+            </a>
         </div>
     </div>
 </div>

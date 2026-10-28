@@ -37,6 +37,14 @@
     <!-- Tab 1: Students Directory -->
     <div class="tab-pane fade show active" id="students" role="tabpanel">
         <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                <div class="fw-bold text-dark"><i class="fa-solid fa-users me-2 text-primary"></i>Enrolled Students ({{ students|length }})</div>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('academics', tier='all') }}" class="btn btn-sm {% if active_tier == 'all' %}btn-primary{% else %}btn-outline-secondary{% endif %}">All</a>
+                    <a href="{{ url_for('academics', tier='intermediate') }}" class="btn btn-sm {% if active_tier == 'intermediate' %}btn-primary{% else %}btn-outline-secondary{% endif %}">🎓 Intermediate (1st/2nd Yr)</a>
+                    <a href="{{ url_for('academics', tier='bs') }}" class="btn btn-sm {% if active_tier == 'bs' %}btn-primary{% else %}btn-outline-secondary{% endif %}">🏛️ BS Programs</a>
+                </div>
+            </div>
             <div class="card-body p-0">
                 <div class="table-responsive border-0">
                     <table class="table table-hover align-middle mb-0">
@@ -44,22 +52,29 @@
                             <tr>
                                 <th>Roll Number</th>
                                 <th>Student Name</th>
-                                <th>Program</th>
+                                <th>Program & Tier</th>
+                                <th>Class / Semester</th>
                                 <th>Email</th>
-                                <th>CNIC</th>
-                                <th>Semester</th>
                                 <th>Status</th>
+                                <th class="text-end pe-3">Print Documents</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for s in students %}
                             <tr>
-                                <td class="fw-bold text-primary">{{ s.roll_number }}</td>
+                                <td class="fw-bold text-primary font-monospace">{{ s.roll_number }}</td>
                                 <td>{{ s.first_name }} {{ s.last_name }}</td>
-                                <td><span class="badge bg-secondary">{{ s.program_code }}</span></td>
-                                <td>{{ s.email }}</td>
-                                <td>{{ s.cnic }}</td>
-                                <td>Semester {{ s.current_semester_num }}</td>
+                                <td>
+                                    <span class="badge {% if s.degree_level == 'Intermediate' %}bg-info-subtle text-info-emphasis border border-info{% else %}bg-primary-subtle text-primary border border-primary{% endif %}">
+                                        {{ s.program_code }} ({{ s.degree_level or 'BS' }})
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">
+                                        {{ s.part_or_year or ('Semester ' ~ s.current_semester_num) }}
+                                    </span>
+                                </td>
+                                <td><small class="text-muted">{{ s.email }}</small></td>
                                 <td>
                                     {% if s.status == 'Active' %}
                                     <span class="badge bg-success">Active</span>
@@ -68,6 +83,14 @@
                                     {% else %}
                                     <span class="badge bg-danger">{{ s.status }}</span>
                                     {% endif %}
+                                </td>
+                                <td class="text-end pe-3">
+                                    <a href="{{ url_for('student_id_card', student_id=s.student_id) }}" target="_blank" class="btn btn-outline-primary btn-sm py-0 px-2" title="Print Student ID Card">
+                                        <i class="fa-solid fa-id-card"></i> Card
+                                    </a>
+                                    <a href="{{ url_for('roll_number_slip', student_id=s.student_id) }}" target="_blank" class="btn btn-outline-dark btn-sm py-0 px-2" title="Print Roll No Slip">
+                                        <i class="fa-solid fa-file-lines"></i> Slip
+                                    </a>
                                 </td>
                             </tr>
                             {% endfor %}
