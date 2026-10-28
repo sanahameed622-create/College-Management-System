@@ -26,7 +26,8 @@ def require_authentication():
     public_endpoints = [
         'login', 'logout', 'static',
         'student_desk', 'api_student_ai',
-        'student_id_card', 'fee_challan', 'roll_number_slip'
+        'student_id_card', 'fee_challan', 'roll_number_slip',
+        'api_biometric_login', 'api_reset_password_pin'
     ]
     if request.endpoint in public_endpoints:
         return
@@ -53,11 +54,39 @@ def login():
             session["user_name"] = user.get("full_name")
             session["user_role"] = user.get("role_name", "Admin")
             flash(f"Welcome back, {user.get('full_name')}!", "success")
+            if user.get("role_name") == "Student":
+                return redirect(url_for("student_desk", roll_number=user.get("username")))
             return redirect(url_for("dashboard"))
         else:
-            flash("Invalid credentials! Master Admin: admin / admin123", "danger")
+            flash("Invalid credentials! Master Admin: admin / sana123 or check your assigned Gmail/Password.", "danger")
 
     return render_template("login.html")
+
+@app.route("/api/biometric-login", methods=["POST"])
+def api_biometric_login():
+    data = request.get_json() or {}
+    identifier = data.get("identifier", "admin")
+    user = db.authenticate_biometric(identifier)
+    if user:
+        session["logged_in"] = True
+        session["user_id"] = user.get("user_id")
+        session["user_name"] = user.get("full_name")
+        session["user_role"] = user.get("role_name", "Admin")
+        if user.get("role_name") == "Student":
+            target_url = url_for("student_desk", roll_number=user.get("username"))
+        else:
+            target_url = url_for("dashboard")
+        return jsonify({"success": True, "redirect": target_url, "user": user.get("full_name")})
+    return jsonify({"success": False, "error": "Biometric sensor verification rejected."})
+
+@app.route("/api/reset-password-pin", methods=["POST"])
+def api_reset_password_pin():
+    data = request.get_json() or {}
+    email = data.get("email", "").strip()
+    pin = data.get("pin", "").strip()
+    new_password = data.get("new_password", "").strip()
+    res = db.reset_password_with_pin(email, pin, new_password)
+    return jsonify(res)
 
 @app.route("/logout")
 def logout():

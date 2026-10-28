@@ -4,21 +4,21 @@
    ========================================================================== */
 
 :root {
-    --brand-primary: #1e3a8a;      /* Deep Oxford Navy */
-    --brand-secondary: #0f172a;    /* Slate Dark Navy */
-    --brand-accent: #2563eb;       /* Vivid Royal Blue */
-    --brand-cyan: #06b6d4;         /* Vibrant Tech Cyan */
+    --brand-primary: #064e3b;      /* Deep Emerald Forest */
+    --brand-secondary: #04140e;    /* Obsidian Dark Green */
+    --brand-accent: #10b981;       /* Vivid Emerald Green */
+    --brand-cyan: #34d399;         /* Mint Accent */
     --brand-emerald: #10b981;      /* Success Emerald */
     --brand-amber: #f59e0b;        /* Warning Amber */
     --brand-rose: #ef4444;         /* Danger Crimson */
     
     --bg-page: #f8fafc;
     --bg-surface: #ffffff;
-    --bg-surface-alt: #f1f5f9;
+    --bg-surface-alt: #f0fdf4;
     --border-subtle: #e2e8f0;
-    --border-focus: #94a3b8;
+    --border-focus: #10b981;
     
-    --text-main: #0f172a;
+    --text-main: #061a12;
     --text-muted: #64748b;
     --text-inverse: #ffffff;
 
@@ -39,7 +39,7 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
     background-color: var(--bg-page);
     color: var(--text-main);
     -webkit-font-smoothing: antialiased;
@@ -53,17 +53,17 @@ html, body {
     background: #f1f5f9;
 }
 ::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: #a7f3d0;
     border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+    background: #10b981;
 }
 
 .sidebar {
-    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+    background: linear-gradient(180deg, #051a13 0%, #064e3b 100%);
     min-height: 100vh;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.08);
     z-index: 100;
 }
 
@@ -85,14 +85,14 @@ html, body {
 
 .brand-subtitle {
     font-size: 0.75rem;
-    color: #94a3b8;
+    color: #a7f3d0;
     text-transform: uppercase;
     letter-spacing: 0.8px;
     font-weight: 600;
 }
 
 .sidebar .nav-link {
-    color: #94a3b8;
+    color: #cbd5e1;
     font-size: 0.92rem;
     font-weight: 500;
     padding: 10px 16px;
@@ -113,7 +113,7 @@ html, body {
 
 .sidebar .nav-link:hover {
     color: #ffffff;
-    background-color: rgba(255, 255, 255, 0.06);
+    background-color: rgba(255, 255, 255, 0.08);
     transform: translateX(3px);
 }
 
@@ -123,9 +123,21 @@ html, body {
 
 .sidebar .nav-link.active {
     color: #ffffff;
-    background: linear-gradient(90deg, #2563eb 0%, #1d4ed8 100%);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+    background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
     font-weight: 600;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    border-color: #059669 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
+}
+.btn-primary:hover {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%) !important;
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.45) !important;
+    transform: translateY(-1px);
 }
 
 .topbar {
