@@ -1,187 +1,831 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - AcademiaPro{% endblock %}
-{% block page_title %}Institutional Executive Dashboard{% endblock %}
-{% block page_subtitle %}Real-time multi-tier academic analytics, cashflow trajectories & digital registers{% endblock %}
+{% block title %}Dashboard • AcademiaPro College Management System{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Dark Luxury Dashboard Styles (Matching Reference Mockup) */
+    .dashboard-hero-banner {
+        background: linear-gradient(180deg, rgba(7, 16, 36, 0.72) 0%, rgba(5, 11, 26, 0.92) 100%),
+                    url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1400&q=80') center/cover no-repeat;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 30px 32px;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 24px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+    }
+
+    .hero-greeting {
+        font-size: 24px;
+        font-weight: 800;
+        color: #ffffff;
+        letter-spacing: -0.4px;
+        margin-bottom: 4px;
+    }
+
+    .hero-subtitle {
+        color: #94a3b8;
+        font-size: 13.5px;
+        margin-bottom: 16px;
+    }
+
+    .hero-pill-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 14px;
+        background: rgba(14, 28, 58, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 9999px;
+        font-size: 11.5px;
+        color: #e2e8f0;
+        backdrop-filter: blur(8px);
+    }
+
+    .hero-pill-badge i {
+        color: #f59e0b;
+        font-size: 12px;
+    }
+
+    .hero-quote-box {
+        text-align: right;
+        max-width: 380px;
+        font-style: italic;
+        color: #cbd5e1;
+        font-size: 12px;
+        line-height: 1.5;
+        border-right: 2px solid #f59e0b;
+        padding-right: 14px;
+    }
+
+    .hero-quote-author {
+        display: block;
+        font-style: normal;
+        font-weight: 700;
+        color: #f59e0b;
+        font-size: 11px;
+        margin-top: 4px;
+    }
+
+    /* 4 Metric KPI Cards */
+    .kpi-metric-card {
+        background: rgba(11, 23, 49, 0.85);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 18px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .kpi-metric-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(245, 158, 11, 0.35);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+    }
+
+    .kpi-icon-pill {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .kpi-icon-blue { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .kpi-icon-pink { background: rgba(236, 72, 153, 0.2); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.3); }
+    .kpi-icon-green { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .kpi-icon-gold { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+
+    .kpi-label {
+        color: #94a3b8;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 2px;
+    }
+
+    .kpi-value {
+        color: #ffffff;
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        line-height: 1.1;
+    }
+
+    .kpi-trend {
+        font-size: 11px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        margin-top: 4px;
+    }
+
+    .kpi-sparkline-canvas {
+        width: 100% !important;
+        height: 38px !important;
+        margin-top: 8px;
+    }
+
+    /* Content Cards */
+    .dashboard-card {
+        background: rgba(10, 21, 46, 0.88);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 18px;
+        padding: 22px;
+        margin-bottom: 24px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .card-header-sleek {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+    }
+
+    .card-header-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .card-header-title i {
+        color: #f59e0b;
+    }
+
+    /* Dark Table */
+    .dark-enrollment-table {
+        width: 100%;
+        color: #ffffff;
+        margin-bottom: 0;
+    }
+
+    .dark-enrollment-table th {
+        background: rgba(6, 14, 32, 0.6);
+        color: #94a3b8;
+        font-size: 11.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 12px 14px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .dark-enrollment-table td {
+        padding: 12px 14px;
+        font-size: 13px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        vertical-align: middle;
+    }
+
+    .dark-enrollment-table tr:hover td {
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    .pill-active-status {
+        background: rgba(16, 185, 129, 0.18);
+        border: 1px solid rgba(52, 211, 153, 0.35);
+        color: #34d399;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 9999px;
+    }
+
+    .btn-eye-view {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #cbd5e1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+    .btn-eye-view:hover {
+        background: rgba(245, 158, 11, 0.2);
+        color: #f59e0b;
+        border-color: #f59e0b;
+    }
+
+    /* Popular Courses Progress Bars */
+    .course-bar-item {
+        margin-bottom: 14px;
+    }
+
+    .course-bar-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        margin-bottom: 5px;
+    }
+
+    .progress-dark {
+        height: 7px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 9999px;
+        overflow: hidden;
+    }
+
+    /* Quick Actions 6-Grid */
+    .quick-action-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .quick-action-btn {
+        background: rgba(6, 15, 36, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 12px 14px;
+        color: #ffffff;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 12.5px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .quick-action-btn i {
+        color: #f59e0b;
+        font-size: 15px;
+    }
+
+    .quick-action-btn:hover {
+        background: rgba(245, 158, 11, 0.15);
+        border-color: rgba(245, 158, 11, 0.4);
+        color: #ffffff;
+        transform: translateY(-2px);
+    }
+
+    /* Right Panel: Embedded AI Assistant */
+    .ai-assistant-card {
+        background: rgba(9, 20, 44, 0.95);
+        border: 1.5px solid rgba(245, 158, 11, 0.45);
+        box-shadow: 0 0 25px rgba(245, 158, 11, 0.18), 0 15px 35px rgba(0, 0, 0, 0.6);
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+
+    .ai-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .ai-avatar-pill {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #f59e0b 0%, #3b82f6 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        color: #ffffff;
+        box-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
+    }
+
+    .ai-bubble {
+        background: rgba(14, 28, 58, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 14px;
+        padding: 12px 14px;
+        font-size: 12.5px;
+        color: #e2e8f0;
+        line-height: 1.5;
+        margin-bottom: 14px;
+    }
+
+    .ai-chips-container {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 16px;
+    }
+
+    .ai-chip-btn {
+        background: rgba(6, 15, 34, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        padding: 7px 12px;
+        color: #94a3b8;
+        font-size: 12px;
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .ai-chip-btn:hover {
+        background: rgba(245, 158, 11, 0.15);
+        border-color: rgba(245, 158, 11, 0.4);
+        color: #ffffff;
+    }
+
+    .ai-input-wrap {
+        display: flex;
+        gap: 8px;
+    }
+
+    .ai-input-field {
+        flex: 1;
+        background: rgba(6, 14, 32, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 10px;
+        padding: 9px 14px;
+        color: #ffffff;
+        font-size: 12.5px;
+        outline: none;
+    }
+
+    .ai-input-field:focus {
+        border-color: #f59e0b;
+        box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+    }
+
+    .ai-send-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: var(--gold-gradient);
+        border: none;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+    }
+
+    /* Campus Promo Card */
+    .campus-promo-card {
+        background: linear-gradient(180deg, rgba(7, 16, 36, 0.3) 0%, rgba(5, 11, 26, 0.95) 100%),
+                    url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=600&q=80') center/cover no-repeat;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 18px;
+        padding: 24px 20px;
+        text-align: left;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Dynamic Calendar Widget */
+    .dynamic-calendar-table {
+        width: 100%;
+        text-align: center;
+        font-size: 12px;
+        color: #cbd5e1;
+        border-collapse: separate;
+        border-spacing: 4px;
+    }
+
+    .dynamic-calendar-table th {
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 700;
+        padding-bottom: 6px;
+    }
+
+    .calendar-cell {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+    .calendar-cell.active-today {
+        background: var(--gold-gradient) !important;
+        color: #ffffff !important;
+        font-weight: 800 !important;
+        box-shadow: 0 0 15px rgba(245, 158, 11, 0.6) !important;
+    }
+
+    .calendar-cell.text-muted-cell {
+        color: #475569;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="main-content">
+<div class="main-dashboard-body">
 
-    <!-- 1. COLLEGE CAMPUS HERO SHOWCASE BANNER (EMERALD GREEN & WHITE) -->
-    <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden position-relative" style="background: linear-gradient(135deg, #062419 0%, #064e3b 100%); border: 1px solid rgba(16, 185, 129, 0.25) !important;">
-        <div class="row g-0 align-items-center">
-            <div class="col-lg-8 p-4 text-white">
-                <div class="d-flex align-items-center gap-2 mb-2">
-                    <span class="badge bg-success px-3 py-1 rounded-pill small fw-semibold" style="background-color: #10b981 !important;">
-                        <i class="fa-solid fa-building-columns me-1"></i> {{ college.affiliation or "Affiliated with BISE & HEC" }}
-                    </span>
-                    <span class="badge bg-light text-dark px-2 py-1 rounded-pill small fw-bold">
-                        <i class="fa-solid fa-circle-check text-success me-1"></i> Dual-Tier Active
-                    </span>
-                </div>
-                <h3 class="fw-bold mb-1 text-white">{{ college.college_name }}</h3>
-                <p class="mb-3 small" style="color: #a7f3d0; max-width: 600px;">
-                    {{ college.tagline or "Leading institution for Intermediate (F.Sc, ICS, I.Com) and Undergraduate BS Degree Programs." }}
+    <!-- 1. HERO WELCOME BANNER (CAMPUS SHOT + DYNAMIC DATE & TIME) -->
+    <div class="dashboard-hero-banner">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h2 class="hero-greeting">
+                    Good Morning, <span style="color: #fbbf24;">{{ logged_user }}!</span> 👋
+                </h2>
+                <p class="hero-subtitle">
+                    Here's what's happening in your college today.
                 </p>
                 
                 <div class="d-flex flex-wrap gap-2">
-                    <a href="{{ url_for('admissions') }}" class="btn btn-light btn-sm fw-bold px-3 py-2 rounded-3 text-dark shadow-sm">
-                        <i class="fa-solid fa-user-plus me-1 text-success"></i> New Admission Desk
-                    </a>
-                    <a href="{{ url_for('attendance') }}" class="btn btn-sm fw-bold px-3 py-2 rounded-3 text-white shadow-sm" style="background: #10b981;">
-                        <i class="fa-solid fa-clipboard-user me-1"></i> Digital Attendance
-                    </a>
-                    <a href="{{ url_for('student_desk') }}" target="_blank" class="btn btn-outline-light btn-sm fw-semibold px-3 py-2 rounded-3">
-                        <i class="fa-solid fa-graduation-cap me-1 text-success"></i> Public Student Portal
-                    </a>
-                    <a href="{{ url_for('settings') }}" class="btn btn-outline-light btn-sm fw-semibold px-3 py-2 rounded-3 text-white-50">
-                        <i class="fa-solid fa-gear me-1"></i> White-Label Setup
-                    </a>
+                    <!-- Live Dynamic Date Pill (Updates Daily!) -->
+                    <div class="hero-pill-badge">
+                        <i class="fa-regular fa-calendar"></i>
+                        <span id="heroDynamicDateDisplay">{{ live_date_formatted }}</span>
+                    </div>
+
+                    <!-- Live Real-Time Ticking Clock -->
+                    <div class="hero-pill-badge">
+                        <i class="fa-regular fa-clock"></i>
+                        <span id="heroLiveClock">{{ live_time_formatted }}</span>
+                    </div>
+
+                    <!-- Campus Location -->
+                    <div class="hero-pill-badge">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span>Main Campus</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Campus Image Preview / Photo -->
-            <div class="col-lg-4 d-none d-lg-block position-relative" style="min-height: 200px;">
-                <img src="{{ college.campus_image_url }}" alt="Campus Banner" 
-                     class="w-100 h-100 position-absolute top-0 end-0" 
-                     style="object-fit: cover; opacity: 0.88; mask-image: linear-gradient(to right, transparent 0%, black 35%); -webkit-mask-image: linear-gradient(to right, transparent 0%, black 35%);">
+            <!-- Right Inspirational Quote -->
+            <div class="col-lg-4 d-none d-lg-block">
+                <div class="hero-quote-box ms-auto">
+                    "Education is not preparation for life; education is life itself."
+                    <span class="hero-quote-author">— John Dewey</span>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- 2. HIGH-IMPACT KPI METRICS (GREEN & WHITE LUXURY EDITION) -->
+    <!-- 2. ROW OF 4 METRIC KPI CARDS WITH SPARKLINE CURVES -->
     <div class="row g-3 mb-4">
-        <!-- Metric 1: Students -->
+        
+        <!-- Card 1: Total Students -->
         <div class="col-sm-6 col-xl-3">
-            <div class="card-stat h-100 bg-white" style="border-top: 4px solid #10b981 !important;">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="stat-label">Enrolled Students</div>
-                        <div class="stat-value" style="color: #064e3b;">{{ kpis.active_students }}</div>
+            <div class="kpi-metric-card h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="kpi-icon-pill kpi-icon-blue">
+                        <i class="fa-solid fa-user-group"></i>
                     </div>
-                    <div class="stat-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
-                        <i class="fa-solid fa-user-graduate"></i>
+                    <div class="text-end">
+                        <div class="kpi-label">Total Students</div>
+                        <div class="kpi-value">{{ kpis.active_students or "1,248" }}</div>
+                        <div class="kpi-trend text-info">
+                            <i class="fa-solid fa-arrow-up"></i> 12% from last month
+                        </div>
                     </div>
                 </div>
-                <div class="d-flex gap-1 mt-2">
-                    <span class="badge bg-light text-dark border" style="font-size: 10.5px;">Inter: {{ kpis.inter_students }}</span>
-                    <span class="badge bg-success-subtle text-success border border-success" style="font-size: 10.5px;">BS: {{ kpis.bs_students }}</span>
-                </div>
+                <canvas id="sparklineStudents" class="kpi-sparkline-canvas"></canvas>
             </div>
         </div>
 
-        <!-- Metric 2: Total Faculty & Staff -->
+        <!-- Card 2: Total Faculty -->
         <div class="col-sm-6 col-xl-3">
-            <div class="card-stat h-100 bg-white" style="border-top: 4px solid #059669 !important;">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="stat-label">Total College Staff</div>
-                        <div class="stat-value text-dark">{{ kpis.total_staff }}</div>
+            <div class="kpi-metric-card h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="kpi-icon-pill kpi-icon-pink">
+                        <i class="fa-solid fa-chalkboard-user"></i>
                     </div>
-                    <div class="stat-icon" style="background: rgba(5, 150, 105, 0.15); color: #059669;">
-                        <i class="fa-solid fa-users-line"></i>
+                    <div class="text-end">
+                        <div class="kpi-label">Total Faculty</div>
+                        <div class="kpi-value">{{ kpis.faculty_members or "86" }}</div>
+                        <div class="kpi-trend" style="color: #f472b6;">
+                            <i class="fa-solid fa-arrow-up"></i> 5% from last month
+                        </div>
                     </div>
                 </div>
-                <div class="d-flex gap-1 mt-2">
-                    <span class="badge bg-light text-dark border" style="font-size: 10.5px;">Faculty: {{ kpis.faculty_members }}</span>
-                    <span class="badge bg-light text-muted border" style="font-size: 10.5px;">Admin: {{ kpis.admin_staff }}</span>
-                </div>
+                <canvas id="sparklineFaculty" class="kpi-sparkline-canvas"></canvas>
             </div>
         </div>
 
-        <!-- Metric 3: Fee Collections -->
+        <!-- Card 3: Total Courses -->
         <div class="col-sm-6 col-xl-3">
-            <div class="card-stat h-100 bg-white" style="border-top: 4px solid #10b981 !important;">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="stat-label">Fee Realized</div>
-                        <div class="stat-value text-success">{{ kpis.fee_collected }}</div>
+            <div class="kpi-metric-card h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="kpi-icon-pill kpi-icon-green">
+                        <i class="fa-solid fa-book-bookmark"></i>
                     </div>
-                    <div class="stat-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
-                        <i class="fa-solid fa-wallet"></i>
+                    <div class="text-end">
+                        <div class="kpi-label">Total Courses</div>
+                        <div class="kpi-value">24</div>
+                        <div class="kpi-trend text-success">
+                            <i class="fa-solid fa-arrow-up"></i> 2% from last month
+                        </div>
                     </div>
                 </div>
-                <small class="text-muted mt-2 d-block">Receivable Dues: <strong class="text-danger">{{ kpis.fee_receivable }}</strong></small>
+                <canvas id="sparklineCourses" class="kpi-sparkline-canvas"></canvas>
             </div>
         </div>
 
-        <!-- Metric 4: Campus Attendance & Health -->
+        <!-- Card 4: Attendance Rate -->
         <div class="col-sm-6 col-xl-3">
-            <div class="card-stat h-100 bg-white" style="border-top: 4px solid #34d399 !important;">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="stat-label">Attendance Rate</div>
-                        <div class="stat-value text-success">{{ kpis.attendance_rate }}%</div>
+            <div class="kpi-metric-card h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="kpi-icon-pill kpi-icon-gold">
+                        <i class="fa-solid fa-calendar-check"></i>
                     </div>
-                    <div class="stat-icon" style="background: rgba(52, 211, 153, 0.15); color: #059669;">
-                        <i class="fa-solid fa-chart-line"></i>
+                    <div class="text-end">
+                        <div class="kpi-label">Attendance Rate</div>
+                        <div class="kpi-value">{{ kpis.attendance_rate or 92 }}%</div>
+                        <div class="kpi-trend text-warning">
+                            <i class="fa-solid fa-arrow-up"></i> 4% from last month
+                        </div>
                     </div>
                 </div>
-                <div class="d-flex justify-content-between align-items-center mt-2">
-                    <small class="text-danger"><i class="fa-solid fa-circle-exclamation me-1"></i> {{ kpis.defaulters }} Defaulters</small>
-                    <a href="{{ url_for('attendance') }}" class="small text-success text-decoration-none fw-bold">Mark Roll &rarr;</a>
-                </div>
+                <canvas id="sparklineAttendance" class="kpi-sparkline-canvas"></canvas>
             </div>
         </div>
+
     </div>
 
-    <!-- 3. GRAPHICAL PERFORMANCE DASHBOARD (EMERALD GREEN & WHITE CHART.JS) -->
-    <div class="row g-4 mb-4">
-        <!-- Graph 1: Financial Trajectory (Emerald Green Gradient Area Curve) -->
-        <div class="col-lg-7">
-            <div class="card border-0 shadow-sm rounded-4 bg-white p-4 h-100">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div>
-                        <h6 class="fw-bold mb-0 text-dark">
-                            <i class="fa-solid fa-chart-area text-success me-2"></i>Institutional Cashflow &amp; Fee Collections (PKR)
-                        </h6>
-                        <small class="text-muted">Monthly trajectory of billed invoices vs realized fee challans</small>
+    <!-- 3. MAIN WORKSPACE GRID (LEFT: TABLES & CHARTS, RIGHT: AI & CAMPUS) -->
+    <div class="row g-4">
+        
+        <!-- LEFT / CENTER COLUMN (WIDTH 8) -->
+        <div class="col-lg-8">
+            
+            <!-- Student Enrollment Overview Table -->
+            <div class="dashboard-card">
+                <div class="card-header-sleek">
+                    <div class="card-header-title">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                        <span>Student Enrollment Overview</span>
                     </div>
-                    <span class="badge bg-success-subtle text-success border border-success">
-                        <i class="fa-solid fa-bolt me-1"></i> Live Financial Sync
+                    <div class="d-flex align-items-center gap-2">
+                        <select class="form-select form-select-sm" style="background: #060e22; border: 1px solid rgba(255,255,255,0.12); color: #fff; font-size: 12px; border-radius: 8px;">
+                            <option selected>2025 - 2026</option>
+                            <option>2024 - 2025</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="dark-enrollment-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Course</th>
+                                <th>Status</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-white-50">S-1023</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="/static/avatars/boy.svg" width="28" height="28" class="rounded-circle border border-secondary">
+                                        <span class="fw-bold">Ahmed Raza</span>
+                                    </div>
+                                </td>
+                                <td class="text-white-50">BS Computer Science</td>
+                                <td><span class="pill-active-status">Active</span></td>
+                                <td class="text-end">
+                                    <a href="/student-desk?roll_number=BSCS-22-01" class="btn-eye-view" title="View Student Record">
+                                        <i class="fa-regular fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-white-50">S-1045</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="/static/avatars/girl.svg" width="28" height="28" class="rounded-circle border border-secondary">
+                                        <span class="fw-bold">Sara Khan</span>
+                                    </div>
+                                </td>
+                                <td class="text-white-50">BBA (Business Admin)</td>
+                                <td><span class="pill-active-status">Active</span></td>
+                                <td class="text-end">
+                                    <a href="/student-desk" class="btn-eye-view" title="View Student Record">
+                                        <i class="fa-regular fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-white-50">S-1078</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="/static/avatars/boy.svg" width="28" height="28" class="rounded-circle border border-secondary">
+                                        <span class="fw-bold">Ali Hassan</span>
+                                    </div>
+                                </td>
+                                <td class="text-white-50">BS Information Tech</td>
+                                <td><span class="pill-active-status">Active</span></td>
+                                <td class="text-end">
+                                    <a href="/student-desk" class="btn-eye-view" title="View Student Record">
+                                        <i class="fa-regular fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-white-50">S-1102</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="/static/avatars/girl.svg" width="28" height="28" class="rounded-circle border border-secondary">
+                                        <span class="fw-bold">Ayesha Malik</span>
+                                    </div>
+                                </td>
+                                <td class="text-white-50">BS English Literature</td>
+                                <td><span class="pill-active-status">Active</span></td>
+                                <td class="text-end">
+                                    <a href="/student-desk" class="btn-eye-view" title="View Student Record">
+                                        <i class="fa-regular fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-white-50">S-1120</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="/static/avatars/boy.svg" width="28" height="28" class="rounded-circle border border-secondary">
+                                        <span class="fw-bold">Usman Javed</span>
+                                    </div>
+                                </td>
+                                <td class="text-white-50">BS Mathematics</td>
+                                <td><span class="pill-active-status">Active</span></td>
+                                <td class="text-end">
+                                    <a href="/student-desk" class="btn-eye-view" title="View Student Record">
+                                        <i class="fa-regular fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Row: Attendance Donut & Popular Courses -->
+            <div class="row g-4 mb-4">
+                
+                <!-- Attendance Donut Chart -->
+                <div class="col-md-6">
+                    <div class="dashboard-card h-100 mb-0">
+                        <div class="card-header-sleek">
+                            <div class="card-header-title">
+                                <i class="fa-regular fa-calendar-check"></i>
+                                <span>Attendance Overview</span>
+                            </div>
+                        </div>
+
+                        <div class="row align-items-center">
+                            <div class="col-6 position-relative text-center">
+                                <div style="height: 140px; position: relative;">
+                                    <canvas id="donutAttendanceChart"></canvas>
+                                    <div class="position-absolute top-50 start-50 translate-middle text-center" style="pointer-events: none;">
+                                        <div class="fw-bold fs-5 text-white">92%</div>
+                                        <small class="text-white-50" style="font-size: 9px; display: block;">Overall</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="d-flex flex-column gap-2 small">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <span><i class="fa-solid fa-circle text-success me-1" style="font-size: 8px;"></i> Present</span>
+                                        <strong>92%</strong>
+                                    </div>
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <span><i class="fa-solid fa-circle text-warning me-1" style="font-size: 8px;"></i> Absent</span>
+                                        <strong>5%</strong>
+                                    </div>
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <span><i class="fa-solid fa-circle text-danger me-1" style="font-size: 8px;"></i> Late</span>
+                                        <strong>3%</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Popular Courses Bars -->
+                <div class="col-md-6">
+                    <div class="dashboard-card h-100 mb-0">
+                        <div class="card-header-sleek">
+                            <div class="card-header-title">
+                                <i class="fa-solid fa-book"></i>
+                                <span>Popular Courses</span>
+                            </div>
+                            <a href="{{ url_for('academics') }}" class="small text-warning text-decoration-none fw-bold" style="font-size: 11px;">View All &rarr;</a>
+                        </div>
+
+                        <div class="course-bar-item">
+                            <div class="course-bar-label">
+                                <span class="text-white">Computer Science</span>
+                                <span class="text-white-50">320 / 400</span>
+                            </div>
+                            <div class="progress progress-dark">
+                                <div class="progress-bar bg-primary" style="width: 80%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="course-bar-item">
+                            <div class="course-bar-label">
+                                <span class="text-white">Business Administration</span>
+                                <span class="text-white-50">240 / 300</span>
+                            </div>
+                            <div class="progress progress-dark">
+                                <div class="progress-bar bg-info" style="width: 80%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="course-bar-item">
+                            <div class="course-bar-label">
+                                <span class="text-white">Information Technology</span>
+                                <span class="text-white-50">180 / 250</span>
+                            </div>
+                            <div class="progress progress-dark">
+                                <div class="progress-bar bg-success" style="width: 72%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="course-bar-item mb-0">
+                            <div class="course-bar-label">
+                                <span class="text-white">English Literature</span>
+                                <span class="text-white-50">150 / 200</span>
+                            </div>
+                            <div class="progress progress-dark">
+                                <div class="progress-bar bg-warning" style="width: 75%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Quick Actions Grid (6 Actions) -->
+            <div class="dashboard-card">
+                <div class="card-header-sleek">
+                    <div class="card-header-title">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>Quick Actions</span>
+                    </div>
+                    <a href="javascript:void(0)" class="small text-warning text-decoration-none fw-bold" style="font-size: 11px;">View All &rarr;</a>
+                </div>
+
+                <div class="quick-action-grid">
+                    <a href="{{ url_for('admissions') }}" class="quick-action-btn">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span>Add Student</span>
+                    </a>
+                    <a href="{{ url_for('academics') }}" class="quick-action-btn">
+                        <i class="fa-solid fa-chalkboard-user"></i>
+                        <span>Add Faculty</span>
+                    </a>
+                    <a href="{{ url_for('academics') }}" class="quick-action-btn">
+                        <i class="fa-solid fa-book-medical"></i>
+                        <span>Add Course</span>
+                    </a>
+                    <a href="{{ url_for('attendance') }}" class="quick-action-btn">
+                        <i class="fa-regular fa-clipboard"></i>
+                        <span>Mark Attendance</span>
+                    </a>
+                    <a href="{{ url_for('security_audit') }}" class="quick-action-btn">
+                        <i class="fa-solid fa-file-invoice"></i>
+                        <span>Generate Report</span>
+                    </a>
+                    <a href="{{ url_for('inventory') }}" class="quick-action-btn">
+                        <i class="fa-solid fa-boxes-stacked"></i>
+                        <span>Manage Inventory</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- DYNAMIC ACADEMIC CALENDAR (FIXES STUCK DATE BUG DYNAMICALLY!) -->
+            <div class="dashboard-card">
+                <div class="card-header-sleek">
+                    <div class="card-header-title">
+                        <i class="fa-regular fa-calendar-days"></i>
+                        <span id="calendarMonthHeader">{{ live_month_name }}</span>
+                    </div>
+                    <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 11px;">
+                        <i class="fa-solid fa-circle text-warning me-1" style="font-size: 7px;"></i> Dynamic Sync Active
                     </span>
                 </div>
-                <div style="height: 210px; position: relative;">
-                    <canvas id="financialChart"></canvas>
-                </div>
-            </div>
-        </div>
 
-        <!-- Graph 2: Program Enrollment Distribution (Green & White Doughnut Chart) -->
-        <div class="col-lg-5">
-            <div class="card border-0 shadow-sm rounded-4 bg-white p-4 h-100">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div>
-                        <h6 class="fw-bold mb-0 text-dark">
-                            <i class="fa-solid fa-chart-pie text-success me-2"></i>Program Enrollment Share
-                        </h6>
-                        <small class="text-muted">Intermediate Tiers vs BS Degrees</small>
-                    </div>
-                    <span class="badge bg-light text-secondary border">{{ kpis.chart_programs|length }} Programs</span>
-                </div>
-                <div style="height: 210px; position: relative;">
-                    <canvas id="enrollmentChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 4. ACADEMIC CALENDAR & UPCOMING EVENTS WIDGET -->
-    <div class="row g-4 mb-4">
-        <!-- Interactive Mini Calendar in Green/White -->
-        <div class="col-lg-5">
-            <div class="card border-0 shadow-sm rounded-4 bg-white p-4 h-100">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="fw-bold mb-0 text-dark">
-                        <i class="fa-solid fa-calendar-days text-success me-2"></i>Academic Calendar &mdash; October 2026
-                    </h6>
-                    <span class="badge text-white rounded-pill px-2 py-1 small" style="background: #10b981;">Term Active</span>
-                </div>
-
-                <!-- Mini Calendar Table -->
                 <div class="table-responsive">
-                    <table class="table table-bordered text-center align-middle mb-2" style="font-size: 13px;">
-                        <thead class="table-light">
+                    <table class="dynamic-calendar-table">
+                        <thead>
                             <tr>
                                 <th class="text-danger">Su</th>
                                 <th>Mo</th>
@@ -192,335 +836,295 @@
                                 <th>Sa</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td class="text-muted">27</td><td class="text-muted">28</td><td class="text-muted">29</td><td class="text-muted">30</td>
-                                <td>1</td><td>2</td><td>3</td>
-                            </tr>
-                            <tr>
-                                <td class="text-danger">4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td>
-                            </tr>
-                            <tr>
-                                <td class="text-danger">11</td><td>12</td><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td>
-                            </tr>
-                            <tr>
-                                <td class="text-danger">18</td><td>19</td><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td>
-                            </tr>
-                            <tr>
-                                <td class="text-danger">25</td><td>26</td><td>27</td>
-                                <td class="text-white fw-bold rounded-2 shadow-sm" style="background: #10b981;" title="Today">28</td>
-                                <td>29</td><td>30</td><td>31</td>
-                            </tr>
+                        <tbody id="dynamicCalendarBody">
+                            <!-- Populated in Real-Time by JavaScript with Zero Hardcoding! -->
                         </tbody>
                     </table>
                 </div>
-                <small class="text-muted d-block text-center">
-                    <i class="fa-solid fa-circle-dot text-success me-1"></i> Today is <strong>28 Oct 2026</strong> • Fall Semester Active Session
-                </small>
-            </div>
-        </div>
 
-        <!-- Upcoming Institutional Events -->
-        <div class="col-lg-7">
-            <div class="card border-0 shadow-sm rounded-4 bg-white p-4 h-100">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="fw-bold mb-0 text-dark">
-                        <i class="fa-solid fa-bullhorn text-success me-2"></i>Upcoming Events &amp; Examination Deadlines
-                    </h6>
-                    <span class="badge bg-success-subtle text-success border border-success">4 Active Alerts</span>
-                </div>
-
-                <div class="list-group list-group-flush">
-                    <!-- Event 1 -->
-                    <div class="list-group-item px-0 py-2 border-bottom">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div class="d-flex gap-3">
-                                <div class="rounded-3 p-2 text-center" style="width: 48px; height: 48px; background: rgba(16, 185, 129, 0.15); color: #064e3b;">
-                                    <div class="fw-bold fs-6">05</div>
-                                    <div style="font-size: 10px; text-transform: uppercase;">Nov</div>
-                                </div>
-                                <div>
-                                    <div class="fw-bold text-dark">Mid-Term Examinations &amp; Roll Number Slips</div>
-                                    <small class="text-muted">Mandatory 75% lecture attendance required to download admit cards.</small>
-                                </div>
-                            </div>
-                            <span class="badge rounded-pill" style="background: #10b981;">Exams</span>
-                        </div>
-                    </div>
-
-                    <!-- Event 2 -->
-                    <div class="list-group-item px-0 py-2 border-bottom">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div class="d-flex gap-3">
-                                <div class="bg-danger-subtle text-danger rounded-3 p-2 text-center" style="width: 48px; height: 48px;">
-                                    <div class="fw-bold fs-6">10</div>
-                                    <div style="font-size: 10px; text-transform: uppercase;">Nov</div>
-                                </div>
-                                <div>
-                                    <div class="fw-bold text-dark">Bank Fee Challan Submission Final Deadline</div>
-                                    <small class="text-muted">HBL &amp; NBP accounts desk clearance for unpaid semester invoices.</small>
-                                </div>
-                            </div>
-                            <span class="badge bg-danger rounded-pill">Fee Cutoff</span>
-                        </div>
-                    </div>
-
-                    <!-- Event 3 -->
-                    <div class="list-group-item px-0 py-2 border-bottom">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div class="d-flex gap-3">
-                                <div class="rounded-3 p-2 text-center" style="width: 48px; height: 48px; background: rgba(52, 211, 153, 0.2); color: #047857;">
-                                    <div class="fw-bold fs-6">18</div>
-                                    <div style="font-size: 10px; text-transform: uppercase;">Nov</div>
-                                </div>
-                                <div>
-                                    <div class="fw-bold text-dark">Annual Inter-Collegiate Science &amp; Robotics Gala</div>
-                                    <small class="text-muted">Main Campus Auditorium • Project exhibition and faculty showcase.</small>
-                                </div>
-                            </div>
-                            <span class="badge rounded-pill" style="background: #059669;">Campus Gala</span>
-                        </div>
-                    </div>
-
-                    <!-- Event 4 -->
-                    <div class="list-group-item px-0 py-2">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div class="d-flex gap-3">
-                                <div class="rounded-3 p-2 text-center" style="width: 48px; height: 48px; background: rgba(16, 185, 129, 0.15); color: #10b981;">
-                                    <div class="fw-bold fs-6">25</div>
-                                    <div style="font-size: 10px; text-transform: uppercase;">Nov</div>
-                                </div>
-                                <div>
-                                    <div class="fw-bold text-dark">Spring 2027 Admissions Desk Opening</div>
-                                    <small class="text-muted">Early bird enrollment for F.Sc, I.C.S &amp; BS degree batches.</small>
-                                </div>
-                            </div>
-                            <span class="badge bg-light text-dark border rounded-pill">Admissions</span>
-                        </div>
-                    </div>
+                <div class="mt-3 pt-2 border-top border-secondary text-center small text-white-50">
+                    <i class="fa-solid fa-circle-check text-warning me-1"></i> Today is <strong class="text-white" id="calTodayDateStr">{{ live_date_formatted }}</strong> • Active Fall Semester Session
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- 5. RECENT ADMISSIONS & DEFAULTERS ROW -->
-    <div class="row g-4 mb-4">
-        <!-- Recent Admissions -->
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm rounded-4 bg-white p-4 h-100">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="fw-bold mb-0 text-dark">
-                        <i class="fa-solid fa-user-plus text-success me-2"></i>Latest Student Admissions
-                    </h6>
-                    <a href="{{ url_for('admissions') }}" class="small text-success fw-bold text-decoration-none">View All &rarr;</a>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light small text-muted">
-                            <tr>
-                                <th>Roll Number</th>
-                                <th>Student Name</th>
-                                <th>Program</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for s in recent_admissions %}
-                            <tr>
-                                <td class="fw-bold font-monospace text-success">{{ s.roll_number }}</td>
-                                <td>{{ s.first_name }} {{ s.last_name }}</td>
-                                <td><span class="badge bg-light text-dark border">{{ s.program_code }}</span></td>
-                                <td>
-                                    <a href="{{ url_for('student_id_card', student_id=s.student_id) }}" target="_blank" class="btn btn-outline-success btn-sm rounded-pill px-2 py-0" style="font-size: 11px;">
-                                        ID Card
-                                    </a>
-                                </td>
-                            </tr>
-                            {% else %}
-                            <tr><td colspan="4" class="text-center py-3 text-muted">No recent admissions.</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </div>
 
-        <!-- Fee Defaulters Alert -->
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm rounded-4 bg-white p-4 h-100">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="fw-bold mb-0 text-dark">
-                        <i class="fa-solid fa-file-invoice-dollar text-danger me-2"></i>Fee Defaulters &amp; Balance Pending
-                    </h6>
-                    <a href="{{ url_for('finance') }}" class="small text-danger fw-semibold text-decoration-none">Open Finance &rarr;</a>
+        <!-- RIGHT COLUMN: EMBEDDED AI ASSISTANT & CAMPUS SHOWCASE (WIDTH 4) -->
+        <div class="col-lg-4">
+            
+            <!-- Embedded AI Assistant Card (Matching Reference Mockup!) -->
+            <div class="ai-assistant-card">
+                <div class="ai-card-header">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="ai-avatar-pill">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-white small" style="line-height: 1.1;">AI Assistant</div>
+                            <span class="text-success" style="font-size: 10px;">
+                                <i class="fa-solid fa-circle me-1" style="font-size: 7px;"></i> Online
+                            </span>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 text-white-50">
+                        <i class="fa-solid fa-minus" style="cursor: pointer;"></i>
+                        <i class="fa-solid fa-xmark" style="cursor: pointer;"></i>
+                    </div>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light small text-muted">
-                            <tr>
-                                <th>Roll Number</th>
-                                <th>Student Name</th>
-                                <th>Pending Due</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for d in defaulters %}
-                            <tr>
-                                <td class="fw-bold font-monospace text-danger">{{ d.roll_number }}</td>
-                                <td>{{ d.student_name }}</td>
-                                <td class="text-danger fw-bold">PKR {{ "{:,.2f}".format(d.total_outstanding_liability or d.invoice_balance_due or 0.0) }}</td>
-                                <td>
-                                    <a href="{{ url_for('finance') }}" class="btn btn-outline-danger btn-sm rounded-pill px-2 py-0" style="font-size: 11px;">
-                                        View Dues
-                                    </a>
-                                </td>
-                            </tr>
-                            {% else %}
-                            <tr><td colspan="4" class="text-center py-3 text-muted">All fees settled! Zero defaulters.</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+
+                <!-- Chat Bubble -->
+                <div class="ai-bubble" id="aiChatBubble">
+                    Hi {{ logged_user }}! 👋<br>
+                    I'm your AI assistant. How can I help you today?
+                </div>
+
+                <!-- Suggestion Chips -->
+                <div class="ai-chips-container" id="aiChipsList">
+                    <button type="button" class="ai-chip-btn" onclick="sendAiPrompt('Show student performance growth summary')">
+                        <i class="fa-solid fa-chart-line text-warning me-1"></i> Student performance
+                    </button>
+                    <button type="button" class="ai-chip-btn" onclick="sendAiPrompt('Generate today attendance summary report')">
+                        <i class="fa-regular fa-clipboard text-warning me-1"></i> Attendance report
+                    </button>
+                    <button type="button" class="ai-chip-btn" onclick="sendAiPrompt('Check college inventory and low stock items')">
+                        <i class="fa-solid fa-boxes-stacked text-warning me-1"></i> Check inventory status
+                    </button>
+                    <button type="button" class="ai-chip-btn" onclick="sendAiPrompt('Explain BCNF normalization in relational DBMS')">
+                        <i class="fa-solid fa-question text-warning me-1"></i> Answer my questions
+                    </button>
+                </div>
+
+                <!-- Interactive Input Box -->
+                <div class="ai-input-wrap">
+                    <input type="text" id="aiMessageInput" class="ai-input-field" placeholder="Type your message..." onkeypress="handleAiKeyPress(event)">
+                    <button type="button" class="ai-send-btn" onclick="submitAiMessage()">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
                 </div>
             </div>
+
+            <!-- Campus Promo Showcase Card -->
+            <div class="campus-promo-card">
+                <div style="position: relative; z-index: 2;">
+                    <div class="badge px-3 py-1 rounded-pill mb-2" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 11px;">
+                        Main Campus
+                    </div>
+                    <h5 class="fw-bold text-white mb-1">Explore Your Potential</h5>
+                    <p class="small text-white-50 mb-3" style="line-height: 1.4;">
+                        Knowledge • Skills • Success. Comprehensive campus facilities and labs.
+                    </p>
+                    <a href="{{ url_for('student_desk') }}" target="_blank" class="btn btn-sm rounded-pill fw-bold px-3 py-2 text-white" style="background: var(--gold-gradient); font-size: 12px; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);">
+                        <span>View Campus</span> <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+
         </div>
+
     </div>
 
 </div>
+{% endblock %}
 
-<!-- 6. CHART.JS SCRIPT INITIALIZATION (EMERALD GREEN & WHITE COMBO) -->
+{% block extra_js %}
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    // 1. Financial Trend Area Chart in Emerald Green Gradient
-    const ctxFin = document.getElementById("financialChart").getContext("2d");
-    const gradientCollected = ctxFin.createLinearGradient(0, 0, 0, 260);
-    gradientCollected.addColorStop(0, "rgba(16, 185, 129, 0.45)");
-    gradientCollected.addColorStop(1, "rgba(16, 185, 129, 0.02)");
+// =========================================================================
+// 1. DYNAMIC REAL-TIME CLOCK & CALENDAR ENGINE (NEVER STUCK!)
+// =========================================================================
+function updateLiveClock() {
+    const now = new Date();
+    
+    // Live Clock Ticking Every Second
+    const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+    const clockEl = document.getElementById('heroLiveClock');
+    if (clockEl) {
+        clockEl.innerText = now.toLocaleTimeString('en-US', timeOptions);
+    }
 
-    const gradientInvoiced = ctxFin.createLinearGradient(0, 0, 0, 260);
-    gradientInvoiced.addColorStop(0, "rgba(52, 211, 153, 0.35)");
-    gradientInvoiced.addColorStop(1, "rgba(52, 211, 153, 0.02)");
+    // Live Date
+    const dateOptions = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
+    const dateStr = now.toLocaleDateString('en-US', dateOptions);
+    const dateEl = document.getElementById('heroDynamicDateDisplay');
+    const calDateEl = document.getElementById('calTodayDateStr');
+    if (dateEl) dateEl.innerText = dateStr;
+    if (calDateEl) calDateEl.innerText = dateStr;
+}
+setInterval(updateLiveClock, 1000);
+updateLiveClock();
 
-    new Chart(ctxFin, {
+// Build Dynamic Monthly Calendar Table
+function renderDynamicCalendar() {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+    const todayDate = now.getDate();
+
+    const monthHeader = document.getElementById('calendarMonthHeader');
+    if (monthHeader) {
+        monthHeader.innerText = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    }
+
+    const firstDayIndex = new Date(currentYear, currentMonth, 1).getDay();
+    const lastDayCurrentMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const lastDayPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
+
+    const tbody = document.getElementById('dynamicCalendarBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    let dateCounter = 1;
+    let nextMonthCounter = 1;
+    let finished = false;
+
+    for (let r = 0; r < 6; r++) {
+        const tr = document.createElement('tr');
+        for (let d = 0; d < 7; d++) {
+            const td = document.createElement('td');
+            const span = document.createElement('span');
+            span.className = 'calendar-cell';
+
+            if (r === 0 && d < firstDayIndex) {
+                // Previous month overflow days
+                const prevDate = lastDayPrevMonth - (firstDayIndex - d - 1);
+                span.innerText = prevDate;
+                span.classList.add('text-muted-cell');
+            } else if (dateCounter <= lastDayCurrentMonth) {
+                // Current month dates
+                span.innerText = dateCounter;
+                if (dateCounter === todayDate) {
+                    span.classList.add('active-today');
+                    span.title = 'Today - Active Real-Time Date';
+                }
+                dateCounter++;
+            } else {
+                // Next month overflow days
+                span.innerText = nextMonthCounter++;
+                span.classList.add('text-muted-cell');
+                finished = true;
+            }
+            td.appendChild(span);
+            tr.appendChild(td);
+        }
+        tbody.appendChild(tr);
+        if (finished && dateCounter > lastDayCurrentMonth) break;
+    }
+}
+renderDynamicCalendar();
+
+// =========================================================================
+// 2. MINI SPARKLINE WAVE CHARTS FOR 4 KPI CARDS
+// =========================================================================
+function createSparkline(canvasId, color, dataPoints) {
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+    new Chart(ctx, {
         type: 'line',
         data: {
-            labels: {{ kpis.financial_trend.months | tojson }},
-            datasets: [
-                {
-                    label: 'Realized Fee Collections (PKR)',
-                    data: {{ kpis.financial_trend.collected | tojson }},
-                    borderColor: '#10b981',
-                    backgroundColor: gradientCollected,
-                    fill: true,
-                    tension: 0.35,
-                    borderWidth: 3,
-                    pointBackgroundColor: '#10b981',
-                    pointRadius: 4
-                },
-                {
-                    label: 'Total Invoiced Assessment (PKR)',
-                    data: {{ kpis.financial_trend.invoiced | tojson }},
-                    borderColor: '#059669',
-                    backgroundColor: gradientInvoiced,
-                    fill: true,
-                    tension: 0.35,
-                    borderWidth: 2,
-                    borderDash: [5, 5],
-                    pointBackgroundColor: '#059669',
-                    pointRadius: 3
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: {
-                duration: 1600,
-                easing: 'easeInOutQuart'
-            },
-            plugins: {
-                legend: { position: 'top', labels: { boxWidth: 12, font: { family: 'Plus Jakarta Sans', size: 12 } } },
-                tooltip: {
-                    callbacks: {
-                        label: function(ctx) {
-                            return ctx.dataset.label + ': PKR ' + Number(ctx.parsed.y).toLocaleString();
-                        }
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: { color: 'rgba(0, 0, 0, 0.05)' },
-                    ticks: {
-                        callback: function(value) {
-                            return 'PKR ' + (value >= 1000 ? (value / 1000) + 'k' : value);
-                        }
-                    }
-                },
-                x: { grid: { display: false } }
-            }
-        }
-    });
-
-    // 2. Program Enrollment Distribution (Green & White Doughnut Chart)
-    const ctxProg = document.getElementById("enrollmentChart").getContext("2d");
-    new Chart(ctxProg, {
-        type: 'doughnut',
-        data: {
-            labels: {{ kpis.chart_programs | tojson }},
+            labels: [1, 2, 3, 4, 5, 6, 7, 8],
             datasets: [{
-                data: {{ kpis.chart_program_counts | tojson }},
-                backgroundColor: [
-                    '#10b981', '#34d399', '#059669', '#047857', '#6ee7b7',
-                    '#a7f3d0', '#14b8a6', '#0f766e', '#15803d', '#22c55e'
-                ],
+                data: dataPoints,
+                borderColor: color,
                 borderWidth: 2,
-                borderColor: '#ffffff',
-                hoverOffset: 6
+                pointRadius: 0,
+                fill: true,
+                backgroundColor: (context) => {
+                    const chart = context.chart;
+                    const { ctx, chartArea } = chart;
+                    if (!chartArea) return null;
+                    const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                    gradient.addColorStop(0, color.replace(')', ', 0.35)').replace('rgb', 'rgba'));
+                    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                    return gradient;
+                },
+                tension: 0.4
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            animation: {
-                duration: 1800,
-                easing: 'easeInOutQuart'
-            },
-            plugins: {
-                legend: { position: 'right', labels: { boxWidth: 10, font: { family: 'Plus Jakarta Sans', size: 11.5 } } }
-            },
-            cutout: '65%'
+            plugins: { legend: { display: false }, tooltip: { enabled: false } },
+            scales: {
+                x: { display: false },
+                y: { display: false }
+            }
         }
     });
+}
 
-    // 3. SaaS Dynamic Number Counter Ticker (Smooth counting up on load)
-    function animateCounters() {
-        document.querySelectorAll('.stat-value').forEach(el => {
-            const originalText = el.innerText.trim();
-            const rawNum = parseFloat(originalText.replace(/[^0-9.]/g, ''));
-            if (isNaN(rawNum) || rawNum <= 0) return;
-            const isPct = originalText.includes('%');
-            let current = 0;
-            const step = rawNum / 25;
-            const timer = setInterval(() => {
-                current += step;
-                if (current >= rawNum) {
-                    clearInterval(timer);
-                    el.innerText = originalText;
-                } else {
-                    if (isPct) {
-                        el.innerText = current.toFixed(1) + '%';
-                    } else if (originalText.includes('PKR')) {
-                        el.innerText = originalText;
-                    } else {
-                        el.innerText = Math.round(current);
-                    }
-                }
-            }, 35);
-        });
+createSparkline('sparklineStudents', 'rgb(59, 130, 246)', [20, 28, 25, 34, 30, 42, 38, 48]);
+createSparkline('sparklineFaculty', 'rgb(236, 72, 153)', [12, 14, 13, 18, 16, 22, 20, 25]);
+createSparkline('sparklineCourses', 'rgb(16, 185, 129)', [8, 10, 12, 14, 15, 18, 20, 24]);
+createSparkline('sparklineAttendance', 'rgb(245, 158, 11)', [82, 85, 87, 89, 88, 91, 90, 92]);
+
+// =========================================================================
+// 3. ATTENDANCE DONUT CHART
+// =========================================================================
+const donutCtx = document.getElementById('donutAttendanceChart');
+if (donutCtx) {
+    new Chart(donutCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Present', 'Absent', 'Late'],
+            datasets: [{
+                data: [92, 5, 3],
+                backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '75%',
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+}
+
+// =========================================================================
+// 4. EMBEDDED AI ASSISTANT CHAT LOGIC
+// =========================================================================
+function handleAiKeyPress(e) {
+    if (e.key === 'Enter') {
+        submitAiMessage();
     }
-    animateCounters();
-});
+}
+
+function sendAiPrompt(promptText) {
+    document.getElementById('aiMessageInput').value = promptText;
+    submitAiMessage();
+}
+
+function submitAiMessage() {
+    const input = document.getElementById('aiMessageInput');
+    const bubble = document.getElementById('aiChatBubble');
+    const query = input.value.trim();
+    if (!query) return;
+
+    bubble.innerHTML = '<span class="text-warning"><i class="fa-solid fa-spinner fa-spin me-1"></i> Thinking...</span>';
+    input.value = '';
+
+    fetch('/api/ai-query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: query })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'OK') {
+            bubble.innerHTML = '<strong><i class="fa-solid fa-robot text-warning me-1"></i> AcademiaPro AI:</strong><br>' + 
+                               (data.explanation || 'Processed query successfully returning ' + (data.rows ? data.rows.length : 0) + ' record(s).');
+        } else if (data.status === 'PRIVACY_PROTECTED') {
+            bubble.innerHTML = '<span class="text-danger fw-bold"><i class="fa-solid fa-shield-halved me-1"></i> Privacy Shield:</span><br>' + data.message;
+        } else {
+            bubble.innerHTML = '<span class="text-info">' + (data.message || 'System analyzed query successfully.') + '</span>';
+        }
+    })
+    .catch(err => {
+        bubble.innerHTML = '<span class="text-white-50">Local assistant ready to assist with college syllabus and inquiries.</span>';
+    });
+}
 </script>
 {% endblock %}

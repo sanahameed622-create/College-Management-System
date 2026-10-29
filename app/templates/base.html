@@ -7,291 +7,541 @@
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome Icons -->
-    <!-- FontAwesome Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <!-- Google Font Plus Jakarta Sans -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Chart.js for High-Impact Graphical Analytics -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Custom Local Stylesheet -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
-        /* Modern Zoom-in and Smooth Saas Entry Animation */
-        @keyframes zoomInSmooth {
-            0% { opacity: 0; transform: scale(0.94) translateY(10px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
+        :root {
+            --bg-canvas: #070e1e;
+            --bg-surface: #0a152d;
+            --bg-card: rgba(14, 28, 58, 0.75);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --border-gold: rgba(245, 158, 11, 0.4);
+            --gold-primary: #f59e0b;
+            --gold-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
         }
-        @keyframes pulseSoft {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
-        .main-content {
-            animation: zoomInSmooth 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-canvas);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
-        .card-stat, .card {
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+        /* Scrollbars */
+        ::-webkit-scrollbar {
+            width: 7px;
+            height: 7px;
         }
-        .card-stat:hover, .card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(37, 99, 235, 0.15) !important;
+        ::-webkit-scrollbar-track {
+            background: #060c1c;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(245, 158, 11, 0.4);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f59e0b;
+        }
+
+        /* Topbar Header */
+        .topbar-header {
+            background: #060d1f;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 12px 28px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .brand-logo-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .brand-cap-icon {
+            font-size: 26px;
+            color: #f59e0b;
+            filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.5));
+        }
+
+        .brand-title-text {
+            font-size: 18px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.4px;
+            line-height: 1.1;
+        }
+
+        .brand-subtitle-text {
+            font-size: 10.5px;
+            color: #cbd5e1;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        /* Center Search Pill */
+        .search-pill-container {
+            flex: 1;
+            max-width: 520px;
+            margin: 0 24px;
+        }
+
+        .search-pill {
+            background: rgba(14, 28, 58, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 9999px;
+            padding: 8px 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.25s ease;
+        }
+
+        .search-pill:focus-within {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+            background: rgba(18, 36, 75, 0.95);
+        }
+
+        .search-input {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-size: 13px;
+            width: 100%;
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: #64748b;
+        }
+
+        /* Topbar Controls */
+        .icon-btn-pill {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .icon-btn-pill:hover {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+            border-color: rgba(245, 158, 11, 0.4);
+        }
+
+        .notification-badge-red {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 16px;
+            height: 16px;
+            background: #ef4444;
+            color: #ffffff;
+            border-radius: 50%;
+            font-size: 9.5px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #060d1f;
+        }
+
+        /* User Profile Capsule */
+        .user-capsule {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 12px 4px 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .user-capsule:hover {
+            background: rgba(245, 158, 11, 0.12);
+            border-color: rgba(245, 158, 11, 0.4);
+        }
+
+        /* Sidebar Navigation */
+        .sidebar-navy {
+            background: #050c1c;
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            min-height: calc(100vh - 65px);
+            padding: 20px 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .nav-gold-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            color: #94a3b8;
+            font-size: 13.5px;
+            font-weight: 500;
+            border-radius: 10px;
+            text-decoration: none;
+            margin-bottom: 5px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-gold-link i {
+            font-size: 15px;
+            width: 20px;
+            text-align: center;
+            color: #64748b;
+            transition: all 0.2s ease;
+        }
+
+        .nav-gold-link:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateX(3px);
+        }
+
+        .nav-gold-link:hover i {
+            color: #f59e0b;
+        }
+
+        .nav-gold-link.active {
+            background: var(--gold-gradient);
+            color: #ffffff;
+            font-weight: 700;
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
+        }
+
+        .nav-gold-link.active i {
+            color: #ffffff;
+        }
+
+        /* Sidebar Bottom Engraved Crest */
+        .sidebar-engraving {
+            text-align: center;
+            padding: 16px 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            margin-top: 20px;
+        }
+
+        .sidebar-engraving i {
+            font-size: 32px;
+            color: #f59e0b;
+            opacity: 0.85;
+            margin-bottom: 6px;
+        }
+
+        .sidebar-engraving-title {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #f59e0b;
+        }
+
+        .sidebar-engraving-sub {
+            font-size: 10px;
+            color: #64748b;
+        }
+
+        /* Main Workspace Content */
+        .workspace-content {
+            padding: 26px 30px;
+            min-height: calc(100vh - 65px);
+        }
+
+        /* Dropdown Menus */
+        .dropdown-menu-dark-custom {
+            background: #09152e;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 14px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+            color: #ffffff;
+        }
+
+        .dropdown-menu-dark-custom .dropdown-item {
+            color: #cbd5e1;
+            font-size: 13px;
+            padding: 8px 16px;
+        }
+
+        .dropdown-menu-dark-custom .dropdown-item:hover {
+            background: rgba(245, 158, 11, 0.2);
+            color: #ffffff;
         }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+
+    <!-- TOPBAR NAVIGATION BAR -->
+    <header class="topbar-header d-flex align-items-center justify-content-between">
+        
+        <!-- Left Brand Logo -->
+        <a href="{{ url_for('dashboard') }}" class="brand-logo-wrap">
+            <i class="fa-solid fa-graduation-cap brand-cap-icon"></i>
+            <div>
+                <div class="brand-title-text">AcademiaPro</div>
+                <div class="brand-subtitle-text">College Management System</div>
+            </div>
+        </a>
+
+        <!-- Center Search Input Pill -->
+        <div class="search-pill-container d-none d-md-block">
+            <div class="search-pill">
+                <i class="fa-solid fa-magnifying-glass text-muted"></i>
+                <input type="text" placeholder="Search students, courses, faculty, or anything..." class="search-input" id="globalTopSearch">
+            </div>
+        </div>
+
+        <!-- Right Side Icons & Profile Capsule -->
+        <div class="d-flex align-items-center gap-3">
+            
+            <!-- Notification Bell with Red Badge -->
+            <a href="javascript:void(0)" class="icon-btn-pill" title="Notifications">
+                <i class="fa-regular fa-bell"></i>
+                <span class="notification-badge-red">3</span>
+            </a>
+
+            <!-- Day / Sun Mode Toggle -->
+            <a href="javascript:void(0)" class="icon-btn-pill" title="Theme Mode">
+                <i class="fa-regular fa-sun"></i>
+            </a>
+
+            <!-- User Profile Dropdown Capsule -->
+            <div class="dropdown">
+                <div class="user-capsule" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="{{ avatar_src }}" id="navbarAvatarImg" class="rounded-circle border border-2 border-warning" width="34" height="34" style="object-fit: cover;">
+                    <div class="text-start d-none d-sm-block">
+                        <div class="fw-bold text-white small" style="line-height: 1.1;">{{ logged_user }}</div>
+                        <div class="text-white-50" style="font-size: 10.5px;">{{ logged_role }}</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-down text-white-50 ms-1" style="font-size: 10px;"></i>
+                </div>
+
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark-custom p-2 mt-2" style="min-width: 220px;">
+                    <li class="px-3 py-2 text-center border-bottom border-secondary mb-1">
+                        <img src="{{ avatar_src }}" id="menuAvatarImg" class="rounded-circle border border-2 border-warning mb-2" width="54" height="54" style="object-fit: cover; cursor: pointer;" onclick="openAvatarModal()" title="Click to Change Avatar">
+                        <div class="fw-bold text-white">{{ logged_user }}</div>
+                        <span class="badge" style="background: var(--gold-gradient); color: #fff; font-size: 11px;">{{ logged_role }}</span>
+                    </li>
+                    <li>
+                        <a class="dropdown-item rounded-3" href="javascript:void(0)" onclick="openAvatarModal()">
+                            <i class="fa-solid fa-user-pen me-2 text-warning"></i> Change Profile Avatar
+                        </a>
+                    </li>
+                    {% if logged_role != 'Teacher' %}
+                    <li>
+                        <a class="dropdown-item rounded-3" href="{{ url_for('settings') }}">
+                            <i class="fa-solid fa-gear me-2 text-warning"></i> College Settings
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li><hr class="dropdown-divider border-secondary my-1"></li>
+                    <li>
+                        <a class="dropdown-item rounded-3 text-danger" href="{{ url_for('logout') }}">
+                            <i class="fa-solid fa-right-from-bracket me-2"></i> Secure Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+    </header>
+
+    <!-- MAIN BODY: SIDEBAR + CONTENT -->
     <div class="container-fluid p-0">
         <div class="row g-0">
-            <!-- Sidebar Navigation -->
-            <div class="col-md-3 col-lg-2 sidebar p-3 d-flex flex-column">
-                <div class="brand-header mb-3">
-                    <h5 class="brand-title">
-                        <i class="fa-solid fa-graduation-cap text-success fs-3"></i>
-                        <span>AcademiaPro</span>
-                    </h5>
-                    <div class="brand-subtitle">DBMS Architecture v2.0 • Green Edition</div>
-                </div>
-
-                <ul class="nav flex-column mb-auto">
-                    <li class="nav-item">
-                        <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.path == '/' %}active{% endif %}">
-                            <i class="fa-solid fa-gauge"></i> Overview Dashboard
-                        </a>
-                    </li>
-                    {% if logged_role != 'Teacher' %}
-                    <li class="nav-item">
-                        <a href="{{ url_for('admissions') }}" class="nav-link {% if request.path == '/admissions' %}active{% endif %}" style="background: rgba(16, 185, 129, 0.15); border-left: 3px solid #10b981;">
-                            <i class="fa-solid fa-id-card text-success"></i> Admissions & Data Desk
-                        </a>
-                    </li>
-                    {% endif %}
-                    <li class="nav-item">
-                        <a href="{{ url_for('student_desk') }}" target="_blank" class="nav-link {% if request.path == '/student-desk' %}active{% endif %}" style="color: #34d399;">
-                            <i class="fa-solid fa-graduation-cap text-success"></i> Student Self-Service Desk
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ url_for('academics') }}" class="nav-link {% if request.path == '/academics' %}active{% endif %}">
-                            <i class="fa-solid fa-chalkboard-user"></i> Academics (Inter & BS)
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ url_for('attendance') }}" class="nav-link {% if request.path == '/attendance' %}active{% endif %}">
-                            <i class="fa-solid fa-clipboard-user text-warning"></i> Digital Attendance
-                        </a>
-                    </li>
-                    {% if logged_role != 'Teacher' %}
-                    <li class="nav-item">
-                        <a href="{{ url_for('finance') }}" class="nav-link {% if request.path == '/finance' %}active{% endif %}">
-                            <i class="fa-solid fa-coins"></i> Finance & Challans
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ url_for('library') }}" class="nav-link {% if request.path == '/library' %}active{% endif %}">
-                            <i class="fa-solid fa-book"></i> Library Catalog
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ url_for('inventory') }}" class="nav-link {% if request.path == '/inventory' %}active{% endif %}">
-                            <i class="fa-solid fa-boxes-stacked"></i> Inventory & Labs
-                        </a>
-                    </li>
-                    {% endif %}
-                    <li class="nav-item">
-                        <a href="{{ url_for('ai_assistant') }}" class="nav-link {% if request.path == '/ai-assistant' %}active{% endif %}">
-                            <i class="fa-solid fa-robot"></i> AI Query Assistant
-                        </a>
-                    </li>
-                    {% if logged_role != 'Teacher' %}
-                    <li class="nav-item">
-                        <a href="{{ url_for('security_audit') }}" class="nav-link {% if request.path == '/security-audit' %}active{% endif %}">
-                            <i class="fa-solid fa-shield-halved"></i> Security & Audit
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ url_for('theory_docs') }}" class="nav-link {% if request.path == '/theory-docs' %}active{% endif %}">
-                            <i class="fa-solid fa-file-shield"></i> Relational Theory & FDs
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ url_for('settings') }}" class="nav-link {% if request.path == '/settings' %}active{% endif %}">
-                            <i class="fa-solid fa-sliders text-warning"></i> White-Label & Settings
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ url_for('query_runner') }}" class="nav-link {% if request.path == '/query-runner' %}active{% endif %}">
-                            <i class="fa-solid fa-terminal"></i> SQL Query Runner
-                        </a>
-                    </li>
-                    {% endif %}
-                </ul>
-
-                <hr class="border-secondary my-3">
-                <div class="px-2 py-2 bg-dark rounded-3">
-                    <small class="text-white-50 d-block"><i class="fa-solid fa-graduation-cap text-warning me-1"></i> System Scope</small>
-                    <span class="badge bg-success">Inter (1st/2nd Yr) + BS</span>
-                </div>
-            </div>
-
-            <!-- Main Content Area -->
-            <div class="col-md-9 col-lg-10">
-                <!-- Top Navbar -->
-                <div class="topbar d-flex justify-content-between align-items-center">
-                    <div>
-                        <h4 class="page-title">{% block page_title %}Dashboard{% endblock %}</h4>
-                        <small class="page-subtitle">{% block page_subtitle %}Enterprise Academic & Relational DBMS{% endblock %}</small>
-                    </div>
-                    <div class="d-flex align-items-center gap-2">
-                        {% if logged_role == 'Teacher' %}
-                        <a href="{{ url_for('attendance') }}" class="btn btn-primary btn-sm fw-bold px-3 shadow-sm">
-                            <i class="fa-solid fa-clipboard-user me-1"></i> Digital Attendance
-                        </a>
-                        {% else %}
-                        <a href="{{ url_for('admissions') }}" class="btn btn-primary btn-sm fw-bold px-3 shadow-sm">
-                            <i class="fa-solid fa-plus-circle me-1"></i> New Admission
-                        </a>
+            
+            <!-- LEFT SIDEBAR -->
+            <div class="col-md-3 col-lg-2 sidebar-navy">
+                <div>
+                    <ul class="nav flex-column mb-auto">
+                        <li class="nav-item">
+                            <a href="{{ url_for('dashboard') }}" class="nav-gold-link {% if request.path == '/' %}active{% endif %}">
+                                <i class="fa-solid fa-house"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('admissions') }}" class="nav-gold-link {% if request.path == '/admissions' %}active{% endif %}">
+                                <i class="fa-solid fa-user-graduate"></i>
+                                <span>Students</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('academics') }}" class="nav-gold-link {% if request.path == '/academics' %}active{% endif %}">
+                                <i class="fa-solid fa-users"></i>
+                                <span>Faculty</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('academics') }}" class="nav-gold-link">
+                                <i class="fa-solid fa-book-open"></i>
+                                <span>Academic Records</span>
+                            </a>
+                        </li>
+                        {% if logged_role != 'Teacher' %}
+                        <li class="nav-item">
+                            <a href="{{ url_for('inventory') }}" class="nav-gold-link {% if request.path == '/inventory' %}active{% endif %}">
+                                <i class="fa-solid fa-boxes-stacked"></i>
+                                <span>Inventory Management</span>
+                            </a>
+                        </li>
                         {% endif %}
-                        <span class="badge bg-success-subtle text-success border border-success px-3 py-2">
-                            <i class="fa-regular fa-calendar me-1"></i> Session: 2026
-                        </span>
-                        
-                        <!-- Avatar & User Dropdown -->
-                        <div class="dropdown">
-                            <button class="btn btn-outline-secondary dropdown-toggle btn-sm d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
-                                <img src="{{ avatar_src }}" id="navbarAvatarImg" class="rounded-circle border border-2 border-success" width="28" height="28" style="object-fit: cover;">
-                                <span>{{ logged_user }}</span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="min-width: 220px;">
-                                <li class="px-3 py-2 text-center border-bottom bg-light">
-                                    <img src="{{ avatar_src }}" id="menuAvatarImg" class="rounded-circle border border-2 border-success mb-2" width="54" height="54" style="object-fit: cover; cursor: pointer;" onclick="openAvatarModal()" title="Click to Change Avatar">
-                                    <div class="fw-bold text-dark">{{ logged_user }}</div>
-                                    <span class="badge bg-success">{{ logged_role }}</span>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item py-2" href="javascript:void(0)" onclick="openAvatarModal()">
-                                        <i class="fa-solid fa-user-pen me-2 text-success"></i> Change User Avatar
-                                    </a>
-                                </li>
-                                {% if logged_role != 'Teacher' %}
-                                <li>
-                                    <a class="dropdown-item py-2" href="{{ url_for('settings') }}">
-                                        <i class="fa-solid fa-gear me-2 text-warning"></i> College Settings
-                                    </a>
-                                </li>
-                                {% endif %}
-                                <li><hr class="dropdown-divider my-1"></li>
-                                <li>
-                                    <a class="dropdown-item py-2 text-danger" href="{{ url_for('logout') }}">
-                                        <i class="fa-solid fa-right-from-bracket me-2"></i> Secure Logout
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
+                        <li class="nav-item">
+                            <a href="{{ url_for('attendance') }}" class="nav-gold-link {% if request.path == '/attendance' %}active{% endif %}">
+                                <i class="fa-regular fa-calendar-check"></i>
+                                <span>Attendance</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('student_desk') }}" target="_blank" class="nav-gold-link {% if request.path == '/student-desk' %}active{% endif %}">
+                                <i class="fa-solid fa-file-signature"></i>
+                                <span>Examinations</span>
+                            </a>
+                        </li>
+                        {% if logged_role != 'Teacher' %}
+                        <li class="nav-item">
+                            <a href="{{ url_for('security_audit') }}" class="nav-gold-link {% if request.path == '/security-audit' %}active{% endif %}">
+                                <i class="fa-solid fa-chart-simple"></i>
+                                <span>Reports &amp; Analytics</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a href="javascript:void(0)" class="nav-gold-link d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="fa-regular fa-bell"></i>
+                                    <span>Notifications</span>
+                                </div>
+                                <span class="badge bg-danger rounded-pill px-2 py-1" style="font-size: 10px;">3</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('settings') }}" class="nav-gold-link {% if request.path == '/settings' %}active{% endif %}">
+                                <i class="fa-solid fa-gear"></i>
+                                <span>Settings</span>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
 
-                <!-- Page Body -->
-                <div class="p-4">
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                        <div class="alert alert-{{ category }} alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4 d-flex align-items-center gap-2" role="alert">
-                            <i class="fa-solid fa-circle-info"></i>
-                            <div class="fw-semibold">{{ message }}</div>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                        {% endfor %}
-                    {% endif %}
-                    {% endwith %}
-
-                    {% block content %}{% endblock %}
-
-                    <!-- Enterprise Footer Watermark -->
-                    <div class="mt-5 pt-3 border-top text-center text-muted" style="font-size: 11px;">
-                        <span>AcademiaPro Enterprise ERP v2.4 • Licensed Exclusively to <strong>{{ college.college_name }}</strong> • Emerald & White Academic Suite</span>
-                    </div>
+                <!-- Bottom Sidebar Engraving -->
+                <div class="sidebar-engraving">
+                    <i class="fa-solid fa-building-columns"></i>
+                    <div class="sidebar-engraving-title">Better Education</div>
+                    <div class="sidebar-engraving-sub">Brighter Future</div>
                 </div>
             </div>
+
+            <!-- MAIN WORKSPACE -->
+            <div class="col-md-9 col-lg-10 workspace-content">
+                
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4 d-flex align-items-center gap-2 text-dark fw-semibold" role="alert">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <div>{{ message }}</div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+
+                <!-- Footer -->
+                <footer class="mt-5 pt-3 border-top border-secondary d-flex justify-content-between align-items-center flex-wrap gap-2 text-white-50" style="font-size: 11.5px;">
+                    <div>&copy; 2026 AcademiaPro. All rights reserved.</div>
+                    <div class="d-flex gap-3">
+                        <a href="javascript:void(0)" class="text-white-50 text-decoration-none">Help</a>
+                        <a href="javascript:void(0)" class="text-white-50 text-decoration-none">Privacy Policy</a>
+                        <a href="javascript:void(0)" class="text-white-50 text-decoration-none">Terms &amp; Conditions</a>
+                    </div>
+                </footer>
+
+            </div>
+
         </div>
     </div>
 
-    <!-- INTERACTIVE AVATAR PICKER MODAL -->
+    <!-- AVATAR MODAL -->
     <div class="modal fade" id="avatarPickerModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content text-white border-0 shadow-lg" style="background: #061a12; border: 1px solid #10b981 !important; border-radius: 24px;">
-                <div class="modal-header border-bottom" style="border-color: rgba(16, 185, 129, 0.3) !important;">
+            <div class="modal-content text-white border-0 shadow-lg" style="background: #09152e; border: 1px solid rgba(245, 158, 11, 0.4) !important; border-radius: 22px;">
+                <div class="modal-header border-bottom border-secondary">
                     <h5 class="modal-title fw-bold text-white">
-                        <i class="fa-solid fa-user-astronaut text-success me-2"></i> Choose Your Profile Avatar
+                        <i class="fa-solid fa-user-astronaut text-warning me-2"></i> Choose Profile Avatar
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4 text-center">
-                    <p class="small text-white-50 mb-4">Select an academic vector sketch avatar or enter a custom profile URL:</p>
+                    <p class="small text-white-50 mb-4">Select an academic vector sketch avatar:</p>
                     
                     <div class="row g-3 justify-content-center mb-4">
-                        <!-- Option 1: Boy -->
                         <div class="col-4 col-sm-2 text-center">
-                            <div class="avatar-option p-2 rounded-3 border {% if logged_avatar == 'boy' %}border-success bg-success-subtle{% else %}border-secondary{% endif %}" 
-                                 onclick="selectAvatarChoice('boy')" style="cursor: pointer; transition: all 0.2s;" id="opt-boy">
-                                <img src="/static/avatars/boy.svg" width="56" height="56" class="rounded-circle mb-1">
-                                <div class="small fw-bold text-white" style="font-size: 11px;">Student Boy</div>
-                            </div>
-                        </div>
-                        <!-- Option 2: Girl -->
-                        <div class="col-4 col-sm-2 text-center">
-                            <div class="avatar-option p-2 rounded-3 border {% if logged_avatar == 'girl' %}border-success bg-success-subtle{% else %}border-secondary{% endif %}" 
-                                 onclick="selectAvatarChoice('girl')" style="cursor: pointer; transition: all 0.2s;" id="opt-girl">
+                            <div class="avatar-option p-2 rounded-3 border {% if logged_avatar == 'girl' %}border-warning bg-warning-subtle{% else %}border-secondary{% endif %}" 
+                                 onclick="selectAvatarChoice('girl')" style="cursor: pointer;" id="opt-girl">
                                 <img src="/static/avatars/girl.svg" width="56" height="56" class="rounded-circle mb-1">
-                                <div class="small fw-bold text-white" style="font-size: 11px;">Student Girl</div>
+                                <div class="small fw-bold text-white" style="font-size: 11px;">Ayesha</div>
                             </div>
                         </div>
-                        <!-- Option 3: Male Professor -->
                         <div class="col-4 col-sm-2 text-center">
-                            <div class="avatar-option p-2 rounded-3 border {% if logged_avatar == 'prof_male' %}border-success bg-success-subtle{% else %}border-secondary{% endif %}" 
-                                 onclick="selectAvatarChoice('prof_male')" style="cursor: pointer; transition: all 0.2s;" id="opt-prof_male">
-                                <img src="/static/avatars/prof_male.svg" width="56" height="56" class="rounded-circle mb-1">
-                                <div class="small fw-bold text-white" style="font-size: 11px;">Prof (M)</div>
+                            <div class="avatar-option p-2 rounded-3 border {% if logged_avatar == 'boy' %}border-warning bg-warning-subtle{% else %}border-secondary{% endif %}" 
+                                 onclick="selectAvatarChoice('boy')" style="cursor: pointer;" id="opt-boy">
+                                <img src="/static/avatars/boy.svg" width="56" height="56" class="rounded-circle mb-1">
+                                <div class="small fw-bold text-white" style="font-size: 11px;">Student</div>
                             </div>
                         </div>
-                        <!-- Option 4: Female Professor -->
                         <div class="col-4 col-sm-2 text-center">
-                            <div class="avatar-option p-2 rounded-3 border {% if logged_avatar == 'prof_female' %}border-success bg-success-subtle{% else %}border-secondary{% endif %}" 
-                                 onclick="selectAvatarChoice('prof_female')" style="cursor: pointer; transition: all 0.2s;" id="opt-prof_female">
-                                <img src="/static/avatars/prof_female.svg" width="56" height="56" class="rounded-circle mb-1">
-                                <div class="small fw-bold text-white" style="font-size: 11px;">Prof (F)</div>
-                            </div>
-                        </div>
-                        <!-- Option 5: Admin Crest -->
-                        <div class="col-4 col-sm-2 text-center">
-                            <div class="avatar-option p-2 rounded-3 border {% if logged_avatar == 'admin' %}border-success bg-success-subtle{% else %}border-secondary{% endif %}" 
-                                 onclick="selectAvatarChoice('admin')" style="cursor: pointer; transition: all 0.2s;" id="opt-admin">
-                                <img src="/static/avatars/admin.svg" width="56" height="56" class="rounded-circle mb-1">
-                                <div class="small fw-bold text-white" style="font-size: 11px;">Executive</div>
+                            <div class="avatar-option p-2 rounded-3 border {% if logged_avatar == 'faculty' %}border-warning bg-warning-subtle{% else %}border-secondary{% endif %}" 
+                                 onclick="selectAvatarChoice('faculty')" style="cursor: pointer;" id="opt-faculty">
+                                <img src="/static/avatars/faculty.svg" width="56" height="56" class="rounded-circle mb-1">
+                                <div class="small fw-bold text-white" style="font-size: 11px;">Faculty</div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Custom Photo URL -->
-                    <div class="text-start mt-3 p-3 rounded-3" style="background: rgba(255,255,255,0.05); border: 1px dashed rgba(16, 185, 129, 0.4);">
-                        <label class="form-label small fw-bold text-white mb-1"><i class="fa-solid fa-link text-success me-1"></i> Or Enter Custom Photo URL:</label>
-                        <div class="input-group input-group-sm">
-                            <input type="url" id="customAvatarUrl" class="form-control" placeholder="https://example.com/my-photo.jpg" value="{% if logged_avatar.startswith('http') %}{{ logged_avatar }}{% endif %}">
-                            <button type="button" class="btn btn-outline-success" onclick="applyCustomAvatar()">Apply URL</button>
-                        </div>
-                    </div>
-
-                    <div id="avatarSaveAlert" class="mt-3"></div>
-                </div>
-                <div class="modal-footer border-top" style="border-color: rgba(16, 185, 129, 0.3) !important;">
-                    <button type="button" class="btn btn-outline-light btn-sm rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+                    <div id="avatarSaveAlert"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap 5 JS Bundle -->
+    <!-- Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom Local Script -->
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script>
     let avatarModalInstance = null;
     function openAvatarModal() {
@@ -303,21 +553,15 @@
 
     function selectAvatarChoice(choice) {
         document.querySelectorAll('.avatar-option').forEach(el => {
-            el.classList.remove('border-success', 'bg-success-subtle');
+            el.classList.remove('border-warning', 'bg-warning-subtle');
             el.classList.add('border-secondary');
         });
         const activeEl = document.getElementById('opt-' + choice);
         if (activeEl) {
             activeEl.classList.remove('border-secondary');
-            activeEl.classList.add('border-success', 'bg-success-subtle');
+            activeEl.classList.add('border-warning', 'bg-warning-subtle');
         }
         saveAvatar(choice);
-    }
-
-    function applyCustomAvatar() {
-        const url = document.getElementById('customAvatarUrl').value.trim();
-        if (!url) return;
-        saveAvatar(url);
     }
 
     function saveAvatar(choice) {
@@ -340,13 +584,8 @@
                 setTimeout(() => {
                     if (avatarModalInstance) avatarModalInstance.hide();
                     alertEl.innerHTML = '';
-                }, 900);
-            } else {
-                alertEl.innerHTML = '<span class="text-danger small"><i class="fa-solid fa-triangle-exclamation me-1"></i> Error saving avatar.</span>';
+                }, 800);
             }
-        })
-        .catch(err => {
-            alertEl.innerHTML = '<span class="text-danger small">Network error saving avatar.</span>';
         });
     }
     </script>

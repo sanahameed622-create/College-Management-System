@@ -13,18 +13,26 @@ app.secret_key = "academiapro_secret_salt_2026_enterprise_secure"
 
 @app.context_processor
 def inject_global_context():
-    avatar_choice = session.get("user_avatar", "boy")
+    avatar_choice = session.get("user_avatar", "girl")
     if avatar_choice.startswith("http://") or avatar_choice.startswith("https://"):
         avatar_src = avatar_choice
     else:
         avatar_src = f"/static/avatars/{avatar_choice}.svg"
+    
+    now = datetime.datetime.now()
     return {
         "college": db.get_college_profile(),
-        "logged_user": session.get("user_name", "Administrator"),
-        "logged_role": session.get("user_role", "Admin"),
+        "logged_user": session.get("user_name", "Ayesha Khan"),
+        "logged_role": session.get("user_role", "Administrator"),
         "logged_avatar": avatar_choice,
         "avatar_src": avatar_src,
-        "is_authenticated": session.get("logged_in", False)
+        "is_authenticated": session.get("logged_in", False),
+        "live_date_formatted": now.strftime("%a, %d %b %Y"),
+        "live_time_formatted": now.strftime("%I:%M %p"),
+        "live_day": now.day,
+        "live_month": now.month,
+        "live_year": now.year,
+        "live_month_name": now.strftime("%B %Y")
     }
 
 @app.before_request
