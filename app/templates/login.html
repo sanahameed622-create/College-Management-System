@@ -3,74 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure ERP Portal - Punjab Group of Colleges / Govt. Graduate College</title>
+    <title>Enterprise ERP Portal • Punjab Group of Colleges / Govt. Graduate College</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Cinzel:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-emerald: #10b981;
+            --emerald-glow: rgba(16, 185, 129, 0.45);
+            --emerald-light: #34d399;
+            --dark-emerald: #06241a;
+            --deep-obsidian: #030b08;
+            --card-glass: rgba(7, 26, 19, 0.82);
+            --border-glass: rgba(52, 211, 153, 0.28);
+            --text-gold: #fbbf24;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
+
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #04100c;
+            background: 
+                radial-gradient(circle at 85% 15%, rgba(16, 185, 129, 0.16) 0%, transparent 50%),
+                radial-gradient(circle at 15% 85%, rgba(5, 150, 105, 0.14) 0%, transparent 50%),
+                linear-gradient(135deg, #020805 0%, #04140e 50%, #020805 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow-x: hidden;
             position: relative;
-            padding: 24px 16px;
+            padding: 30px 16px;
+            color: #ffffff;
         }
 
-        /* Ambient Glowing Emerald/Mint Orbs behind the Glass Wall */
+        /* Subtle Luxury Geometric Grid Pattern */
+        body::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(16, 185, 129, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(16, 185, 129, 0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Ambient Glowing Aura Orbs */
         .ambient-orb {
             position: absolute;
             border-radius: 50%;
-            filter: blur(100px);
+            filter: blur(110px);
             z-index: 1;
             pointer-events: none;
-            opacity: 0.55;
-            animation: floatOrb 12s infinite alternate ease-in-out;
+            opacity: 0.6;
+            animation: floatOrb 14s infinite alternate ease-in-out;
         }
         .orb-1 {
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, #10b981 0%, #064e3b 70%);
-            top: -120px;
+            width: 520px;
+            height: 520px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.35) 0%, rgba(6, 78, 59, 0.1) 70%);
+            top: -140px;
             left: -120px;
         }
         .orb-2 {
-            width: 450px;
-            height: 450px;
-            background: radial-gradient(circle, #34d399 0%, #047857 70%);
-            bottom: -90px;
-            right: -90px;
-            animation-delay: -4s;
-        }
-        .orb-3 {
-            width: 320px;
-            height: 320px;
-            background: radial-gradient(circle, #059669 0%, #022c22 70%);
-            top: 45%;
-            right: 25%;
-            animation-delay: -7s;
+            width: 480px;
+            height: 480px;
+            background: radial-gradient(circle, rgba(52, 211, 153, 0.3) 0%, rgba(4, 120, 87, 0.08) 70%);
+            bottom: -100px;
+            right: -100px;
+            animation-delay: -5s;
         }
 
         @keyframes floatOrb {
             0% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(45px, -35px) scale(1.08); }
-            100% { transform: translate(-35px, 45px) scale(0.94); }
+            50% { transform: translate(40px, -30px) scale(1.06); }
+            100% { transform: translate(-30px, 40px) scale(0.95); }
         }
 
-        /* Smooth SaaS Zoom-in Animation */
-        @keyframes glassZoomIn {
+        /* Luxury Split Container */
+        .luxury-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 1120px;
+            background: var(--card-glass);
+            backdrop-filter: blur(35px);
+            -webkit-backdrop-filter: blur(35px);
+            border: 1px solid var(--border-glass);
+            border-radius: 30px;
+            box-shadow: 
+                0 35px 80px -15px rgba(0, 0, 0, 0.9),
+                0 0 50px rgba(16, 185, 129, 0.12),
+                inset 0 1px 1px rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            animation: luxuryEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes luxuryEnter {
             0% {
                 opacity: 0;
-                transform: scale(0.94) translateY(24px);
+                transform: scale(0.96) translateY(20px);
             }
             100% {
                 opacity: 1;
@@ -78,370 +117,585 @@
             }
         }
 
-        /* Split-Hero 2-Column Luxury Frosted Container (Emerald & Crisp White) */
-        .login-wrapper {
-            position: relative;
-            z-index: 10;
-            width: 100%;
-            max-width: 1080px;
-            background: rgba(6, 26, 18, 0.88);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            border: 1px solid rgba(16, 185, 129, 0.35);
-            border-radius: 28px;
-            box-shadow: 
-                0 30px 70px -12px rgba(0, 0, 0, 0.9),
-                0 0 0 1px rgba(16, 185, 129, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            overflow: hidden;
-            animation: glassZoomIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        /* Academic Hero Showcase Banner (Left Side) */
-        .academic-hero {
-            background: linear-gradient(135deg, rgba(6, 78, 59, 0.90) 0%, rgba(2, 44, 34, 0.95) 100%),
-                        url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
-            padding: 44px 38px;
+        /* Left Showcase Column (Luxury Academic Brand Showcase) */
+        .showcase-column {
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.22) 0%, transparent 60%),
+                linear-gradient(160deg, rgba(6, 36, 26, 0.94) 0%, rgba(2, 18, 12, 0.98) 100%),
+                url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
+            padding: 48px 42px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            border-right: 1px solid rgba(16, 185, 129, 0.25);
+            border-right: 1px solid rgba(52, 211, 153, 0.2);
             position: relative;
         }
 
-        /* Right Side Form Container */
-        .login-form-side {
-            padding: 40px 38px;
-            background: rgba(4, 18, 13, 0.92);
+        .showcase-column::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(4, 20, 14, 0.5) 0%, rgba(2, 12, 8, 0.85) 100%);
+            pointer-events: none;
         }
 
-        /* Brand Badge */
-        .brand-badge {
+        .showcase-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Luxury Institutional Crest Badge */
+        .crest-pill {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 7px 16px;
-            background: rgba(16, 185, 129, 0.18);
-            border: 1px solid rgba(52, 211, 153, 0.4);
+            gap: 10px;
+            padding: 8px 18px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(6, 78, 59, 0.3) 100%);
+            border: 1px solid rgba(52, 211, 153, 0.45);
             border-radius: 9999px;
-            font-size: 11.5px;
-            font-weight: 700;
-            color: #34d399;
-            letter-spacing: 0.8px;
-            box-shadow: 0 0 16px rgba(16, 185, 129, 0.25);
-        }
-
-        /* Inspirational Quote Box */
-        .quote-box {
-            background: rgba(255, 255, 255, 0.06);
-            border-left: 3px solid #10b981;
-            border-radius: 0 12px 12px 0;
-            padding: 12px 16px;
-            font-style: italic;
-            font-size: 12.5px;
-            color: #d1fae5;
-            line-height: 1.5;
-        }
-        .quote-author {
-            font-style: normal;
-            font-weight: 700;
-            color: #ffffff;
             font-size: 11px;
-            display: block;
-            margin-top: 4px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: #6ee7b7;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
         }
 
-        /* Mode Selector Tabs (Password vs Fingerprint) */
-        .auth-tab-btn {
+        .crest-pill i {
+            color: #fbbf24;
+            font-size: 13px;
+        }
+
+        .hero-title {
+            font-size: 29px;
+            font-weight: 800;
+            line-height: 1.25;
+            letter-spacing: -0.6px;
+            margin-top: 18px;
+            margin-bottom: 12px;
+            color: #ffffff;
+        }
+
+        .hero-title span {
+            background: linear-gradient(135deg, #34d399 0%, #a7f3d0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-description {
+            color: #a7f3d0;
+            font-size: 13.5px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            opacity: 0.9;
+        }
+
+        /* Luxury Live Metric Cards */
+        .metric-card {
+            background: rgba(4, 28, 19, 0.65);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(52, 211, 153, 0.25);
+            border-radius: 16px;
+            padding: 14px 18px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(52, 211, 153, 0.5);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 20px rgba(16, 185, 129, 0.15);
+        }
+
+        .metric-icon-wrap {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(6, 78, 59, 0.4) 100%);
+            border: 1px solid rgba(52, 211, 153, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #34d399;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .metric-text h6 {
+            color: #ffffff;
+            font-size: 13.5px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .metric-text p {
+            color: #94a3b8;
+            font-size: 11.5px;
+            margin-bottom: 0;
+            line-height: 1.4;
+        }
+
+        /* Community / Social Proof Badge */
+        .community-strip {
+            background: rgba(2, 18, 12, 0.7);
+            border: 1px solid rgba(52, 211, 153, 0.2);
+            border-radius: 16px;
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        .avatar-stack {
+            display: flex;
+            align-items: center;
+        }
+
+        .avatar-stack img {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 2px solid #064e3b;
+            margin-left: -8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .avatar-stack img:first-child {
+            margin-left: 0;
+        }
+
+        .community-text {
+            font-size: 12px;
+            color: #e2e8f0;
+            line-height: 1.35;
+        }
+
+        .community-text strong {
+            color: #34d399;
+            font-weight: 700;
+        }
+
+        /* Right Form Column */
+        .form-column {
+            padding: 44px 40px;
+            background: rgba(3, 16, 11, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Form Header */
+        .form-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .gateway-icon {
+            width: 58px;
+            height: 58px;
+            margin: 0 auto 14px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(6, 78, 59, 0.5) 100%);
+            border: 1px solid rgba(52, 211, 153, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #34d399;
+            font-size: 24px;
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.25);
+        }
+
+        .form-header h4 {
+            font-size: 23px;
+            font-weight: 800;
+            letter-spacing: -0.4px;
+            margin-bottom: 4px;
+            color: #ffffff;
+        }
+
+        .form-header p {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-bottom: 0;
+        }
+
+        /* Modern Segmented Pill Switcher (Apple/SaaS Style) */
+        .auth-segmented {
+            background: rgba(2, 12, 8, 0.85);
+            border: 1px solid rgba(52, 211, 153, 0.25);
+            border-radius: 14px;
+            padding: 5px;
+            display: flex;
+            gap: 6px;
+            margin-bottom: 22px;
+        }
+
+        .seg-btn {
+            flex: 1;
             background: transparent;
             border: none;
             color: #94a3b8;
-            font-weight: 600;
             font-size: 13px;
-            padding: 8px 16px;
+            font-weight: 600;
+            padding: 10px 14px;
             border-radius: 10px;
-            transition: all 0.2s ease;
             cursor: pointer;
-            flex: 1;
-        }
-        .auth-tab-btn.active {
-            background: rgba(16, 185, 129, 0.25);
-            color: #34d399;
-            border: 1px solid rgba(16, 185, 129, 0.4);
-        }
-
-        /* Inputs - Clean Frosted Dark Emerald Style (NO awkward stark white) */
-        .form-label {
-            color: #e2e8f0;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
-        .input-group-text {
-            background: rgba(10, 38, 28, 0.85) !important;
-            border: 1.5px solid rgba(16, 185, 129, 0.3) !important;
-            border-right: none !important;
-            color: #34d399 !important;
-            border-radius: 12px 0 0 12px !important;
-        }
-        .form-control {
-            background: rgba(10, 38, 28, 0.85) !important;
-            border: 1.5px solid rgba(16, 185, 129, 0.3) !important;
-            border-left: none !important;
-            color: #ffffff !important;
-            border-radius: 0 12px 12px 0 !important;
-            padding: 11px 16px;
-            font-size: 14px;
             transition: all 0.25s ease;
-        }
-        .form-control:focus {
-            background: rgba(12, 48, 36, 0.95) !important;
-            border-color: #10b981 !important;
-            color: #ffffff !important;
-            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.22) !important;
-        }
-        .form-control::placeholder {
-            color: #64748b !important;
-        }
-
-        /* Primary Emerald Button */
-        .btn-emerald {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            border: none;
-            color: #ffffff;
-            border-radius: 12px;
-            padding: 12px 16px;
-            font-weight: 700;
-            font-size: 14.5px;
-            letter-spacing: 0.5px;
-            transition: all 0.25s ease;
-            box-shadow: 0 10px 24px -4px rgba(16, 185, 129, 0.5);
-            width: 100%;
-        }
-        .btn-emerald:hover {
-            background: linear-gradient(135deg, #34d399 0%, #047857 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 14px 28px -4px rgba(16, 185, 129, 0.65);
-            color: #ffffff;
-        }
-
-        /* Student Self-Service Desk Button */
-        .btn-student-desk {
-            background: rgba(16, 185, 129, 0.12);
-            border: 1px solid rgba(52, 211, 153, 0.4);
-            color: #a7f3d0;
-            border-radius: 12px;
-            padding: 10px 16px;
-            font-weight: 600;
-            font-size: 13px;
-            text-decoration: none;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 100%;
-            transition: all 0.2s ease;
-        }
-        .btn-student-desk:hover {
-            background: rgba(16, 185, 129, 0.25);
-            color: #ffffff;
-            border-color: #34d399;
-            transform: translateY(-1px);
+            gap: 8px;
         }
 
-        /* Fingerprint Biometric Scanner Box */
-        .fingerprint-box {
-            background: rgba(10, 38, 28, 0.7);
+        .seg-btn.active {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.3) 0%, rgba(6, 78, 59, 0.5) 100%);
+            color: #ffffff;
+            border: 1px solid rgba(52, 211, 153, 0.45);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+            font-weight: 700;
+        }
+
+        /* Luxury Inputs */
+        .form-label-luxury {
+            color: #e2e8f0;
+            font-size: 12.5px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .luxury-input-group {
+            position: relative;
+            margin-bottom: 18px;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #34d399;
+            font-size: 15px;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .luxury-control {
+            width: 100%;
+            background: rgba(5, 26, 18, 0.8) !important;
+            border: 1.5px solid rgba(52, 211, 153, 0.25) !important;
+            border-radius: 12px !important;
+            padding: 12px 16px 12px 46px !important;
+            color: #ffffff !important;
+            font-size: 13.5px !important;
+            transition: all 0.25s ease !important;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        .luxury-control:focus {
+            background: rgba(6, 36, 25, 0.95) !important;
+            border-color: #10b981 !important;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.25), 0 0 20px rgba(16, 185, 129, 0.2) !important;
+            outline: none !important;
+        }
+
+        .luxury-control::placeholder {
+            color: #64748b !important;
+            font-size: 13px;
+        }
+
+        .pass-toggle-btn {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: #34d399;
+            cursor: pointer;
+            padding: 4px;
+            font-size: 14px;
+            z-index: 3;
+        }
+
+        /* Luxury Action Button */
+        .btn-luxury-signin {
+            width: 100%;
+            background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+            border: 1px solid rgba(52, 211, 153, 0.5);
+            border-radius: 12px;
+            padding: 13px 20px;
+            color: #ffffff;
+            font-size: 14.5px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 
+                0 10px 25px -5px rgba(16, 185, 129, 0.5),
+                inset 0 1px 1px rgba(255, 255, 255, 0.3);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-luxury-signin:hover {
+            background: linear-gradient(135deg, #34d399 0%, #10b981 50%, #059669 100%);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 14px 30px -4px rgba(16, 185, 129, 0.65),
+                0 0 25px rgba(52, 211, 153, 0.4);
+            color: #ffffff;
+        }
+
+        /* High-Tech Holographic Biometric Scanner */
+        .scanner-card {
+            background: rgba(4, 25, 17, 0.8);
             border: 2px dashed rgba(52, 211, 153, 0.4);
-            border-radius: 16px;
-            padding: 24px;
+            border-radius: 18px;
+            padding: 26px 20px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
-        }
-        .fingerprint-box:hover {
-            border-color: #34d399;
-            background: rgba(16, 185, 129, 0.15);
-            box-shadow: 0 0 25px rgba(16, 185, 129, 0.3);
-        }
-        .fingerprint-icon {
-            font-size: 54px;
-            color: #10b981;
-            transition: all 0.3s ease;
-        }
-        .fingerprint-box:hover .fingerprint-icon {
-            color: #34d399;
-            transform: scale(1.06);
+            margin-bottom: 18px;
         }
 
-        /* Animated Laser Scanning Beam */
-        .laser-beam {
+        .scanner-card:hover {
+            border-color: #34d399;
+            background: rgba(16, 185, 129, 0.12);
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.25);
+        }
+
+        .scanner-glyph {
+            font-size: 56px;
+            color: #10b981;
+            transition: all 0.3s ease;
+            display: inline-block;
+            filter: drop-shadow(0 0 15px rgba(16, 185, 129, 0.5));
+        }
+
+        .scanner-card:hover .scanner-glyph {
+            color: #34d399;
+            transform: scale(1.08);
+            filter: drop-shadow(0 0 22px rgba(52, 211, 153, 0.7));
+        }
+
+        /* Laser Beam Animation */
+        .scanner-laser {
             position: absolute;
-            left: 10%;
-            width: 80%;
+            left: 12%;
+            width: 76%;
             height: 3px;
             background: linear-gradient(90deg, transparent, #34d399, transparent);
             box-shadow: 0 0 15px #10b981, 0 0 25px #34d399;
             opacity: 0;
             pointer-events: none;
         }
-        .scanning .laser-beam {
+
+        .scanning .scanner-laser {
             opacity: 1;
-            animation: scanRay 1.4s infinite ease-in-out;
-        }
-        @keyframes scanRay {
-            0% { top: 15%; }
-            50% { top: 80%; }
-            100% { top: 15%; }
+            animation: laserSweep 1.3s infinite ease-in-out;
         }
 
-        /* Showcase Feature Pill */
-        .showcase-pill {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(16, 185, 129, 0.3);
+        @keyframes laserSweep {
+            0% { top: 18%; }
+            50% { top: 78%; }
+            100% { top: 18%; }
+        }
+
+        /* Protocol Alert Box */
+        .protocol-box {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(52, 211, 153, 0.22);
             border-radius: 12px;
-            padding: 10px 14px;
+            padding: 9px 14px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-            backdrop-filter: blur(10px);
-        }
-        .showcase-pill i {
-            font-size: 20px;
-            color: #34d399;
-            flex-shrink: 0;
-        }
-        .showcase-pill div {
-            color: #e2e8f0;
-            font-size: 13px;
-            line-height: 1.35;
-        }
-        .showcase-pill strong {
-            color: #ffffff;
-            display: block;
+            gap: 10px;
+            margin-top: 14px;
+            margin-bottom: 14px;
+            font-size: 11.5px;
+            color: #a7f3d0;
+            line-height: 1.4;
         }
 
-        /* Live Pulsing Dot */
-        .pulse-dot {
-            width: 10px;
-            height: 10px;
-            background: #10b981;
-            border-radius: 50%;
-            display: inline-block;
-            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-            animation: pulseWave 1.8s infinite cubic-bezier(0.66, 0, 0, 1);
+        .protocol-box i {
+            color: #34d399;
+            font-size: 15px;
+            flex-shrink: 0;
         }
-        @keyframes pulseWave {
-            to { box-shadow: 0 0 0 12px rgba(16, 185, 129, 0); }
+
+        /* Quick Autofill Pills (Executive Minimalist) */
+        .autofill-strip {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .autofill-label {
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 600;
+            margin-right: 2px;
+        }
+
+        .chip-autofill {
+            background: rgba(2, 14, 9, 0.8);
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            border-radius: 9999px;
+            padding: 4px 12px;
+            font-size: 11px;
+            color: #cbd5e1;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .chip-autofill i {
+            color: #34d399;
+            font-size: 10px;
+        }
+
+        .chip-autofill:hover {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: #34d399;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        /* Clean Luxury Modal */
+        .modal-luxury {
+            background: #04140e !important;
+            border: 1px solid rgba(52, 211, 153, 0.4) !important;
+            border-radius: 22px !important;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 40px rgba(16, 185, 129, 0.2) !important;
         }
     </style>
 </head>
 <body>
 
-    <!-- Ambient Glowing Emerald Orbs -->
+    <!-- Ambient Glowing Orbs -->
     <div class="ambient-orb orb-1"></div>
     <div class="ambient-orb orb-2"></div>
-    <div class="ambient-orb orb-3"></div>
 
-    <!-- 2-Column Split Hero Container -->
-    <div class="login-wrapper">
+    <!-- Main Luxury Container -->
+    <div class="luxury-wrapper">
         <div class="row g-0">
             
-            <!-- LEFT COLUMN: COLORFUL ACADEMIC SHOWCASE -->
-            <div class="col-lg-6 academic-hero">
-                <div>
-                    <!-- College Crest & Badges -->
+            <!-- LEFT COLUMN: EXECUTIVE BRAND SHOWCASE -->
+            <div class="col-lg-6 showcase-column">
+                <div class="showcase-content">
+                    
+                    <!-- Institutional Crest -->
                     <div class="d-flex align-items-center justify-content-between mb-3">
-                        <div class="brand-badge">
-                            <i class="fa-solid fa-graduation-cap"></i>
-                            <span>ENTERPRISE ACADEMIC DBMS</span>
+                        <div class="crest-pill">
+                            <i class="fa-solid fa-crown"></i>
+                            <span>Enterprise Academic DBMS</span>
                         </div>
-                        <span class="badge bg-success-subtle text-success border border-success px-3 py-1 rounded-pill" style="font-size: 11px;">
-                            <span class="pulse-dot me-1"></span> Session 2026 Active
+                        <span class="badge px-3 py-1 rounded-pill" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(52, 211, 153, 0.35); color: #34d399; font-size: 11px;">
+                            <i class="fa-solid fa-circle text-success me-1" style="font-size: 8px;"></i> Session 2026 Live
                         </span>
                     </div>
 
-                    <h3 class="fw-bold text-white mb-2" style="letter-spacing: -0.5px;">
-                        Punjab Group of Colleges / Govt. Graduate College
-                    </h3>
-                    <p class="small mb-4" style="color: #a7f3d0; line-height: 1.6;">
-                        Complete multi-tier enterprise management suite for Intermediate (F.Sc, ICS, FA, I.Com) &amp; Undergraduate 4-Year BS Degree Programs.
+                    <h2 class="hero-title">
+                        Punjab Group of Colleges / <br>
+                        <span>Govt. Graduate College</span>
+                    </h2>
+
+                    <p class="hero-description">
+                        Unified enterprise academic architecture for Intermediate (F.Sc, ICS, FA, I.Com) &amp; Undergraduate 4-Year BS Degree Programs with BCNF-normalized relational intelligence.
                     </p>
 
-                    <!-- Student Avatars & Features Card -->
-                    <div class="p-3 rounded-4 mb-3" style="background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(16, 185, 129, 0.35);">
-                        <div class="d-flex align-items-center gap-3 mb-2">
-                            <img src="/static/avatars/boy.svg" width="48" height="48" class="rounded-circle border border-2 border-success shadow-sm">
-                            <img src="/static/avatars/girl.svg" width="48" height="48" class="rounded-circle border border-2 border-success shadow-sm">
-                            <div>
-                                <h6 class="fw-bold text-white mb-0">Student Self-Service Ecosystem</h6>
-                                <small style="color: #6ee7b7; font-size: 11.5px;">1-Click Roll Number Lookup • Fee Challans • ID Cards</small>
-                            </div>
+                    <!-- Interactive Luxury Stat Cards -->
+                    <div class="metric-card">
+                        <div class="metric-icon-wrap">
+                            <i class="fa-solid fa-database"></i>
+                        </div>
+                        <div class="metric-text">
+                            <h6>ACID Concurrency Engine</h6>
+                            <p>25+ Normalized tables with automated audit logs &amp; zero data redundancy.</p>
                         </div>
                     </div>
 
-                    <!-- Highlight Pills -->
-                    <div class="showcase-pill">
-                        <i class="fa-solid fa-clipboard-check"></i>
-                        <div>
-                            <strong>Digital Attendance Register</strong>
-                            Automatic 75% examination eligibility enforcement &amp; parent SMS alerts.
+                    <div class="metric-card">
+                        <div class="metric-icon-wrap">
+                            <i class="fa-solid fa-clipboard-check"></i>
+                        </div>
+                        <div class="metric-text">
+                            <h6>Digital Attendance &amp; Growth Tracker</h6>
+                            <p>Real-time 75% exam eligibility enforcement &amp; teacher subject performance.</p>
                         </div>
                     </div>
 
-                    <div class="showcase-pill">
-                        <i class="fa-solid fa-database"></i>
-                        <div>
-                            <strong>ACID Compliant DBMS Engine</strong>
-                            25+ Normalized BCNF tables, audit logs, and fee challan reconciliation.
+                    <div class="metric-card">
+                        <div class="metric-icon-wrap">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <div class="metric-text">
+                            <h6>Zero-Trust Privacy &amp; Biometrics</h6>
+                            <p>Student identity isolation &amp; multi-tier AI academic query firewalls.</p>
                         </div>
                     </div>
 
-                    <div class="showcase-pill">
-                        <i class="fa-solid fa-robot"></i>
-                        <div>
-                            <strong>Sandboxed AI Query Assistant</strong>
-                            Students &amp; faculty query exams, syllabus, and results in natural language.
+                    <!-- Social Proof / Community -->
+                    <div class="community-strip">
+                        <div class="avatar-stack">
+                            <img src="/static/avatars/boy.svg" alt="Student">
+                            <img src="/static/avatars/girl.svg" alt="Student">
+                            <img src="/static/avatars/faculty.svg" alt="Faculty">
+                        </div>
+                        <div class="community-text">
+                            Trusted by <strong>2,400+ Students &amp; Faculty</strong> across all academic departments.
                         </div>
                     </div>
+
                 </div>
 
-                <!-- Bottom Quote -->
-                <div class="quote-box mt-3">
-                    <i class="fa-solid fa-quote-left text-success me-1"></i>
-                    "Education is the most powerful weapon which you can use to change the world."
-                    <span class="quote-author">— Nelson Mandela</span>
+                <!-- Bottom Accreditation -->
+                <div class="showcase-content mt-4 pt-3 border-top" style="border-color: rgba(52, 211, 153, 0.15) !important;">
+                    <small class="text-white-50" style="font-size: 11px;">
+                        <i class="fa-solid fa-building-columns text-emerald me-1"></i> Higher Education Commission (HEC) &amp; BISE Standard Aligned
+                    </small>
                 </div>
             </div>
 
-            <!-- RIGHT COLUMN: FROSTED GLASS LOGIN CARD -->
-            <div class="col-lg-6 login-form-side">
+            <!-- RIGHT COLUMN: LUXURY SIGN-IN CARD -->
+            <div class="col-lg-6 form-column">
                 
-                <!-- Header -->
-                <div class="text-center mb-3">
-                    <div class="brand-badge mb-2">
+                <!-- Gateway Header -->
+                <div class="form-header">
+                    <div class="gateway-icon">
                         <i class="fa-solid fa-shield-halved"></i>
-                        <span>SECURE ERP GATEWAY</span>
                     </div>
-                    <h4 class="fw-bold mb-1 text-white">Institutional Sign-In</h4>
-                    <p class="small mb-0" style="color: #a7f3d0;">
-                        Students, Faculty &amp; Executive Administration
-                    </p>
+                    <h4>Institutional Gateway</h4>
+                    <p>Enter your institutional credentials or biometric ID</p>
                 </div>
 
-                <!-- Auth Mode Selector (Gmail & Password vs Fingerprint Scanner) -->
-                <div class="d-flex justify-content-center gap-1 mb-3 p-1 rounded-3" style="background: rgba(0,0,0,0.35);">
-                    <button type="button" class="auth-tab-btn active" id="tabPassword" onclick="switchAuthMode('password')">
-                        <i class="fa-solid fa-envelope me-1"></i> Official Gmail &amp; Pass
+                <!-- Modern Segmented Control -->
+                <div class="auth-segmented">
+                    <button type="button" class="seg-btn active" id="tabPassword" onclick="switchAuthMode('password')">
+                        <i class="fa-solid fa-envelope"></i>
+                        <span>Official Gmail / Roll No</span>
                     </button>
-                    <button type="button" class="auth-tab-btn" id="tabBiometric" onclick="switchAuthMode('biometric')">
-                        <i class="fa-solid fa-fingerprint me-1"></i> Fingerprint / Touch
+                    <button type="button" class="seg-btn" id="tabBiometric" onclick="switchAuthMode('biometric')">
+                        <i class="fa-solid fa-fingerprint"></i>
+                        <span>Touch Fingerprint</span>
                     </button>
                 </div>
 
-                <!-- Flash Alert Messages -->
+                <!-- Flash Messages -->
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                         {% for category, message in messages %}
@@ -453,86 +707,82 @@
                     {% endif %}
                 {% endwith %}
 
-                <!-- MODE 1: OFFICIAL GMAIL / PASSWORD LOGIN FORM -->
+                <!-- MODE 1: OFFICIAL GMAIL & PASSWORD FORM -->
                 <div id="passwordMode">
                     <form method="POST" action="{{ url_for('login') }}">
                         <div class="mb-3">
-                            <label class="form-label">Official Assigned Gmail / Username</label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="fa-solid fa-at"></i>
-                                </span>
-                                <input type="text" name="username" id="login_user" class="form-control ps-0" placeholder="e.g. name@student.edu.pk or admin" required autocomplete="username">
+                            <label class="form-label-luxury">Institutional Email or Roll Number</label>
+                            <div class="luxury-input-group">
+                                <i class="fa-solid fa-at input-icon"></i>
+                                <input type="text" name="username" id="login_user" class="luxury-control" placeholder="e.g. name@student.edu.pk or BSCS-22-01" required autocomplete="username">
                             </div>
-                            <small style="color: #6ee7b7; font-size: 11px;">Enter your institutional assigned email or roll number</small>
                         </div>
 
                         <div class="mb-3">
                             <div class="d-flex justify-content-between align-items-center mb-1">
-                                <label class="form-label mb-0">Portal Access Password</label>
-                                <a href="javascript:void(0)" onclick="openPinModal()" class="small text-decoration-none fw-semibold" style="color: #34d399; font-size: 12px;">
+                                <label class="form-label-luxury mb-0">Portal Access Password</label>
+                                <a href="javascript:void(0)" onclick="openPinModal()" class="text-decoration-none fw-semibold" style="color: #34d399; font-size: 11.5px;">
                                     Forgot? (4-Digit PIN)
                                 </a>
                             </div>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="fa-solid fa-key"></i>
-                                </span>
-                                <input type="password" name="password" id="pass_field" class="form-control ps-0 border-end-0" placeholder="Enter password" required autocomplete="current-password">
-                                <button class="btn btn-outline-secondary border-start-0" type="button" onclick="togglePass()" style="border-color: rgba(16, 185, 129, 0.3) !important; background: rgba(10, 38, 28, 0.85); color: #34d399;">
+                            <div class="luxury-input-group">
+                                <i class="fa-solid fa-lock input-icon"></i>
+                                <input type="password" name="password" id="pass_field" class="luxury-control" placeholder="Enter security password" required autocomplete="current-password">
+                                <button type="button" class="pass-toggle-btn" onclick="togglePass()">
                                     <i class="fa-solid fa-eye" id="eye_icon"></i>
                                 </button>
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-emerald mb-3">
-                            <i class="fa-solid fa-right-to-bracket me-2"></i> Enter Secure ERP Portal
+                        <button type="submit" class="btn-luxury-signin mb-2">
+                            <span>Authenticate &amp; Enter Portal</span>
+                            <i class="fa-solid fa-arrow-right"></i>
                         </button>
                     </form>
                 </div>
 
-                <!-- MODE 2: BIOMETRIC FINGERPRINT / TOUCH SCANNER -->
+                <!-- MODE 2: BIOMETRIC TOUCH SCANNER -->
                 <div id="biometricMode" style="display: none;">
-                    <div class="fingerprint-box mb-3" id="fpScanner" onclick="triggerBiometricScan()">
-                        <div class="laser-beam"></div>
-                        <div class="fingerprint-icon mb-2">
+                    <div class="scanner-card" id="fpScanner" onclick="triggerBiometricScan()">
+                        <div class="scanner-laser"></div>
+                        <div class="scanner-glyph mb-2">
                             <i class="fa-solid fa-fingerprint"></i>
                         </div>
                         <h6 class="fw-bold text-white mb-1" id="fpStatusText">Touch Fingerprint Sensor</h6>
-                        <small class="text-white-50" id="fpSubText">Click sensor to simulate biometric verification</small>
+                        <small class="text-white-50" id="fpSubText">Tap sensor to scan cryptographic biometric token</small>
                     </div>
 
-                    <button type="button" class="btn btn-emerald mb-3" onclick="triggerBiometricScan()">
-                        <i class="fa-solid fa-fingerprint me-2"></i> Verify Biometric &amp; Enter
+                    <button type="button" class="btn-luxury-signin mb-2" onclick="triggerBiometricScan()">
+                        <i class="fa-solid fa-fingerprint me-2"></i>
+                        <span>Scan Fingerprint &amp; Enter</span>
                     </button>
                 </div>
 
-                <!-- Institutional Security Notice -->
-                <div class="p-2 rounded-3 text-start mb-3" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25);">
-                    <small style="color: #6ee7b7; font-size: 11.5px; line-height: 1.4; display: block;">
-                        <i class="fa-solid fa-shield-halved text-success me-1"></i> <strong>Strict Data Security Protocol:</strong> Students, faculty, and administration must sign in with their assigned institutional Gmail / Roll Number and password or fingerprint to view academic records.
-                    </small>
-                </div>
-
-                <!-- Quick Demo Login Pills for Instant Testing -->
-                <div class="p-2 rounded-3 text-center" style="background: rgba(0, 0, 0, 0.3); border: 1px dashed rgba(16, 185, 129, 0.25);">
-                    <small class="text-white-50 d-block mb-1" style="font-size: 11px;">Quick 1-Click Credentials Autofill:</small>
-                    <div class="d-flex justify-content-center gap-2 flex-wrap">
-                        <button type="button" class="btn btn-sm btn-outline-success py-0 px-2 rounded-pill" style="font-size: 11px;" onclick="autofillLogin('admin', 'sana123')">
-                            Admin (admin)
-                        </button>
-                        <button type="button" class="btn btn-sm btn-outline-success py-0 px-2 rounded-pill" style="font-size: 11px;" onclick="autofillLogin('tariq@faculty.edu.pk', 'sana123')">
-                            Faculty (Teacher)
-                        </button>
-                        <button type="button" class="btn btn-sm btn-outline-success py-0 px-2 rounded-pill" style="font-size: 11px;" onclick="autofillLogin('BSCS-22-01', 'sana123')">
-                            Student (BSCS)
-                        </button>
+                <!-- Zero-Trust Protocol Info -->
+                <div class="protocol-box">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <div>
+                        <strong>Institutional Security Protocol:</strong> Students, faculty, and admins must authenticate to view academic records and growth metrics.
                     </div>
                 </div>
 
-                <!-- Footer Security -->
-                <div class="text-center mt-3 pt-2 border-top" style="border-color: rgba(16, 185, 129, 0.15) !important;">
-                    <small class="text-muted" style="font-size: 11px;">
+                <!-- Quick Demo Fill -->
+                <div class="autofill-strip">
+                    <span class="autofill-label">Demo Autofill:</span>
+                    <span class="chip-autofill" onclick="autofillLogin('admin', 'sana123')">
+                        <i class="fa-solid fa-crown"></i> Admin
+                    </span>
+                    <span class="chip-autofill" onclick="autofillLogin('tariq@faculty.edu.pk', 'sana123')">
+                        <i class="fa-solid fa-chalkboard-user"></i> Faculty
+                    </span>
+                    <span class="chip-autofill" onclick="autofillLogin('BSCS-22-01', 'sana123')">
+                        <i class="fa-solid fa-user-graduate"></i> Student
+                    </span>
+                </div>
+
+                <!-- Footer -->
+                <div class="text-center mt-3 pt-2">
+                    <small class="text-white-50" style="font-size: 11px;">
                         &copy; 2026 AcademiaPro Enterprise DBMS • Emerald Green &amp; Crisp White Edition
                     </small>
                 </div>
@@ -544,8 +794,8 @@
     <!-- 4-DIGIT PIN PASSWORD RESET MODAL -->
     <div class="modal fade" id="pinResetModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content text-white" style="background: #061a12; border: 1px solid #10b981; border-radius: 20px;">
-                <div class="modal-header border-bottom border-success">
+            <div class="modal-content text-white modal-luxury">
+                <div class="modal-header border-bottom" style="border-color: rgba(52, 211, 153, 0.3) !important;">
                     <h6 class="modal-title fw-bold text-white">
                         <i class="fa-solid fa-key text-success me-2"></i>Reset Password with 4-Digit Security PIN
                     </h6>
@@ -554,22 +804,22 @@
                 <div class="modal-body p-4">
                     <div id="pinAlert"></div>
                     <div class="mb-3">
-                        <label class="form-label small fw-bold">Official Assigned Gmail / Roll Number</label>
-                        <input type="text" id="resetEmail" class="form-control" placeholder="e.g. ali.khan@student.edu.pk or admin">
+                        <label class="form-label-luxury">Official Assigned Gmail / Roll Number</label>
+                        <input type="text" id="resetEmail" class="luxury-control" placeholder="e.g. name@student.edu.pk or admin">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label small fw-bold">4-Digit Security Recovery PIN</label>
-                        <input type="password" id="resetPin" maxlength="6" class="form-control font-monospace text-center fs-5" placeholder="1 2 3 4">
-                        <small class="text-muted">Default demo security PIN: <code>1234</code></small>
+                        <label class="form-label-luxury">4-Digit Security Recovery PIN</label>
+                        <input type="password" id="resetPin" maxlength="6" class="luxury-control font-monospace text-center fs-5" placeholder="1 2 3 4">
+                        <small class="text-white-50" style="font-size: 11px;">Default demo security PIN: <code style="color: #34d399;">1234</code></small>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label small fw-bold">New Password</label>
-                        <input type="password" id="resetNewPass" class="form-control" placeholder="Enter new password">
+                        <label class="form-label-luxury">New Password</label>
+                        <input type="password" id="resetNewPass" class="luxury-control" placeholder="Enter new password">
                     </div>
                 </div>
-                <div class="modal-footer border-top border-success">
+                <div class="modal-footer border-top" style="border-color: rgba(52, 211, 153, 0.3) !important;">
                     <button type="button" class="btn btn-outline-light btn-sm rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-emerald btn-sm px-4 rounded-pill" onclick="submitPinReset()" style="width: auto;">
+                    <button type="button" class="btn btn-luxury-signin btn-sm px-4 rounded-pill" onclick="submitPinReset()" style="width: auto;">
                         <i class="fa-solid fa-check me-1"></i> Reset Password
                     </button>
                 </div>
@@ -623,7 +873,7 @@
         scanner.classList.add("scanning");
         statusText.innerText = "Scanning Fingerprint...";
         statusText.style.color = "#34d399";
-        subText.innerText = "Matching biometric template against DBMS identity records...";
+        subText.innerText = "Matching biometric token against institutional DBMS records...";
 
         setTimeout(() => {
             fetch('/api/biometric-login', {
@@ -635,7 +885,7 @@
             .then(data => {
                 scanner.classList.remove("scanning");
                 if (data.success) {
-                    statusText.innerText = "Access Granted: " + data.user;
+                    statusText.innerText = "Identity Verified: " + data.user;
                     statusText.style.color = "#10b981";
                     subText.innerText = "Redirecting to ERP portal...";
                     setTimeout(() => {
