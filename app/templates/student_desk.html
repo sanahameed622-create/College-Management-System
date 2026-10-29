@@ -172,47 +172,63 @@
             </div>
 
             <div class="text-center pt-2">
-                <span class="badge bg-primary-subtle text-primary border border-primary px-3 py-2 rounded-pill fw-semibold">
-                    <i class="fa-solid fa-bolt me-1"></i> Public Student Self-Service Desk • No Password Required
+                <span class="badge bg-success-subtle text-success border border-success px-3 py-2 rounded-pill fw-semibold">
+                    <i class="fa-solid fa-shield-halved me-1"></i> Authenticated Institutional Student Portal • Role-Protected
                 </span>
                 <p class="text-white-50 small mt-2 mb-0">
-                    Instantly view your fee vouchers, semester transcripts, examination admit cards, or chat with AI.
+                    Securely access your official fee vouchers, transcripts, admit cards, and 24/7 Academic Study Tutor.
                 </p>
             </div>
         </div>
     </header>
 
-    <!-- Search Section -->
+    <!-- Search / Session Section -->
     <div class="container search-container mb-4">
+        {% if is_student_locked %}
+        <div class="search-card p-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-success-subtle text-success border border-success px-3 py-2 rounded-pill fw-bold">
+                    <i class="fa-solid fa-lock text-success me-1"></i> Verified Student Identity: {{ search_query }}
+                </span>
+                <small class="text-muted">Your records and AI study tutor are securely isolated to your verified institutional session.</small>
+            </div>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                <i class="fa-solid fa-right-from-bracket me-1"></i> Sign Out
+            </a>
+        </div>
+        {% else %}
         <div class="search-card">
             <form method="GET" action="{{ url_for('student_desk') }}" class="row g-2 align-items-center">
                 <div class="col-md-9">
                     <div class="search-input-group">
                         <i class="fa-solid fa-magnifying-glass search-icon"></i>
                         <input type="text" name="roll_number" class="form-control" 
-                               placeholder="Enter Student Roll Number (e.g. 2026-FSC-MED-103, 2026-FSC-101, BSCS-22-01) or CNIC"
+                               placeholder="Admin / Faculty: Enter Student Roll Number (e.g. BSCS-22-01) or CNIC"
                                value="{{ search_query }}" required autofocus>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <button type="submit" class="btn btn-search w-100">
-                        <i class="fa-solid fa-arrow-right me-2"></i> Access My Portal
+                        <i class="fa-solid fa-arrow-right me-2"></i> Search Student Portal
                     </button>
                 </div>
             </form>
 
-            <!-- Sample Roll Numbers for Quick Testing -->
+            {% if sample_students %}
+            <!-- Sample Roll Numbers for Admin Quick Testing -->
             <div class="d-flex align-items-center flex-wrap gap-2 mt-3 pt-2 border-top">
                 <span class="text-muted small fw-semibold">
                     <i class="fa-solid fa-lightbulb text-warning me-1"></i> Quick Test Roll Numbers:
                 </span>
                 {% for sample in sample_students %}
                 <a href="{{ url_for('student_desk', roll_number=sample.roll_number) }}" class="sample-chip">
-                    <i class="fa-solid fa-id-badge text-primary me-1"></i>{{ sample.roll_number }} ({{ sample.full_name.split()[0] }})
+                    <i class="fa-solid fa-id-badge text-success me-1"></i>{{ sample.roll_number }} ({{ sample.full_name.split()[0] }})
                 </a>
                 {% endfor %}
             </div>
+            {% endif %}
         </div>
+        {% endif %}
     </div>
 
     <!-- Main Content Area -->

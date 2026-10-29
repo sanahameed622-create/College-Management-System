@@ -789,8 +789,31 @@ class DatabaseEngine:
         }
 
     def process_student_ai_inquiry(self, student_id: int, query_text: str) -> Dict[str, Any]:
-        """Offline AI assistant for student self-service queries."""
+        """Offline AI assistant for student queries with strict institutional privacy firewall."""
         query_lower = query_text.lower().strip()
+
+        # 1. STRICT INSTITUTIONAL PRIVACY FIREWALL (Students cannot probe faculty presence or staff records)
+        faculty_privacy_phrases = [
+            "teacher attendance", "faculty attendance", "staff attendance", "teacher salary",
+            "faculty salary", "teacher phone", "teacher number", "teacher email", "kon aya",
+            "kon nahi aya", "attendance of teacher", "who is absent", "who is present"
+        ]
+        has_phrase = any(kw in query_lower for kw in faculty_privacy_phrases)
+        has_teacher = any(t in query_lower for t in ["teacher", "faculty", "staff", "sir", "madam", "prof", "instructor"])
+        has_presence = any(p in query_lower for p in ["aya", "ay", "aye", "present", "absent", "leave", "chutti", "holiday", "attendance", "aaye", "aae", "kahan"])
+
+        if has_phrase or (has_teacher and has_presence):
+            return {
+                "success": False,
+                "answer": (
+                    "🔒 Institutional Privacy & Security Firewall: "
+                    "Daily faculty attendance, teacher personal presence/absence, contact numbers, "
+                    "and administrative staff records are strictly confidential and protected by college policy. "
+                    "Students may only query academic course syllabus, study topics, and their own personal academic records."
+                ),
+                "topic": "Privacy Violation Blocked"
+            }
+
         portal_data = self.get_student_portal_data(str(student_id))
         if not portal_data:
             return {"success": False, "answer": "Student record not found in system."}
@@ -832,6 +855,20 @@ class DatabaseEngine:
                 answer = f"{student['first_name']}, you are currently enrolled in {student['program_name']}. Exam grades are currently being compiled."
             return {"success": True, "answer": answer, "topic": "Academic Performance"}
 
+        elif any(w in query_lower for w in ["database", "sql", "normalization", "acid", "table", "bcnf"]):
+            answer = (f"{student['first_name']}, in Database Systems, ACID transactions guarantee reliability: "
+                      f"Atomicity (all or nothing), Consistency (preserves rules), Isolation (concurrency control), "
+                      f"and Durability (persisted on disk). BCNF requires that every determinant is a superkey!")
+            return {"success": True, "answer": answer, "topic": "Course Study Guidance"}
+
+        elif any(w in query_lower for w in ["study", "prep", "tips", "how to study", "guidance"]):
+            answer = (f"Study Tips for {student['first_name']}: "
+                      f"1. Maintain >75% attendance in lectures to ensure exam clearance. "
+                      f"2. Solve past 5-year Board/University examination papers. "
+                      f"3. Review syllabus objectives after each lecture. "
+                      f"4. Practice lab assignments weekly for technical courses.")
+            return {"success": True, "answer": answer, "topic": "Study Guidance"}
+
         elif any(w in query_lower for w in ["id", "card", "profile", "father", "blood"]):
             answer = (f"Student: {student['first_name']} {student['last_name']} | Roll No: {student['roll_number']} | "
                       f"Father Name: {student['father_name']} | Program: {student['program_name']} ({student['part_or_year']}) | "
@@ -839,17 +876,57 @@ class DatabaseEngine:
             return {"success": True, "answer": answer, "topic": "Profile & ID"}
 
         else:
-            answer = (f"Hello {student['first_name']}! I am your 24/7 AI Academic Assistant. "
-                      f"You can ask me about your fee dues, exam eligibility, GPA results, or download your ID card & challan!")
+            answer = (f"Hello {student['first_name']}! I am your 24/7 AI Academic Study Assistant. "
+                      f"You can ask me about your course syllabus, fee dues, exam eligibility, GPA results, or download your ID card & challan!")
             return {"success": True, "answer": answer, "topic": "General"}
 
     # ==========================================
-    # SAFE AI QUERY ENGINE
+    # SAFE AI QUERY ENGINE (WITH MULTI-TIER PRIVACY FIREWALL)
     # ==========================================
     def execute_safe_ai_query(self, user_id: int, user_role: str, user_query: str, proposed_sql: str) -> Dict[str, Any]:
         clean_sql = proposed_sql.strip()
         upper_sql = clean_sql.upper()
+        query_lower = user_query.lower()
 
+        # 1. Multi-Tier Role-Based Security & Privacy Policy
+        if user_role == "Student":
+            # Guard against students inquiring on teacher presence/attendance or staff
+            faculty_privacy_keywords = [
+                "teacher", "faculty", "salary", "payroll", "absent", "present",
+                "attendance of teacher", "kon aya", "kon nahi aya", "staff", "user_account", "password"
+            ]
+            if any(kw in query_lower for kw in faculty_privacy_keywords):
+                self.log_ai_message(user_id, user_role, user_query, "", "REJECTED_PRIVACY", 0, "Rejected: Privacy firewall blocked student inquiry on faculty.")
+                return {
+                    "success": False,
+                    "error": "🔒 Institutional Privacy Policy: Daily faculty presence, teacher attendance records, and staff information are confidential. Students are restricted to course syllabus, study topics, and personal academic records.",
+                    "status": "REJECTED_PRIVACY"
+                }
+
+            # Guard against students querying administrative/faculty tables
+            blocked_tables = ['TEACHER', 'USER_ACCOUNT', 'USER_ROLE', 'AUDIT_LOG', 'PURCHASE_ORDER', 'COLLEGE_PROFILE', 'INVENTORY_ITEM']
+            for bt in blocked_tables:
+                if f"FROM {bt}" in upper_sql or f"JOIN {bt}" in upper_sql:
+                    self.log_ai_message(user_id, user_role, user_query, proposed_sql, "REJECTED_SECURITY", 0, f"Rejected: Student attempted access to {bt}.")
+                    return {
+                        "success": False,
+                        "error": "Security Notice: Students are strictly restricted from querying faculty attendance, staff credentials, and administrative tables.",
+                        "status": "REJECTED_SECURITY"
+                    }
+
+        elif user_role == "Teacher":
+            # Teachers can query academic views and courses, but cannot query user passwords or audit logs
+            blocked_tables = ['USER_ACCOUNT', 'AUDIT_LOG']
+            for bt in blocked_tables:
+                if f"FROM {bt}" in upper_sql or f"JOIN {bt}" in upper_sql:
+                    self.log_ai_message(user_id, user_role, user_query, proposed_sql, "REJECTED_SECURITY", 0, f"Rejected: Teacher attempted access to {bt}.")
+                    return {
+                        "success": False,
+                        "error": "Security Notice: Faculty access is restricted to academic and departmental views.",
+                        "status": "REJECTED_SECURITY"
+                    }
+
+        # 2. Strict mutation protection
         forbidden_keywords = ['INSERT', 'UPDATE', 'DELETE', 'DROP', 'ALTER', 'TRUNCATE', 'GRANT', 'REVOKE', 'EXEC']
         for kw in forbidden_keywords:
             if upper_sql.startswith(kw) or f" {kw} " in upper_sql:
@@ -924,10 +1001,20 @@ class DatabaseEngine:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-    def get_student_growth_tracker(self, section_id: int = None) -> List[Dict[str, Any]]:
-        """Returns student subject academic growth, grades, and performance percentiles."""
-        filter_sql = "WHERE e.section_id = ?" if section_id else ""
-        params = (section_id,) if section_id else ()
+    def get_student_growth_tracker(self, section_id: int = None, teacher_user_id: int = None) -> List[Dict[str, Any]]:
+        """Returns student subject academic growth, grades, and performance percentiles.
+        If teacher_user_id is provided, strictly filters only students enrolled in classes taught by this faculty member!
+        """
+        where_clauses = []
+        params = []
+        if section_id:
+            where_clauses.append("e.section_id = ?")
+            params.append(section_id)
+        if teacher_user_id:
+            where_clauses.append("sec.teacher_id = (SELECT teacher_id FROM teacher WHERE user_id = ? OR teacher_id = ? LIMIT 1)")
+            params.extend([teacher_user_id, teacher_user_id])
+
+        filter_sql = ("WHERE " + " AND ".join(where_clauses)) if where_clauses else ""
         sql = f"""
             SELECT e.enrollment_id, e.student_id, e.section_id, e.final_grade, e.gpa_points,
                    s.first_name || ' ' || s.last_name as student_name, s.roll_number, s.photo_url,
@@ -943,7 +1030,7 @@ class DatabaseEngine:
             {filter_sql}
             ORDER BY c.course_code, s.roll_number ASC
         """
-        rows = self.query(sql, params)
+        rows = self.query(sql, tuple(params))
         for r in rows:
             gpa = r.get("gpa_points") or 3.0
             pct = int(min(100, max(45, (gpa / 4.0) * 100)))

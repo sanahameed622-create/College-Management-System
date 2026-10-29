@@ -32,8 +32,6 @@ def require_authentication():
     # Public endpoints that do not require login
     public_endpoints = [
         'login', 'logout', 'static',
-        'student_desk', 'api_student_ai',
-        'student_id_card', 'fee_challan', 'roll_number_slip',
         'api_biometric_login', 'api_reset_password_pin',
         'api_update_avatar'
     ]
@@ -41,6 +39,7 @@ def require_authentication():
         return
     # Check session
     if not session.get("logged_in"):
+        flash("Institutional Authentication Required: Please sign in with your official assigned institutional email / roll number and password or fingerprint.", "warning")
         return redirect(url_for("login"))
 
     user_role = session.get("user_role", "Admin")
@@ -72,6 +71,7 @@ def login():
         if user:
             session["logged_in"] = True
             session["user_id"] = user.get("user_id")
+            session["username"] = user.get("username")
             session["user_name"] = user.get("full_name")
             session["user_role"] = user.get("role_name", "Admin")
             flash(f"Welcome back, {user.get('full_name')}!", "success")
@@ -91,6 +91,7 @@ def api_biometric_login():
     if user:
         session["logged_in"] = True
         session["user_id"] = user.get("user_id")
+        session["username"] = user.get("username")
         session["user_name"] = user.get("full_name")
         session["user_role"] = user.get("role_name", "Admin")
         if user.get("role_name") == "Student":
@@ -130,11 +131,22 @@ def logout():
     return redirect(url_for("login"))
 
 # ==========================================
-# STUDENT SELF-SERVICE DESK (NO PASSWORD REQUIRED)
+# AUTHENTICATED STUDENT PORTAL DESK
 # ==========================================
 @app.route("/student-desk", methods=["GET", "POST"])
 def student_desk():
-    query = request.args.get("roll_number", "").strip() or request.form.get("roll_number", "").strip()
+    user_role = session.get("user_role", "Admin")
+    logged_roll = session.get("username", "")
+
+    # Strict Privacy Enforcement: A student can ONLY view their own record!
+    if user_role == "Student":
+        query = logged_roll
+    else:
+        # Admin or Faculty can search/lookup any student's portal
+        query = request.args.get("roll_number", "").strip() or request.form.get("roll_number", "").strip()
+        if not query and logged_roll:
+            query = logged_roll
+
     student_data = None
     not_found = False
 
@@ -143,29 +155,37 @@ def student_desk():
         if not student_data:
             not_found = True
 
-    # Provide sample roll numbers for quick testing
+    # Sample students are ONLY shown to Admin or Faculty for testing, NEVER to students!
     sample_students = db.query("""
         SELECT roll_number, first_name || ' ' || last_name as full_name, academic_tier, part_or_year
         FROM student
         ORDER BY student_id DESC
         LIMIT 6;
-    """)
+    """) if user_role != "Student" else []
 
     return render_template(
         "student_desk.html",
         student_data=student_data,
         search_query=query,
         not_found=not_found,
-        sample_students=sample_students
+        sample_students=sample_students,
+        is_student_locked=(user_role == "Student")
     )
 
 @app.route("/api/student-ai", methods=["POST"])
 def api_student_ai():
     data = request.get_json() or {}
-    student_id = data.get("student_id")
+    user_role = session.get("user_role", "Student")
+
+    # Strict Identity Enforcement: If student is logged in, force their own student_id from session!
+    if user_role == "Student":
+        student_id = session.get("user_id")
+    else:
+        student_id = data.get("student_id") or session.get("user_id")
+
     query_text = data.get("query_text", "")
     if not student_id or not query_text:
-        return jsonify({"success": False, "answer": "Please provide a valid question."})
+        return jsonify({"success": False, "answer": "Please provide a valid inquiry."})
 
     res = db.process_student_ai_inquiry(int(student_id), query_text)
     return jsonify(res)
@@ -305,6 +325,12 @@ def admissions():
 # ==========================================
 @app.route("/student-id-card/<int:student_id>")
 def student_id_card(student_id):
+    user_role = session.get("user_role", "Admin")
+    logged_uid = session.get("user_id")
+    if user_role == "Student" and logged_uid != student_id:
+        flash("Access Denied: You are only authorized to view your own Student ID Card.", "danger")
+        return redirect(url_for("student_desk"))
+
     card_data = db.get_student_id_card_data(student_id)
     if not card_data:
         flash("Student record not found.", "warning")
@@ -313,14 +339,27 @@ def student_id_card(student_id):
 
 @app.route("/fee-challan/<int:invoice_id>")
 def fee_challan(invoice_id):
+    user_role = session.get("user_role", "Admin")
+    logged_uid = session.get("user_id")
     challan_data = db.get_fee_challan_data(invoice_id)
     if not challan_data:
         flash("Fee invoice / challan record not found.", "warning")
         return redirect(url_for("finance"))
+
+    if user_role == "Student" and challan_data.get("student", {}).get("student_id") != logged_uid:
+        flash("Access Denied: You are only authorized to view your own Fee Challan.", "danger")
+        return redirect(url_for("student_desk"))
+
     return render_template("fee_challan.html", data=challan_data)
 
 @app.route("/roll-number-slip/<int:student_id>")
 def roll_number_slip(student_id):
+    user_role = session.get("user_role", "Admin")
+    logged_uid = session.get("user_id")
+    if user_role == "Student" and logged_uid != student_id:
+        flash("Access Denied: You are only authorized to view your own Roll Number Slip.", "danger")
+        return redirect(url_for("student_desk"))
+
     slip_data = db.get_roll_number_slip_data(student_id)
     if not slip_data:
         flash("Roll number slip data not found.", "warning")
@@ -333,6 +372,9 @@ def roll_number_slip(student_id):
 @app.route("/academics")
 def academics():
     tier_filter = request.args.get("tier", "all")
+    user_role = session.get("user_role", "Admin")
+    teacher_uid = session.get("user_id") if user_role == "Teacher" else None
+
     where_prog = ""
     where_stud = ""
     if tier_filter == "intermediate":
@@ -345,6 +387,8 @@ def academics():
     departments = db.query("SELECT * FROM department")
     programs = db.query(f"SELECT p.*, d.dept_name FROM program p JOIN department d ON p.dept_id = d.dept_id {where_prog} ORDER BY p.degree_level, p.program_name")
     courses = db.query("SELECT c.*, p.program_code, p.degree_level FROM course c JOIN program p ON c.program_id = p.program_id ORDER BY c.course_code")
+    
+    # If teacher, highlight sections taught by this teacher
     sections = db.query("""
         SELECT sec.*, c.course_code, c.title as course_title, t.first_name || ' ' || t.last_name as teacher_name 
         FROM section sec 
@@ -361,7 +405,8 @@ def academics():
     transcripts = db.query("SELECT * FROM v_student_transcript ORDER BY student_id, course_code")
     attendance_report = db.query("SELECT * FROM v_attendance_shortage")
 
-    growth_records = db.get_student_growth_tracker()
+    # Teachers strictly see students enrolled in their assigned subjects! Admin sees all students!
+    growth_records = db.get_student_growth_tracker(teacher_user_id=teacher_uid)
     teacher_performance = db.get_teacher_performance_overview()
 
     return render_template("academics.html",
@@ -374,6 +419,7 @@ def academics():
                            attendance_report=attendance_report,
                            growth_records=growth_records,
                            teacher_performance=teacher_performance,
+                           is_teacher=(user_role == "Teacher"),
                            active_tier=tier_filter)
 
 @app.route("/api/academics/update-grade", methods=["POST"])
@@ -615,11 +661,24 @@ def api_collect_fee():
 @app.route("/api/ai-query", methods=["POST"])
 def api_ai_query():
     data = request.get_json() or {}
-    user_id = int(data.get("user_id", 10))
-    user_role = data.get("user_role", "Student")
+    user_id = session.get("user_id", int(data.get("user_id", 1)))
+    user_role = session.get("user_role", data.get("user_role", "Admin"))
     query_text = data.get("query_text", "")
-    query_lower = query_text.lower()
+    query_lower = query_text.lower().strip()
     sql = ""
+
+    # Strict Privacy Guardrail: Block student snooping on teacher attendance or staff records
+    if user_role == "Student":
+        faculty_privacy_keywords = [
+            "teacher", "faculty", "salary", "payroll", "absent", "present",
+            "attendance of teacher", "kon aya", "kon nahi aya", "staff", "user_account", "password"
+        ]
+        if any(kw in query_lower for kw in faculty_privacy_keywords):
+            return jsonify({
+                "success": False,
+                "error": "🔒 Institutional Privacy Policy: Daily faculty presence, teacher attendance records, and staff information are confidential. Students are restricted to course syllabus, study topics, and personal academic records.",
+                "status": "REJECTED_PRIVACY"
+            })
 
     upper_query = query_text.strip().upper()
     direct_sql_keywords = ['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'DROP', 'ALTER', 'TRUNCATE']
@@ -627,17 +686,17 @@ def api_ai_query():
         sql = query_text.strip()
     elif "fee" in query_lower or "invoice" in query_lower or "due" in query_lower or "balance" in query_lower:
         if user_role == "Student":
-            sql = f"SELECT invoice_number, total_amount, paid_amount, balance_due, status FROM student_invoice WHERE student_id = {user_id - 9};"
+            sql = f"SELECT invoice_number, total_amount, paid_amount, balance_due, status FROM student_invoice WHERE student_id = {user_id};"
         else:
             sql = "SELECT * FROM v_defaulters;"
     elif "transcript" in query_lower or "grade" in query_lower or "gpa" in query_lower or "result" in query_lower:
         if user_role == "Student":
-            sql = f"SELECT course_code, course_title, final_grade, gpa_points, quality_points FROM v_student_transcript WHERE student_id = {user_id - 9};"
+            sql = f"SELECT course_code, course_title, final_grade, gpa_points, quality_points FROM v_student_transcript WHERE student_id = {user_id};"
         else:
             sql = "SELECT roll_number, student_name, course_code, course_title, final_grade, gpa_points FROM v_student_transcript LIMIT 25;"
     elif "attendance" in query_lower or "shortage" in query_lower or "debarred" in query_lower:
         if user_role == "Student":
-            sql = f"SELECT course_code, course_title, total_lectures_held, attended_lectures, attendance_percentage, examination_eligibility FROM v_attendance_shortage WHERE student_id = {user_id - 9};"
+            sql = f"SELECT course_code, course_title, total_lectures_held, attended_lectures, attendance_percentage, examination_eligibility FROM v_attendance_shortage WHERE student_id = {user_id};"
         else:
             sql = "SELECT * FROM v_attendance_shortage WHERE examination_eligibility = 'DEBARRED_FROM_FINAL_EXAM';"
     elif "book" in query_lower or "overdue" in query_lower or "library" in query_lower:
