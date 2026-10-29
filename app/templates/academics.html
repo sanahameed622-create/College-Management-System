@@ -2,7 +2,50 @@
 
 {% block title %}Academics - AcademiaPro{% endblock %}
 {% block page_title %}Academic Administration & Grading{% endblock %}
-{% block page_subtitle %}Departments, Degree Programs, Course Sections, Transcripts and Examination Eligibility{% endblock %}
+{% block extra_css %}
+<style>
+    .card-header.bg-white {
+        background: #0d1b3e !important;
+        color: #ffffff !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+    .card-header .text-dark {
+        color: #ffffff !important;
+    }
+    .table-light, .table-light th {
+        background-color: rgba(6, 13, 31, 0.8) !important;
+        color: #94a3b8 !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+    .nav-tabs {
+        border-bottom: 2px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    .nav-tabs .nav-link {
+        color: #94a3b8 !important;
+        font-weight: 600 !important;
+    }
+    .nav-tabs .nav-link:hover {
+        color: #f59e0b !important;
+    }
+    .nav-tabs .nav-link.active {
+        color: #fbbf24 !important;
+        border-bottom: 3px solid #f59e0b !important;
+        background: transparent !important;
+    }
+    .text-success {
+        color: #fbbf24 !important;
+    }
+    .btn-outline-primary {
+        border-color: rgba(245, 158, 11, 0.4) !important;
+        color: #fbbf24 !important;
+    }
+    .btn-outline-primary:hover {
+        background: rgba(245, 158, 11, 0.2) !important;
+        border-color: #f59e0b !important;
+        color: #ffffff !important;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <ul class="nav nav-tabs mb-4" id="academicTabs" role="tablist">
@@ -611,5 +654,18 @@ function saveStudentGrade(enrollmentId) {
         btn.disabled = false;
     });
 }
+
+// Auto-activate tabs based on URL ?tab=... or #hash
+document.addEventListener("DOMContentLoaded", function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabName = urlParams.get('tab') || window.location.hash.replace('#', '');
+    if (tabName) {
+        const tabBtn = document.getElementById(tabName + '-tab');
+        if (tabBtn) {
+            const trigger = new bootstrap.Tab(tabBtn);
+            trigger.show();
+        }
+    }
+});
 </script>
 {% endblock %}
