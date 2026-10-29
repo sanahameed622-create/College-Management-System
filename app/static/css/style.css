@@ -4,6 +4,14 @@
    ========================================================================== */
 
 :root {
+    --bs-primary: #f59e0b !important;
+    --bs-primary-rgb: 245, 158, 11 !important;
+    --bs-link-color: #f59e0b !important;
+    --bs-link-hover-color: #fbbf24 !important;
+    --bs-body-bg: #060d1f !important;
+    --bs-body-color: #ffffff !important;
+    --bs-border-color: rgba(255, 255, 255, 0.1) !important;
+
     --brand-primary: #0a1530;      /* Deep Midnight Navy */
     --brand-secondary: #060d1f;    /* Obsidian Dark Navy */
     --brand-navy: #0d1b3e;         /* Rich Royal Navy */
@@ -42,6 +50,134 @@
     --radius-lg: 18px;
     --transition-fast: 0.15s ease;
     --transition-smooth: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==========================================================================
+   GLOBAL UTILITY OVERRIDES (BANISH ROGUE BOOTSTRAP BLUE & WHITE RECTANGLES)
+   ========================================================================== */
+.text-primary, a.text-primary, .text-primary-emphasis {
+    color: #f59e0b !important;
+}
+
+.bg-primary {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+    color: #ffffff !important;
+}
+
+.bg-primary-subtle {
+    background-color: rgba(245, 158, 11, 0.16) !important;
+    color: #fbbf24 !important;
+    border: 1px solid rgba(245, 158, 11, 0.35) !important;
+}
+
+.border-primary {
+    border-color: rgba(245, 158, 11, 0.45) !important;
+}
+
+.badge.bg-primary {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+    color: #ffffff !important;
+}
+
+/* Force rogue white card backgrounds into Midnight Navy */
+.card, .card-stat, .bg-white, .card-header.bg-white, .card-footer.bg-white, .modal-content, .offcanvas {
+    background-color: #0a1530 !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.card-header {
+    background-color: #0d1b3e !important;
+    color: #ffffff !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.bg-light, .card.bg-light, .form-control.bg-light {
+    background-color: #060d1f !important;
+    color: #cbd5e1 !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Tables across all tabs */
+.table {
+    --bs-table-bg: transparent !important;
+    --bs-table-color: #ffffff !important;
+    --bs-table-border-color: rgba(255, 255, 255, 0.08) !important;
+    color: #ffffff !important;
+}
+
+.table-light, .table-light th, .table-light td, thead.table-light th {
+    background-color: #0d1b3e !important;
+    color: #f59e0b !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.table-hover>tbody>tr:hover>* {
+    --bs-table-hover-bg: rgba(245, 158, 11, 0.08) !important;
+    color: #ffffff !important;
+}
+
+.table-striped>tbody>tr:nth-of-type(odd)>* {
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.02) !important;
+    color: #ffffff !important;
+}
+
+/* Input Fields & Dropdowns */
+.form-control, .form-select {
+    background-color: #060d1f !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #f59e0b !important;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25) !important;
+    background-color: #081128 !important;
+    color: #ffffff !important;
+}
+
+.form-control::placeholder {
+    color: #64748b !important;
+}
+
+.form-label {
+    color: #cbd5e1 !important;
+}
+
+.form-select option {
+    background-color: #0a1530 !important;
+    color: #ffffff !important;
+}
+
+/* Nav Pills & Tabs */
+.nav-pills.custom-nav-pills {
+    background-color: #0a1530 !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.nav-pills .nav-link {
+    color: #cbd5e1 !important;
+}
+
+.nav-pills .nav-link.active {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35) !important;
+}
+
+.list-group-item {
+    background-color: transparent !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.card .text-dark, .modal-content .text-dark, .offcanvas .text-dark, h5.text-dark, h6.text-dark {
+    color: #ffffff !important;
+}
+
+.card .text-muted, .modal-content .text-muted, .text-secondary {
+    color: #94a3b8 !important;
 }
 
 html, body {

@@ -823,6 +823,14 @@ class DatabaseEngine:
         transcripts = portal_data["transcripts"]
         attendance = portal_data["attendance"]
 
+        if any(w in query_lower for w in ["permission", "restriction", "policy", "rules", "role", "access", "kis k lea", "kya restriction"]):
+            answer = (f"Hello {student['first_name']}! Under college policy: "
+                      f"🎒 Students have access to personal grades, fee challans, exam slips, and syllabus. "
+                      f"🔒 Institutional Privacy Shield: Students are strictly restricted from viewing faculty attendance, teacher presence, or other students' records. "
+                      f"🎓 Teachers can view section enrollments and student growth. "
+                      f"👑 Admin has analytical access across all departments.")
+            return {"success": True, "answer": answer, "topic": "Role Permissions & Policy"}
+
         if any(w in query_lower for w in ["fee", "dues", "balance", "challan", "pay", "voucher", "invoice"]):
             if summary["balance_due"] > 0:
                 answer = (f"Hello {student['first_name']}! You currently have an outstanding fee balance of "
@@ -887,6 +895,28 @@ class DatabaseEngine:
         clean_sql = proposed_sql.strip()
         upper_sql = clean_sql.upper()
         query_lower = user_query.lower()
+
+        # 0. AI Role Permissions & Restriction Matrix Inquiry (Explains rules for Admin, Teacher, Student, Parent)
+        policy_keywords = [
+            "permission", "restriction", "policy", "role", "access", "rule", 
+            "who can", "what can", "kya restriction", "kis k lea", "kya kar sakta", "kon kya"
+        ]
+        if any(pk in query_lower for pk in policy_keywords):
+            policy_summary = "Enforced RBAC: Admin (Full 25 tables, SELECT-only), Teacher (Academic growth & debarred lists, no financial ledger), Student (Own transcripts/fees only, strict faculty privacy shield), Parent (Public verification)."
+            self.log_ai_message(user_id, user_role, user_query, "-- RBAC POLICY INQUIRY", "SUCCESS", 4, policy_summary)
+            return {
+                "success": True,
+                "is_policy": True,
+                "summary": policy_summary,
+                "sql": "-- Institutional Role-Based Access Control (RBAC) & AI Policy Matrix Enforced by Dual Engine",
+                "rows": [
+                    {"Role": "👑 Administrator", "Scope": "Full College Schema (25 Normalized Tables)", "Permissions": "SELECT Analytical Views, Cashflow, Stock, Audits", "Restrictions": "MUTATIONS (INSERT/UPDATE/DELETE/DROP) Blocked, Passwords Masked"},
+                    {"Role": "🎓 Teacher / Faculty", "Scope": "Department & Assigned Sections", "Permissions": "Student Growth Tracker (A+, B, Needs Guidance), Syllabus, Debarred Lists", "Restrictions": "Cannot access Audit Logs, Staff Passwords, or College Treasury"},
+                    {"Role": "🎒 Student", "Scope": "Personal Isolated Sandbox", "Permissions": "Own GPA Transcripts, Registered Invoices, Exam Slips, Study Guidance", "Restrictions": "🔒 Strict Privacy Firewall: Blocked from Teacher Attendance & Other Students' Data"},
+                    {"Role": "👨‍👩‍👧 Parent / Public", "Scope": "Public Portal & Verification Desk", "Permissions": "Academic Calendar, Fee Tariffs, Verified Roll No Lookup", "Restrictions": "Zero Internal Schema Access, No System Modification"}
+                ],
+                "row_count": 4
+            }
 
         # 1. Multi-Tier Role-Based Security & Privacy Policy
         if user_role == "Student":

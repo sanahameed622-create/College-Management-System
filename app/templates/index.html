@@ -440,6 +440,78 @@
 
     </div>
 
+    <!-- 4.1 ACADEMIAPRO RELATIONAL AI ASSISTANT SUITE (DASHBOARD WIDGET) -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card-navy-section" style="border: 1px solid rgba(245, 158, 11, 0.35); position: relative; overflow: hidden;">
+                
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="icon-kpi-gold" style="width: 44px; height: 44px; font-size: 20px;">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                <h6 class="fw-bold mb-0 text-white fs-6">AcademiaPro Relational AI Assistant &amp; Intelligence Desk</h6>
+                                <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); font-size: 10px;">
+                                    🟢 Operational &bull; {{ logged_role }} Mode
+                                </span>
+                            </div>
+                            <small class="text-white-50">Natural language query synthesizer for fees, grades, attendance, and role security firewalls</small>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('ai_assistant') }}" class="btn btn-gold btn-sm fw-bold px-3 py-2 rounded-3 text-white shadow-sm">
+                            <i class="fa-solid fa-arrow-up-right-from-square me-1"></i> Open Full AI Console &rarr;
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Inquiry Suggestion Chips -->
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <button class="badge border bg-transparent text-white-50 py-2 px-3 rounded-pill dash-preset-btn" style="border-color: rgba(245, 158, 11, 0.3) !important; cursor: pointer;" data-query="What is my current semester fee status and balance?">
+                        💰 Fee Status
+                    </button>
+                    <button class="badge border bg-transparent text-white-50 py-2 px-3 rounded-pill dash-preset-btn" style="border-color: rgba(245, 158, 11, 0.3) !important; cursor: pointer;" data-query="Show my official transcript grades and GPA.">
+                        🎓 Transcript &amp; GPA
+                    </button>
+                    <button class="badge border bg-transparent text-white-50 py-2 px-3 rounded-pill dash-preset-btn" style="border-color: rgba(245, 158, 11, 0.3) !important; cursor: pointer;" data-query="Check my attendance and examination eligibility.">
+                        📋 75% Attendance Check
+                    </button>
+                    <button class="badge border bg-transparent text-white-50 py-2 px-3 rounded-pill dash-preset-btn" style="border-color: rgba(245, 158, 11, 0.3) !important; cursor: pointer;" data-query="Explain what are the restrictions and permissions for Admin, Teachers, and Students?">
+                        🛡️ Role Policy Matrix
+                    </button>
+                    <button class="badge border bg-transparent text-white-50 py-2 px-3 rounded-pill dash-preset-btn text-info" style="border-color: rgba(59, 130, 246, 0.4) !important; cursor: pointer;" data-query="Aj kon kon sa teacher aya hai aur kon absent hai?">
+                        🔒 Test Faculty Privacy Firewall
+                    </button>
+                </div>
+
+                <!-- Live Prompt Input Pill -->
+                <div class="input-group mb-3">
+                    <span class="input-group-text border-0 text-warning" style="background: #060d1f;">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </span>
+                    <input type="text" class="form-control border-0 py-2 text-white" id="dashAiInput" placeholder="Ask AI: e.g. Meri attendance kitni hai? Or check fee balances, course syllabus, or role rules..." style="background: #060d1f; font-size: 13.5px;">
+                    <button class="btn btn-gold px-4 fw-bold text-white" id="dashAiSubmitBtn" type="button">
+                        <i class="fa-solid fa-paper-plane me-1"></i> Ask AI
+                    </button>
+                </div>
+
+                <!-- Dynamic Dashboard AI Response Box -->
+                <div id="dashAiResultBox" style="display: none;" class="p-3 rounded-3 mt-2" style="background: #060d1f; border: 1px solid rgba(245, 158, 11, 0.25);">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="small fw-bold text-warning" id="dashAiResponseTitle">
+                            <i class="fa-solid fa-brain me-1"></i> AI Response:
+                        </span>
+                        <span id="dashAiStatusBadge" class="badge bg-success" style="font-size: 10px;">SUCCESS</span>
+                    </div>
+                    <div id="dashAiResponseContent" class="small text-white-50"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <!-- 5. RECENT ADMISSIONS & DEFAULTERS ROW -->
     <div class="row g-4 mb-4">
         
@@ -707,6 +779,85 @@ if (enrollCtx) {
                 }
             },
             cutout: '68%'
+        }
+    });
+}
+
+// =========================================================================
+// 4. DASHBOARD AI ASSISTANT WIDGET HANDLER
+// =========================================================================
+const dashAiInput = document.getElementById('dashAiInput');
+const dashAiSubmitBtn = document.getElementById('dashAiSubmitBtn');
+const dashAiResultBox = document.getElementById('dashAiResultBox');
+const dashAiStatusBadge = document.getElementById('dashAiStatusBadge');
+const dashAiResponseContent = document.getElementById('dashAiResponseContent');
+
+document.querySelectorAll('.dash-preset-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        if (dashAiInput) {
+            dashAiInput.value = this.getAttribute('data-query');
+            if (dashAiSubmitBtn) dashAiSubmitBtn.click();
+        }
+    });
+});
+
+if (dashAiSubmitBtn) {
+    dashAiSubmitBtn.addEventListener('click', async function() {
+        const queryText = (dashAiInput ? dashAiInput.value.trim() : '');
+        if (!queryText) return;
+
+        dashAiSubmitBtn.disabled = true;
+        dashAiSubmitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Asking...';
+
+        try {
+            const res = await fetch('/api/ai-query', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query_text: queryText })
+            });
+            const data = await res.json();
+            if (dashAiResultBox) dashAiResultBox.style.display = 'block';
+
+            if (data.success) {
+                if (dashAiStatusBadge) {
+                    dashAiStatusBadge.className = 'badge bg-success';
+                    dashAiStatusBadge.innerText = 'SUCCESS (ALLOWED)';
+                }
+                let html = `<div class="text-white mb-2">${data.summary || 'Query processed successfully.'}</div>`;
+                if (data.rows && data.rows.length > 0) {
+                    const cols = Object.keys(data.rows[0]);
+                    html += `<div class="table-responsive rounded-2 border border-secondary" style="max-height: 180px;"><table class="table table-sm table-hover mb-0"><thead class="table-light"><tr>`;
+                    cols.forEach(c => html += `<th class="text-uppercase small">${c.replace('_',' ')}</th>`);
+                    html += `</tr></thead><tbody>`;
+                    data.rows.slice(0, 5).forEach(r => {
+                        html += `<tr>`;
+                        cols.forEach(c => html += `<td class="text-white small">${r[c] !== null ? r[c] : '-'}</td>`);
+                        html += `</tr>`;
+                    });
+                    html += `</tbody></table></div>`;
+                    if (data.rows.length > 5) {
+                        html += `<small class="text-warning d-block mt-1">Showing first 5 of ${data.rows.length} rows. Open full AI console for complete records.</small>`;
+                    }
+                }
+                if (dashAiResponseContent) dashAiResponseContent.innerHTML = html;
+            } else {
+                if (dashAiStatusBadge) {
+                    dashAiStatusBadge.className = 'badge bg-danger';
+                    dashAiStatusBadge.innerText = data.status || 'REJECTED';
+                }
+                if (dashAiResponseContent) {
+                    dashAiResponseContent.innerHTML = `
+                        <div class="p-2 rounded" style="background: rgba(244, 63, 94, 0.15); color: #fda4af;">
+                            <i class="fa-solid fa-shield-halved me-1"></i> ${data.error}
+                        </div>
+                    `;
+                }
+            }
+        } catch (err) {
+            if (dashAiResponseContent) dashAiResponseContent.innerText = 'Error: ' + err;
+        } finally {
+            dashAiSubmitBtn.disabled = false;
+            dashAiSubmitBtn.innerHTML = '<i class="fa-solid fa-paper-plane me-1"></i> Ask AI';
         }
     });
 }

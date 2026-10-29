@@ -1,144 +1,389 @@
 {% extends "base.html" %}
 
-{% block title %}AI Assistant - AcademiaPro{% endblock %}
-{% block page_title %}AI Relational Query Assistant & Audit Monitor{% endblock %}
-{% block page_subtitle %}Strictly sandboxed read-only query generator operating exclusively on secure analytical views{% endblock %}
+{% block title %}AI Relational Assistant & Security Gate - AcademiaPro{% endblock %}
+{% block page_title %}AI Relational Query Assistant & Role Security Gate{% endblock %}
+{% block page_subtitle %}Strictly sandboxed multi-tier natural language query synthesizer with institutional privacy firewalls{% endblock %}
+
+{% block extra_css %}
+<style>
+    .ai-hero-card {
+        background: linear-gradient(135deg, #09152e 0%, #0d1b3e 100%);
+        border: 1px solid rgba(245, 158, 11, 0.35);
+        border-radius: 16px;
+        padding: 24px;
+        position: relative;
+        overflow: hidden;
+    }
+    .ai-hero-card::before {
+        content: "";
+        position: absolute;
+        top: -50px;
+        right: -50px;
+        width: 180px;
+        height: 180px;
+        background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .role-badge-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 9999px;
+        font-size: 11.5px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .role-admin-pill {
+        background: rgba(245, 158, 11, 0.15);
+        border: 1px solid rgba(245, 158, 11, 0.4);
+        color: #fbbf24;
+    }
+    .role-teacher-pill {
+        background: rgba(59, 130, 246, 0.15);
+        border: 1px solid rgba(59, 130, 246, 0.4);
+        color: #93c5fd;
+    }
+    .role-student-pill {
+        background: rgba(16, 185, 129, 0.15);
+        border: 1px solid rgba(16, 185, 129, 0.4);
+        color: #6ee7b7;
+    }
+    .policy-rule-card {
+        background: #060d1f;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 16px;
+        transition: all 0.25s ease;
+    }
+    .policy-rule-card:hover {
+        border-color: rgba(245, 158, 11, 0.4);
+        transform: translateY(-2px);
+    }
+    .preset-pill-btn {
+        background: #060d1f;
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        color: #cbd5e1;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 9999px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    .preset-pill-btn:hover {
+        background: rgba(245, 158, 11, 0.18);
+        border-color: #f59e0b;
+        color: #ffffff;
+    }
+    .code-terminal {
+        background: #040916;
+        border: 1px solid rgba(245, 158, 11, 0.25);
+        border-radius: 10px;
+        color: #fbbf24;
+        font-family: 'Fira Code', Consolas, monospace;
+        font-size: 12.5px;
+        padding: 12px 16px;
+        line-height: 1.6;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="row g-4">
-    <!-- Left Column: Interactive Chat & Query Simulator -->
-    <div class="col-lg-7">
-        <div class="card border-0 shadow-sm rounded-3">
-            <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
-                <h6 class="mb-0 fw-bold">
-                    <i class="fa-solid fa-robot text-primary me-2"></i>Natural Language Query Console
-                </h6>
-                <span class="badge bg-success-subtle text-success border border-success">
-                    <i class="fa-solid fa-lock me-1"></i> Read-Only SELECT Sandbox Enforced
-                </span>
+<div class="container-fluid p-0">
+
+    <!-- TOP HERO BANNER: AI ARCHITECTURE & PRIVACY SHIELD -->
+    <div class="ai-hero-card mb-4 shadow-lg">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge" style="background: var(--gold-gradient); color: #fff; font-size: 11px;">
+                        <i class="fa-solid fa-brain me-1"></i> Dual-Engine Relational AI
+                    </span>
+                    <span class="badge border" style="background: rgba(16,185,129,0.15); border-color: rgba(16,185,129,0.4) !important; color: #34d399; font-size: 11px;">
+                        <i class="fa-solid fa-shield-halved me-1"></i> Strict RBAC Sandbox Enforced
+                    </span>
+                    <span class="badge border" style="background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1) !important; color: #cbd5e1; font-size: 11px;">
+                        <i class="fa-solid fa-server me-1"></i> 100% Offline (Zero API Cost)
+                    </span>
+                </div>
+                <h4 class="fw-bold text-white mb-1">AcademiaPro Relational Intelligence Desk</h4>
+                <p class="text-white-50 small mb-0" style="max-width: 780px;">
+                    This sandboxed AI engine converts natural language inquiries into secure analytical SQL queries against the 25 normalized database tables. Each role (Admin, Teacher, Student, Parent) operates within strictly enforced firewall boundaries.
+                </p>
             </div>
-
-            <div class="card-body">
-                <!-- User Persona Selection -->
-                <div class="row g-3 mb-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold small">Active Persona / User</label>
-                        <select class="form-select form-select-sm" id="userSelect">
-                            <option value="10" data-role="Student">Ali Khan (Student - BSCS-22-01)</option>
-                            <option value="11" data-role="Student">Bilal Ahmed (Student - BSCS-22-02)</option>
-                            <option value="2" data-role="Teacher">Dr. Tariq Mahmood (Teacher)</option>
-                            <option value="1" data-role="Admin">Engr. Shahbaz Ahmed (Administrator)</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold small">User Role</label>
-                        <input type="text" class="form-control form-control-sm bg-light" id="roleDisplay" value="Student" readonly>
-                    </div>
-                </div>
-
-                <!-- Pre-built Question Presets -->
-                <label class="form-label fw-semibold small">Quick Inquiry Prompts (Lecture Presets)</label>
-                <div class="d-flex flex-wrap gap-2 mb-3">
-                    <button class="btn btn-outline-secondary btn-sm preset-btn" data-query="What is my current semester fee status and balance?">
-                        💰 Fee Status
-                    </button>
-                    <button class="btn btn-outline-secondary btn-sm preset-btn" data-query="Show my official transcript grades and GPA.">
-                        🎓 My Transcript
-                    </button>
-                    <button class="btn btn-outline-secondary btn-sm preset-btn" data-query="Check my attendance and examination eligibility.">
-                        📋 My Attendance
-                    </button>
-                    <button class="btn btn-outline-secondary btn-sm preset-btn" data-query="List all overdue books across the library.">
-                        📚 Overdue Books
-                    </button>
-                    <button class="btn btn-outline-secondary btn-sm preset-btn" data-query="Show me all low stock inventory items below reorder level.">
-                        📦 Low Stock Items
-                    </button>
-                    <button class="btn btn-outline-danger btn-sm preset-btn text-danger" data-query="DELETE FROM student WHERE student_id = 1;">
-                        ⚠️ Malicious Query Test (Simulate Attack)
-                    </button>
-                </div>
-
-                <!-- Query Input Box -->
-                <div class="mb-3">
-                    <label class="form-label fw-semibold small">Natural Language Prompt or SQL Test</label>
-                    <textarea class="form-control" id="queryInput" rows="3" placeholder="e.g. Meri attendance kitni hai? Or ask about fees, courses..."></textarea>
-                </div>
-
-                <div class="d-flex justify-content-between align-items-center">
-                    <small class="text-muted"><i class="fa-solid fa-shield-halved text-success"></i> Strict non-SELECT prevention enabled</small>
-                    <button class="btn btn-primary px-4" id="submitBtn">
-                        <i class="fa-solid fa-paper-plane me-1"></i> Synthesize & Query
-                    </button>
-                </div>
-
-                <hr class="my-4">
-
-                <!-- Execution Result Display -->
-                <div id="resultContainer" style="display: none;">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h6 class="fw-bold mb-0">Execution Result & Audit Footprint</h6>
-                        <span id="statusBadge" class="badge bg-success">SUCCESS</span>
-                    </div>
-
-                    <div class="mb-2">
-                        <small class="text-muted d-block fw-semibold">Generated Read-Only SQL:</small>
-                        <div class="code-snippet p-2 mt-1" id="generatedSqlDisplay">SELECT * FROM ...</div>
-                    </div>
-
-                    <div id="queryOutputTable" class="table-responsive mt-3" style="max-height: 250px; overflow-y: auto;">
-                        <!-- Dynamic Result Table -->
-                    </div>
-                </div>
+            <div>
+                <button class="btn btn-outline-gold btn-sm px-3 py-2 fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#rbacMatrixCollapse" aria-expanded="true">
+                    <i class="fa-solid fa-eye me-1"></i> View Role Permission Matrix
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Right Column: Audit Log of AI Inquiries -->
-    <div class="col-lg-5">
-        <div class="card border-0 shadow-sm rounded-3">
-            <div class="card-header bg-white border-bottom py-3">
-                <h6 class="mb-0 fw-bold">
-                    <i class="fa-solid fa-list-check text-secondary me-2"></i>ai.message Audit Log (Live)
+    <!-- COLLAPSIBLE: ROLE RESTRICTION & ACCESS MATRIX -->
+    <div class="collapse show mb-4" id="rbacMatrixCollapse">
+        <div class="card border-0 p-4" style="background: #09152e; border: 1px solid rgba(245, 158, 11, 0.25) !important; border-radius: 16px;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0 text-white">
+                    <i class="fa-solid fa-scale-balanced text-warning me-2"></i>Official Institutional RBAC Security &amp; Privacy Policy Matrix
                 </h6>
+                <small class="text-white-50">Enforced by backend `database_engine.py`</small>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive border-0" style="max-height: 580px; overflow-y: auto;">
+
+            <div class="row g-3">
+                
+                <!-- 1. Administrator -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="policy-rule-card h-100" style="border-top: 3px solid #f59e0b;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="fw-bold text-warning small text-uppercase">Administrator</div>
+                            <i class="fa-solid fa-crown text-warning"></i>
+                        </div>
+                        <div class="small text-white fw-bold mb-1">Master Cross-Departmental Query</div>
+                        <p class="small text-white-50 mb-2" style="font-size: 11.5px; line-height: 1.5;">
+                            Can query all 25 tables: fee cashflow, inventory stock, student profiles, faculty records, audit logs.
+                        </p>
+                        <div class="border-top border-secondary pt-2">
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle small" style="font-size: 10px;">
+                                <i class="fa-solid fa-ban me-1"></i> No Mutation (SELECT Only)
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Teacher / Faculty -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="policy-rule-card h-100" style="border-top: 3px solid #3b82f6;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="fw-bold text-info small text-uppercase">Teacher / Faculty</div>
+                            <i class="fa-solid fa-chalkboard-user text-info"></i>
+                        </div>
+                        <div class="small text-white fw-bold mb-1">Academic &amp; Student Growth Tracker</div>
+                        <p class="small text-white-50 mb-2" style="font-size: 11.5px; line-height: 1.5;">
+                            Can query enrolled students, grading percentiles (A+, B, Needs Guidance), attendance shortage (&lt;75%), and syllabus.
+                        </p>
+                        <div class="border-top border-secondary pt-2">
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle small" style="font-size: 10px;">
+                                <i class="fa-solid fa-ban me-1"></i> Blocked: Financial Ledgers &amp; Audits
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Student -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="policy-rule-card h-100" style="border-top: 3px solid #10b981;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="fw-bold text-success small text-uppercase">Student (Sandboxed)</div>
+                            <i class="fa-solid fa-user-graduate text-success"></i>
+                        </div>
+                        <div class="small text-white fw-bold mb-1">Personal Academic Partner</div>
+                        <p class="small text-white-50 mb-2" style="font-size: 11.5px; line-height: 1.5;">
+                            Can query own GPA transcript, enrolled subjects, fee voucher balance, exam eligibility slips, study guidance.
+                        </p>
+                        <div class="border-top border-secondary pt-2">
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle small" style="font-size: 10px;">
+                                <i class="fa-solid fa-lock me-1"></i> Privacy Shield: Faculty Presence Blocked
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Parent / Public -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="policy-rule-card h-100" style="border-top: 3px solid #8b5cf6;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="fw-bold text-purple small text-uppercase" style="color: #c084fc;">Parent / Public Desk</div>
+                            <i class="fa-solid fa-users text-secondary"></i>
+                        </div>
+                        <div class="small text-white fw-bold mb-1">Public Offerings &amp; Verification</div>
+                        <p class="small text-white-50 mb-2" style="font-size: 11.5px; line-height: 1.5;">
+                            Can verify student attendance percentage and exam clearance by roll number, browse degree programs and fee tariffs.
+                        </p>
+                        <div class="border-top border-secondary pt-2">
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle small" style="font-size: 10px;">
+                                <i class="fa-solid fa-ban me-1"></i> Zero Internal DB Schema Access
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN TWO-COLUMN WORKSPACE: CONSOLE + AUDIT LOG -->
+    <div class="row g-4">
+        
+        <!-- LEFT COLUMN: INTERACTIVE CONSOLE -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-4 p-4" style="background: #0a1530; border: 1px solid rgba(255, 255, 255, 0.08) !important;">
+                
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="mb-0 fw-bold text-white">
+                        <i class="fa-solid fa-terminal text-warning me-2"></i>Natural Language AI Relational Query Console
+                    </h6>
+                    <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4);">
+                        <i class="fa-solid fa-lock me-1"></i> Read-Only SELECT Sandbox
+                    </span>
+                </div>
+
+                <!-- Persona Switcher -->
+                <div class="row g-3 mb-3 p-3 rounded-3" style="background: #060d1f; border: 1px solid rgba(255,255,255,0.06);">
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold text-white-50 mb-1">Active User Persona / Identity</label>
+                        <select class="form-select form-select-sm" id="userSelect">
+                            <option value="10" data-role="Student">Ali Khan (Student &bull; BSCS-22-01)</option>
+                            <option value="11" data-role="Student">Bilal Ahmed (Student &bull; BSCS-22-02)</option>
+                            <option value="2" data-role="Teacher">Dr. Tariq Mahmood (Faculty &bull; CS Dept)</option>
+                            <option value="1" data-role="Admin" selected>Engr. Shahbaz Ahmed (Chief Administrator)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold text-white-50 mb-1">Enforced Role Sandbox</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="text" class="form-control form-control-sm font-monospace fw-bold" id="roleDisplay" value="Admin" readonly style="color: #f59e0b; background: #09152e !important;">
+                            <span class="badge border" id="roleBadgeInfo" style="background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.4); color: #fbbf24;">Master</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Inquiry Preset Buttons -->
+                <label class="form-label small fw-bold text-white-50 mb-2">
+                    <i class="fa-solid fa-wand-magic-sparkles text-warning me-1"></i> Quick Inquiry Presets (Click to Test)
+                </label>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <button class="preset-pill-btn preset-btn" data-query="What is my current semester fee status and balance?">
+                        💰 Fee Status
+                    </button>
+                    <button class="preset-pill-btn preset-btn" data-query="Show my official transcript grades and GPA.">
+                        🎓 My Transcript
+                    </button>
+                    <button class="preset-pill-btn preset-btn" data-query="Check my attendance and examination eligibility.">
+                        📋 75% Attendance Check
+                    </button>
+                    <button class="preset-pill-btn preset-btn" data-query="Explain what are the restrictions and permissions for Admin, Teachers, and Students?">
+                        🛡️ Role Policy Matrix
+                    </button>
+                    <button class="preset-pill-btn preset-btn" data-query="List all overdue books across the library.">
+                        📚 Overdue Books
+                    </button>
+                    <button class="preset-pill-btn preset-btn" data-query="Show me all low stock inventory items below reorder level.">
+                        📦 Low Stock Items
+                    </button>
+                    <button class="preset-pill-btn preset-btn text-info" data-query="Aj kon kon sa teacher aya hai aur kon absent hai?">
+                        🔒 Test Faculty Privacy Firewall
+                    </button>
+                    <button class="preset-pill-btn preset-btn text-danger" style="border-color: rgba(244, 63, 94, 0.4);" data-query="DELETE FROM student WHERE student_id = 1;">
+                        ⚠️ Malicious Attack Test (DELETE)
+                    </button>
+                </div>
+
+                <!-- Query Textarea -->
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-white-50 mb-1">Inquiry Prompt (English or Urdu)</label>
+                    <textarea class="form-control" id="queryInput" rows="3" placeholder="e.g. Meri attendance kitni hai? Or ask about fee dues, course syllabus, or test security..."></textarea>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-white-50">
+                        <i class="fa-solid fa-shield-halved text-success me-1"></i> Strict non-SELECT mutation prevention active
+                    </small>
+                    <button class="btn btn-gold px-4 py-2 fw-bold" id="submitBtn">
+                        <i class="fa-solid fa-paper-plane me-1"></i> Synthesize &amp; Query
+                    </button>
+                </div>
+
+                <hr class="border-secondary my-4">
+
+                <!-- Dynamic Output Container -->
+                <div id="resultContainer" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="fw-bold mb-0 text-white">Execution Result &amp; Audit Footprint</h6>
+                        <span id="statusBadge" class="badge bg-success">SUCCESS</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <small class="text-white-50 d-block fw-semibold mb-1">Generated Read-Only SQL Query:</small>
+                        <div class="code-terminal" id="generatedSqlDisplay">SELECT * FROM ...</div>
+                    </div>
+
+                    <div id="queryOutputTable" class="table-responsive rounded-3 border border-secondary" style="max-height: 280px; overflow-y: auto;">
+                        <!-- Dynamic Result Table injected by JS -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: AUDIT LOG -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100" style="background: #0a1530; border: 1px solid rgba(255, 255, 255, 0.08) !important;">
+                
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="mb-0 fw-bold text-white">
+                        <i class="fa-solid fa-list-check text-warning me-2"></i>Live AI Audit Log (ai.message)
+                    </h6>
+                    <span class="badge border" style="background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1) !important; color: #cbd5e1; font-size: 10.5px;">
+                        {{ messages|length }} Entries
+                    </span>
+                </div>
+
+                <p class="text-white-50 small mb-3">
+                    Every inquiry, synthesized SQL statement, and security block is permanently recorded in the normalized relational `message` table.
+                </p>
+
+                <div class="table-responsive border border-secondary rounded-3" style="max-height: 540px; overflow-y: auto;">
                     <table class="table table-hover align-middle mb-0" id="aiLogTable">
                         <thead class="table-light">
                             <tr>
                                 <th>User</th>
                                 <th>Role</th>
                                 <th>Status</th>
-                                <th>Summary / SQL</th>
+                                <th>Query / Footprint</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for m in messages %}
                             <tr>
-                                <td class="fw-bold">{{ m.full_name }}</td>
-                                <td><span class="badge bg-secondary">{{ m.user_role }}</span></td>
+                                <td>
+                                    <div class="fw-bold text-white small">{{ m.full_name }}</div>
+                                </td>
+                                <td>
+                                    <span class="badge" style="background: rgba(255,255,255,0.08); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.12); font-size: 10px;">
+                                        {{ m.user_role }}
+                                    </span>
+                                </td>
                                 <td>
                                     {% if m.execution_status == 'SUCCESS' %}
-                                    <span class="badge bg-success">SUCCESS</span>
+                                    <span class="badge bg-success" style="font-size: 9.5px;">SUCCESS</span>
+                                    {% elif m.execution_status == 'REJECTED_PRIVACY' %}
+                                    <span class="badge bg-warning text-dark" style="font-size: 9.5px;">PRIVACY_BLOCK</span>
                                     {% elif m.execution_status == 'REJECTED_SECURITY' %}
-                                    <span class="badge bg-danger">SECURITY_REJECT</span>
+                                    <span class="badge bg-danger" style="font-size: 9.5px;">SECURITY_BLOCK</span>
                                     {% else %}
-                                    <span class="badge bg-warning text-dark">{{ m.execution_status }}</span>
+                                    <span class="badge bg-secondary" style="font-size: 9.5px;">{{ m.execution_status }}</span>
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <div class="small fw-semibold text-truncate" style="max-width: 180px;">{{ m.user_query }}</div>
-                                    <small class="text-muted d-block">{{ m.response_summary }}</small>
+                                    <div class="small fw-semibold text-white text-truncate" style="max-width: 170px;" title="{{ m.user_query }}">{{ m.user_query }}</div>
+                                    <small class="text-white-50 d-block text-truncate" style="font-size: 10.5px; max-width: 170px;" title="{{ m.response_summary }}">{{ m.response_summary }}</small>
                                 </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center text-white-50 py-4">No AI transactions recorded yet.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
+
             </div>
         </div>
+
     </div>
+
 </div>
 {% endblock %}
 
@@ -147,6 +392,7 @@
 document.addEventListener("DOMContentLoaded", function() {
     const userSelect = document.getElementById("userSelect");
     const roleDisplay = document.getElementById("roleDisplay");
+    const roleBadgeInfo = document.getElementById("roleBadgeInfo");
     const queryInput = document.getElementById("queryInput");
     const submitBtn = document.getElementById("submitBtn");
     const resultContainer = document.getElementById("resultContainer");
@@ -154,21 +400,43 @@ document.addEventListener("DOMContentLoaded", function() {
     const generatedSqlDisplay = document.getElementById("generatedSqlDisplay");
     const queryOutputTable = document.getElementById("queryOutputTable");
 
+    // Persona switch updates role badge
     userSelect.addEventListener("change", function() {
         const selectedOpt = userSelect.options[userSelect.selectedIndex];
-        roleDisplay.value = selectedOpt.getAttribute("data-role");
+        const role = selectedOpt.getAttribute("data-role");
+        roleDisplay.value = role;
+        if (role === "Admin") {
+            roleBadgeInfo.innerText = "Master Authority";
+            roleBadgeInfo.style.color = "#fbbf24";
+            roleBadgeInfo.style.borderColor = "rgba(245, 158, 11, 0.4)";
+        } else if (role === "Teacher") {
+            roleBadgeInfo.innerText = "Faculty Tutor";
+            roleBadgeInfo.style.color = "#93c5fd";
+            roleBadgeInfo.style.borderColor = "rgba(59, 130, 246, 0.4)";
+        } else {
+            roleBadgeInfo.innerText = "Sandboxed Student";
+            roleBadgeInfo.style.color = "#6ee7b7";
+            roleBadgeInfo.style.borderColor = "rgba(16, 185, 129, 0.4)";
+        }
     });
 
+    // Preset button clicks
     document.querySelectorAll(".preset-btn").forEach(btn => {
         btn.addEventListener("click", function() {
             queryInput.value = this.getAttribute("data-query");
+            // If testing faculty privacy, automatically switch persona to Student for accurate simulation!
+            if (this.innerText.includes("Privacy Firewall")) {
+                userSelect.value = "10";
+                userSelect.dispatchEvent(new Event("change"));
+            }
         });
     });
 
+    // Query Submission Handler
     submitBtn.addEventListener("click", async function() {
         const queryText = queryInput.value.trim();
         if (!queryText) {
-            alert("Please type an inquiry or select a preset.");
+            alert("Please type an inquiry or select a preset prompt.");
             return;
         }
 
@@ -188,38 +456,46 @@ document.addEventListener("DOMContentLoaded", function() {
             const data = await res.json();
 
             resultContainer.style.display = "block";
-            generatedSqlDisplay.innerText = data.sql || "N/A";
+            generatedSqlDisplay.innerText = data.sql || "-- [Execution Filter Applied]";
 
             if (data.success) {
                 statusBadge.className = "badge bg-success";
-                statusBadge.innerText = "SUCCESS (ALLOWED)";
+                statusBadge.innerText = data.is_policy ? "SUCCESS (POLICY VERIFIED)" : "SUCCESS (ALLOWED)";
 
                 if (data.rows && data.rows.length > 0) {
                     const cols = Object.keys(data.rows[0]);
-                    let tableHtml = `<table class="table table-bordered table-sm"><thead><tr class="table-light">`;
-                    cols.forEach(c => tableHtml += `<th>${c}</th>`);
+                    let tableHtml = `<table class="table table-hover align-middle mb-0"><thead class="table-light"><tr>`;
+                    cols.forEach(c => tableHtml += `<th class="text-uppercase small">${c.replace('_', ' ')}</th>`);
                     tableHtml += `</tr></thead><tbody>`;
 
                     data.rows.forEach(r => {
                         tableHtml += `<tr>`;
-                        cols.forEach(c => tableHtml += `<td>${r[c] !== null ? r[c] : '-'}</td>`);
+                        cols.forEach(c => {
+                            const val = r[c] !== null ? r[c] : '-';
+                            tableHtml += `<td class="text-white small">${val}</td>`;
+                        });
                         tableHtml += `</tr>`;
                     });
                     tableHtml += `</tbody></table>`;
                     queryOutputTable.innerHTML = tableHtml;
                 } else {
-                    queryOutputTable.innerHTML = `<div class="alert alert-info py-2">Query returned 0 rows.</div>`;
+                    queryOutputTable.innerHTML = `<div class="p-3 text-white-50"><i class="fa-solid fa-circle-check text-success me-2"></i>${data.summary || 'Query executed successfully returning 0 rows.'}</div>`;
                 }
             } else {
                 statusBadge.className = "badge bg-danger";
                 statusBadge.innerText = data.status || "REJECTED";
-                queryOutputTable.innerHTML = `<div class="alert alert-danger py-2"><strong>Security Interception:</strong> ${data.error}</div>`;
+                queryOutputTable.innerHTML = `
+                    <div class="p-3" style="background: rgba(244, 63, 94, 0.12); border-left: 4px solid #f43f5e; color: #fda4af;">
+                        <div class="fw-bold mb-1"><i class="fa-solid fa-shield-halved me-1"></i> Security Protocol Triggered:</div>
+                        <div>${data.error}</div>
+                    </div>
+                `;
             }
         } catch (err) {
-            alert("Error sending query: " + err);
+            alert("Error sending AI query: " + err);
         } finally {
             submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane me-1"></i> Synthesize & Query';
+            submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane me-1"></i> Synthesize &amp; Query';
         }
     });
 });
