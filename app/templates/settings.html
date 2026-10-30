@@ -88,25 +88,25 @@
                     </div>
 
                     <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">
-                        <i class="fa-solid fa-image me-2 text-warning"></i> 4. College Campus Building Banner / Main Photo
+                        <i class="fa-solid fa-image me-2 text-warning"></i> 4. Institutional Campus Photography & Visual Identity
                     </h6>
                     <div class="row g-3 mb-4 align-items-center">
                         <div class="col-md-8">
                             <!-- Direct Gallery File Upload Box -->
                             <div class="p-3 rounded-3 mb-3 text-center" style="background: rgba(245, 158, 11, 0.08); border: 2px dashed rgba(245, 158, 11, 0.45);">
                                 <i class="fa-solid fa-cloud-arrow-up fs-2 text-warning mb-2 d-block"></i>
-                                <div class="fw-bold text-white mb-1 fs-6">Apne Phone / Computer Ki Gallery Se Photo Lagayein</div>
+                                <div class="fw-bold text-white mb-1 fs-6">Upload Campus Photograph from Device / Gallery</div>
                                 <p class="small text-white-50 mb-3" style="font-size: 12px;">
-                                    Gallery se picture select karein, yeh automatic <strong class="text-warning">Dashboard</strong> aur <strong class="text-warning">Login Page</strong> dono par preview aur apply ho jayegi.
+                                    Select an image from your local device or photo gallery. It will automatically synchronize across both the <strong class="text-warning">Executive Dashboard</strong> and the <strong class="text-warning">Secure Login Portal</strong>.
                                 </p>
                                 
                                 <div class="d-flex justify-content-center gap-2 flex-wrap">
                                     <label class="btn btn-gold btn-sm px-4 py-2 rounded-pill fw-bold text-white shadow-sm" style="cursor: pointer;">
-                                        <i class="fa-solid fa-images me-1"></i> Gallery Se Picture Select Karein
+                                        <i class="fa-solid fa-images me-1"></i> Browse Device / Photo Gallery
                                         <input type="file" name="campus_image_file" id="settingsCampusFileInput" accept="image/*" style="display: none;" onchange="previewGalleryImage(this)">
                                     </label>
                                     <button type="button" class="btn btn-outline-warning btn-sm px-3 py-2 rounded-pill fw-bold" id="quickSaveGalleryBtn" style="display: none;" onclick="instantSaveGalleryImage()">
-                                        <i class="fa-solid fa-bolt me-1"></i> Abhi Apply Karein
+                                        <i class="fa-solid fa-bolt me-1"></i> Apply & Synchronize Now
                                     </button>
                                 </div>
                                 <div id="selectedFileNameDisplay" class="small text-warning mt-2 fw-semibold" style="display: none;"></div>
@@ -114,7 +114,7 @@
 
                             <!-- Optional URL Input / Fallback -->
                             <div class="mt-2">
-                                <label class="form-label small fw-semibold text-white-50">Ya Web URL / Presets Use Karein (Optional):</label>
+                                <label class="form-label small fw-semibold text-white-50">Or Specify an External Image URL / Presets (Optional):</label>
                                 <input type="text" name="campus_image_url" id="campusImageUrlInput" class="form-control form-control-sm" value="{{ college.campus_image_url }}" oninput="updateCampusPreview(this.value)">
                             </div>
                             
@@ -255,7 +255,7 @@ function previewGalleryImage(input) {
 async function instantSaveGalleryImage() {
     const input = document.getElementById('settingsCampusFileInput');
     if (!input || !input.files || !input.files[0]) {
-        alert('Please select an image file from your gallery first.');
+        alert('Please select an image file from your device first.');
         return;
     }
 
@@ -275,27 +275,27 @@ async function instantSaveGalleryImage() {
         });
         const data = await res.json();
         if (data.success) {
-            alert('🎉 Kamyabi! Picture aapki gallery se upload ho kar Dashboard aur Login Page dono par apply ho gayi hai.');
+            alert('Campus photograph uploaded successfully! Synchronized across Executive Dashboard and Login Portal.');
             const urlInput = document.getElementById('campusImageUrlInput');
             if (urlInput) urlInput.value = data.image_url;
             const previewImg = document.getElementById('campusPreviewImg');
             if (previewImg) previewImg.src = data.image_url;
             if (btn) {
                 btn.className = 'btn btn-success btn-sm px-3 py-2 rounded-pill fw-bold';
-                btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Applied & Saved!';
+                btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Applied & Synchronized!';
             }
         } else {
             alert('Upload error: ' + (data.error || 'Failed to upload'));
             if (btn) {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-bolt me-1"></i> Abhi Apply Karein';
+                btn.innerHTML = '<i class="fa-solid fa-bolt me-1"></i> Apply & Synchronize Now';
             }
         }
     } catch (err) {
         alert('Upload failed: ' + err);
         if (btn) {
             btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-bolt me-1"></i> Abhi Apply Karein';
+            btn.innerHTML = '<i class="fa-solid fa-bolt me-1"></i> Apply & Synchronize Now';
         }
     }
 }

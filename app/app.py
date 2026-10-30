@@ -73,11 +73,15 @@ def require_authentication():
     # Role 1: Student (Access restricted strictly to Student Desk & Docs)
     student_allowed = ['student_desk', 'logout', 'student_id_card', 'fee_challan', 'roll_number_slip', 'api_student_ai', 'static']
     if user_role == "Student" and request.endpoint not in student_allowed:
+        if request.path.startswith("/api/"):
+            return jsonify({"success": False, "error": "Access Denied: Student account does not have permission to execute this administrative operation."}), 403
         return redirect(url_for("student_desk", roll_number=session.get("username", "")))
 
     # Role 2: Teacher (Access restricted from Finance, Settings, Security Audit, Inventory)
-    teacher_blocked = ['finance', 'settings', 'security_audit', 'inventory', 'api_change_password']
+    teacher_blocked = ['finance', 'settings', 'security_audit', 'inventory', 'api_change_password', 'api_upload_campus_banner']
     if user_role == "Teacher" and request.endpoint in teacher_blocked:
+        if request.path.startswith("/api/"):
+            return jsonify({"success": False, "error": "Access Denied: Faculty account does not have permission to modify administrative branding."}), 403
         flash("Access Notice: Financial Balances, System Inventory & White-Label Settings are restricted to Administrative Authorities.", "warning")
         return redirect(url_for("academics"))
 
@@ -221,6 +225,10 @@ def api_student_ai():
 # ==========================================
 @app.route("/settings", methods=["GET", "POST"])
 def settings():
+    if session.get("user_role") in ["Student", "Teacher", "Evaluator"]:
+        flash("Unauthorized Access: White-label branding and administrative configuration are restricted to Institutional Administrators.", "danger")
+        return redirect(url_for("student_desk" if session.get("user_role") == "Student" else "academics"))
+
     if request.method == "POST":
         data = dict(request.form)
         file = request.files.get("campus_image_file")
@@ -238,9 +246,12 @@ def settings():
 
 @app.route("/api/upload-campus-banner", methods=["POST"])
 def api_upload_campus_banner():
+    if session.get("user_role") in ["Student", "Teacher", "Evaluator"]:
+        return jsonify({"success": False, "error": "Unauthorized Access: Only Institutional Administrators can update campus photography."}), 403
+
     file = request.files.get("campus_image_file") or request.files.get("file")
     if not file or not file.filename:
-        return jsonify({"success": False, "error": "No image file selected from gallery."})
+        return jsonify({"success": False, "error": "No image file selected from device gallery."})
     
     saved_name = save_uploaded_image(file)
     if not saved_name:
