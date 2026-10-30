@@ -172,6 +172,12 @@
             <div class="col-lg-4 d-none d-lg-block position-relative" style="min-height: 220px;">
                 <img src="{{ college.campus_image_url or 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80' }}" alt="Campus Facade Banner" 
                      class="w-100 h-100 position-absolute top-0 end-0 campus-banner-img" id="dashboardCampusImg">
+                
+                <!-- Instant Gallery Change Button on Dashboard -->
+                <label for="dashCampusUploadInput" class="btn btn-gold btn-sm rounded-pill px-3 py-1 position-absolute bottom-0 end-0 m-3 shadow-lg" style="cursor: pointer; z-index: 10; font-size: 11px;">
+                    <i class="fa-solid fa-camera me-1"></i> Gallery Se Pic Badlein
+                </label>
+                <input type="file" id="dashCampusUploadInput" accept="image/*" style="display: none;" onchange="uploadCampusBannerDirect(this)">
             </div>
 
         </div>
@@ -860,6 +866,43 @@ if (dashAiSubmitBtn) {
             dashAiSubmitBtn.innerHTML = '<i class="fa-solid fa-paper-plane me-1"></i> Ask AI';
         }
     });
+}
+
+// =========================================================================
+// 5. DIRECT GALLERY UPLOAD HANDLER ON DASHBOARD
+// =========================================================================
+async function uploadCampusBannerDirect(inputEl) {
+    if (!inputEl.files || !inputEl.files[0]) return;
+    const file = inputEl.files[0];
+
+    // 1. Instant client-side preview on dashboard image
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = document.getElementById('dashboardCampusImg');
+        if (img) img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+
+    // 2. Upload to server & persist in database
+    const formData = new FormData();
+    formData.append('campus_image_file', file);
+
+    try {
+        const res = await fetch('/api/upload-campus-banner', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert('🎉 Kamyabi! Picture aapki gallery se upload ho kar Dashboard aur Login Page dono par apply ho chuki hai.');
+            const img = document.getElementById('dashboardCampusImg');
+            if (img && data.image_url) img.src = data.image_url;
+        } else {
+            alert('Picture upload error: ' + (data.error || 'Upload failed'));
+        }
+    } catch (err) {
+        alert('Upload failed: ' + err);
+    }
 }
 </script>
 {% endblock %}

@@ -26,8 +26,8 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             min-height: 100vh;
-            background: linear-gradient(180deg, rgba(6, 14, 34, 0.65) 0%, rgba(4, 10, 24, 0.9) 100%),
-                        url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat fixed;
+            background: linear-gradient(180deg, rgba(6, 14, 34, 0.70) 0%, rgba(4, 10, 24, 0.92) 100%),
+                        url('{{ college.campus_image_url or "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1920&q=80" }}') center/cover no-repeat fixed;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -538,6 +538,23 @@
                     <div class="text-end">
                         <small class="text-warning fw-bold">— AcademiaPro Mission</small>
                     </div>
+                </div>
+
+                <!-- Campus Building Preview Card (Real-Time Live Preview!) -->
+                <div class="p-3 rounded-4 mt-3" style="background: rgba(8, 19, 44, 0.78); backdrop-filter: blur(15px); border: 1.5px solid rgba(245, 158, 11, 0.35); box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <small class="text-warning fw-bold" style="font-size: 11px;">
+                            <i class="fa-solid fa-building-columns me-1"></i> Campus Preview
+                        </small>
+                        <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-size: 9.5px; border: 1px solid rgba(16, 185, 129, 0.4);">Active Banner</span>
+                    </div>
+                    <img src="{{ college.campus_image_url or 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80' }}" 
+                         alt="College Campus Banner" 
+                         class="w-100 rounded-3 shadow-sm" 
+                         style="height: 125px; object-fit: cover; border: 1px solid rgba(255, 255, 255, 0.1);">
+                    <small class="text-white-50 d-block mt-2 text-center" style="font-size: 10.5px;">
+                        {{ college.college_name }}
+                    </small>
                 </div>
             </div>
 

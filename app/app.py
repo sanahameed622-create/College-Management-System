@@ -11,6 +11,24 @@ from database_engine import db
 app = Flask(__name__)
 app.secret_key = "academiapro_secret_salt_2026_enterprise_secure"
 
+UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "uploads")
+ALLOWED_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.webp', '.svg', '.gif'}
+
+def save_uploaded_image(file):
+    """Safely saves an uploaded image file to the static/uploads folder."""
+    if not file or not file.filename:
+        return None
+    _, ext = os.path.splitext(file.filename)
+    clean_ext = ext.lower()
+    if clean_ext not in ALLOWED_EXTENSIONS:
+        return None
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    timestamp = int(datetime.datetime.now().timestamp() * 1000)
+    filename = f"campus_banner_{timestamp}{clean_ext}"
+    filepath = os.path.join(UPLOAD_FOLDER, filename)
+    file.save(filepath)
+    return filename
+
 @app.context_processor
 def inject_global_context():
     avatar_choice = session.get("user_avatar", "girl")
@@ -204,12 +222,37 @@ def api_student_ai():
 @app.route("/settings", methods=["GET", "POST"])
 def settings():
     if request.method == "POST":
-        if db.update_college_profile(request.form):
-            flash("Institution profile updated successfully! All ID Cards and Challans now reflect new branding.", "success")
+        data = dict(request.form)
+        file = request.files.get("campus_image_file")
+        if file and file.filename:
+            saved_name = save_uploaded_image(file)
+            if saved_name:
+                data["campus_image_url"] = f"/static/uploads/{saved_name}"
+
+        if db.update_college_profile(data):
+            flash("Institution profile & Campus Picture updated successfully! Active on both Dashboard and Login Page.", "success")
         else:
             flash("Failed to update profile.", "danger")
         return redirect(url_for("settings"))
     return render_template("settings.html")
+
+@app.route("/api/upload-campus-banner", methods=["POST"])
+def api_upload_campus_banner():
+    file = request.files.get("campus_image_file") or request.files.get("file")
+    if not file or not file.filename:
+        return jsonify({"success": False, "error": "No image file selected from gallery."})
+    
+    saved_name = save_uploaded_image(file)
+    if not saved_name:
+        return jsonify({"success": False, "error": "Invalid file format. Please select an image file (JPG, PNG, WEBP, or SVG)."})
+    
+    image_url = f"/static/uploads/{saved_name}"
+    db.execute("UPDATE college_profile SET campus_image_url = ?", (image_url,))
+    return jsonify({
+        "success": True, 
+        "image_url": image_url, 
+        "message": "Campus picture successfully updated from gallery! It is now active on both Dashboard and Login Page."
+    })
 
 @app.route("/api/change-password", methods=["POST"])
 def change_password():
