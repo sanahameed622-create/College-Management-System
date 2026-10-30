@@ -87,6 +87,11 @@ class DatabaseEngine:
     def update_college_profile(self, data: Dict[str, Any]) -> bool:
         """Updates college white-label settings so client name appears everywhere."""
         try:
+            existing = self.get_college_profile()
+            campus_img = data.get("campus_image_url")
+            if not campus_img or not str(campus_img).strip():
+                campus_img = existing.get("campus_image_url") or "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80"
+
             sql = """
             UPDATE college_profile
             SET college_name = ?,
@@ -105,18 +110,18 @@ class DatabaseEngine:
             WHERE profile_id = (SELECT profile_id FROM college_profile LIMIT 1);
             """
             self.execute(sql, (
-                data.get("college_name", "Punjab Group of Colleges / Govt. Graduate College"),
-                data.get("college_short_code", "PGC-GGC"),
-                data.get("tagline", "Committed to Academic Excellence"),
-                data.get("affiliation", "Affiliated with BISE & HEC"),
-                data.get("address", "College Road, Multan"),
-                data.get("phone", "+92 61 111-222-333"),
-                data.get("email", "admissions@college.edu.pk"),
-                data.get("bank_name", "Habib Bank Limited (HBL)"),
-                data.get("bank_account_no", "0123-45678901-03"),
-                data.get("bank_branch_code", "HBL-0452"),
-                data.get("principal_name", "Prof. Dr. Tariq Mahmood"),
-                data.get("campus_image_url", "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80")
+                data.get("college_name", existing.get("college_name", "Punjab Group of Colleges / Govt. Graduate College")),
+                data.get("college_short_code", existing.get("college_short_code", "PGC-GGC")),
+                data.get("tagline", existing.get("tagline", "Committed to Academic Excellence")),
+                data.get("affiliation", existing.get("affiliation", "Affiliated with BISE & HEC")),
+                data.get("address", existing.get("address", "College Road, Multan")),
+                data.get("phone", existing.get("phone", "+92 61 111-222-333")),
+                data.get("email", existing.get("email", "admissions@college.edu.pk")),
+                data.get("bank_name", existing.get("bank_name", "Habib Bank Limited (HBL)")),
+                data.get("bank_account_no", existing.get("bank_account_no", "0123-45678901-03")),
+                data.get("bank_branch_code", existing.get("bank_branch_code", "HBL-0452")),
+                data.get("principal_name", existing.get("principal_name", "Prof. Dr. Tariq Mahmood")),
+                campus_img
             ))
             return True
         except Exception as e:

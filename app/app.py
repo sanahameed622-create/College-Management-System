@@ -258,7 +258,7 @@ def api_upload_campus_banner():
         return jsonify({"success": False, "error": "Invalid file format. Please select an image file (JPG, PNG, WEBP, or SVG)."})
     
     image_url = f"/static/uploads/{saved_name}"
-    db.execute("UPDATE college_profile SET campus_image_url = ?", (image_url,))
+    db.execute("UPDATE college_profile SET campus_image_url = ?, updated_at = CURRENT_TIMESTAMP WHERE profile_id = (SELECT profile_id FROM college_profile LIMIT 1);", (image_url,))
     return jsonify({
         "success": True, 
         "image_url": image_url, 

@@ -26,7 +26,7 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             min-height: 100vh;
-            background: linear-gradient(180deg, rgba(6, 14, 34, 0.70) 0%, rgba(4, 10, 24, 0.92) 100%),
+            background: linear-gradient(to right, rgba(6, 14, 34, 0.18) 0%, rgba(6, 14, 34, 0.40) 50%, rgba(4, 10, 24, 0.88) 85%, rgba(4, 10, 24, 0.95) 100%),
                         url('{{ college.campus_image_url or "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1920&q=80" }}') center/cover no-repeat fixed;
             display: flex;
             align-items: center;
@@ -390,33 +390,33 @@
 
     <div class="main-hero-container">
         
-        <div class="row align-items-center g-4">
+        <div class="row align-items-center justify-content-between g-4">
             
-            <!-- LEFT COLUMN: CAMPUS HEADLINE & 4 FEATURE PILLS -->
-            <div class="col-lg-5">
-                <div class="top-brand-logo">
+            <!-- LEFT COLUMN: CAMPUS HEADLINE & HIGHLIGHTS (OPEN & CLEAR VIEW OF CAMPUS BACKGROUND) -->
+            <div class="col-lg-6 col-xl-6 text-white pe-lg-4">
+                <div class="top-brand-logo mb-3">
                     <i class="fa-solid fa-graduation-cap"></i>
                     <div>
-                        <div class="top-brand-text">AcademiaPro</div>
-                        <div class="top-brand-sub">College Management System</div>
+                        <div class="top-brand-text">{{ college.college_name }}</div>
+                        <div class="top-brand-sub">{{ college.affiliation or "Affiliated with BISE & HEC" }} • Secure ERP Portal</div>
                     </div>
                 </div>
 
-                <h1 class="hero-left-headline">
+                <h1 class="hero-left-headline" style="text-shadow: 0 4px 20px rgba(0,0,0,0.85);">
                     Your Journey<br>
-                    <span style="color: #fbbf24;">to a Brighter Future</span>
+                    <span style="color: #fbbf24; text-shadow: 0 4px 25px rgba(245, 158, 11, 0.45);">to a Brighter Future</span>
                 </h1>
 
-                <div class="hero-left-sub">
-                    Manage • Learn • Grow
+                <div class="hero-left-sub" style="text-shadow: 0 2px 10px rgba(0,0,0,0.85);">
+                    {{ college.tagline or "Manage • Learn • Grow" }}
                 </div>
 
-                <div class="pillar-inscription">
+                <div class="pillar-inscription mb-4" style="background: rgba(6, 14, 34, 0.5); backdrop-filter: blur(10px); display: inline-block; padding: 8px 18px; border-radius: 8px;">
                     Knowledge Builds Tomorrow
                 </div>
 
                 <!-- 4 Bottom Feature Pill Badges -->
-                <div class="feature-pills-row">
+                <div class="feature-pills-row mb-4">
                     <span class="feature-pill-btn">
                         <i class="fa-solid fa-user-graduate"></i>
                         <span>Student Management</span>
@@ -434,17 +434,27 @@
                         <span>Reports &amp; Analytics</span>
                     </span>
                 </div>
+
+                <!-- Sleek Institutional Mission Quote -->
+                <div class="right-quote-card" style="max-width: 480px; background: rgba(8, 19, 44, 0.6); backdrop-filter: blur(12px);">
+                    <div class="mb-2 ps-3">
+                        "Education is the key to unlock a better tomorrow."
+                    </div>
+                    <div class="text-end">
+                        <small class="text-warning fw-bold">— {{ college.college_short_code or 'AcademiaPro' }} Vision</small>
+                    </div>
+                </div>
             </div>
 
-            <!-- CENTER-RIGHT COLUMN: FLOATING DARK NAVY & GOLD LOGIN CARD -->
-            <div class="col-lg-4 col-md-8 mx-auto">
+            <!-- RIGHT COLUMN: FLOATING DARK NAVY & GOLD LOGIN CARD (RIGHT-ALIGNED) -->
+            <div class="col-lg-5 col-xl-5 ms-lg-auto">
                 <div class="login-card-gold">
                     
                     <div class="card-inner-brand">
                         <i class="fa-solid fa-graduation-cap"></i>
                         <div>
                             <div class="fw-bold text-white small" style="line-height: 1.1;">AcademiaPro</div>
-                            <small class="text-white-50" style="font-size: 10px;">College Management System</small>
+                            <small class="text-white-50" style="font-size: 10px;">Institutional Access Portal</small>
                         </div>
                     </div>
 
@@ -526,35 +536,6 @@
                         </small>
                     </div>
 
-                </div>
-            </div>
-
-            <!-- FAR RIGHT COLUMN: BOOKS & QUOTE -->
-            <div class="col-lg-3 d-none d-lg-block">
-                <div class="right-quote-card">
-                    <div class="mb-3 ps-3">
-                        "Education is the key to unlock a better tomorrow."
-                    </div>
-                    <div class="text-end">
-                        <small class="text-warning fw-bold">— AcademiaPro Mission</small>
-                    </div>
-                </div>
-
-                <!-- Campus Building Preview Card (Real-Time Live Preview!) -->
-                <div class="p-3 rounded-4 mt-3" style="background: rgba(8, 19, 44, 0.78); backdrop-filter: blur(15px); border: 1.5px solid rgba(245, 158, 11, 0.35); box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <small class="text-warning fw-bold" style="font-size: 11px;">
-                            <i class="fa-solid fa-building-columns me-1"></i> Campus Preview
-                        </small>
-                        <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-size: 9.5px; border: 1px solid rgba(16, 185, 129, 0.4);">Active Banner</span>
-                    </div>
-                    <img src="{{ college.campus_image_url or 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80' }}" 
-                         alt="College Campus Banner" 
-                         class="w-100 rounded-3 shadow-sm" 
-                         style="height: 125px; object-fit: cover; border: 1px solid rgba(255, 255, 255, 0.1);">
-                    <small class="text-white-50 d-block mt-2 text-center" style="font-size: 10.5px;">
-                        {{ college.college_name }}
-                    </small>
                 </div>
             </div>
 
