@@ -88,17 +88,34 @@
                     </div>
 
                     <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">
-                        <i class="fa-solid fa-image me-2 text-info"></i> 4. College Campus Building Banner / Photo
+                        <i class="fa-solid fa-image me-2 text-warning"></i> 4. College Campus Building Banner / Main Photo
                     </h6>
                     <div class="row g-3 mb-4">
                         <div class="col-md-8">
                             <label class="form-label fw-semibold">Campus Building Photo / Banner URL</label>
-                            <input type="text" name="campus_image_url" class="form-control" value="{{ college.campus_image_url }}">
-                            <small class="text-muted">Displayed prominently in the Institutional Dashboard header banner.</small>
+                            <input type="text" name="campus_image_url" id="campusImageUrlInput" class="form-control" value="{{ college.campus_image_url }}" oninput="updateCampusPreview(this.value)">
+                            <small class="text-muted d-block mt-1">Paste any direct image link, or choose from one of the luxury presets below:</small>
+                            
+                            <!-- Quick Image Presets -->
+                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                <button type="button" class="btn btn-outline-warning btn-sm" onclick="setPresetCampusImage('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80')">
+                                    🏛️ Dusk Campus Facade
+                                </button>
+                                <button type="button" class="btn btn-outline-warning btn-sm" onclick="setPresetCampusImage('https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1200&q=80')">
+                                    🎓 Classic University Brick
+                                </button>
+                                <button type="button" class="btn btn-outline-warning btn-sm" onclick="setPresetCampusImage('https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?auto=format&fit=crop&w=1200&q=80')">
+                                    📚 Modern Academic Hall
+                                </button>
+                                <button type="button" class="btn btn-outline-warning btn-sm" onclick="setPresetCampusImage('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80')">
+                                    🏫 Tech &amp; Science Campus
+                                </button>
+                            </div>
                         </div>
                         <div class="col-md-4 text-center">
-                            <label class="form-label fw-semibold d-block">Current Preview</label>
-                            <img src="{{ college.campus_image_url }}" alt="Campus Preview" class="img-fluid rounded-3 border shadow-sm" style="height: 60px; width: 100%; object-fit: cover;">
+                            <label class="form-label fw-semibold d-block">Live Preview</label>
+                            <img src="{{ college.campus_image_url }}" id="campusPreviewImg" alt="Campus Preview" class="img-fluid rounded-3 border shadow-sm" style="height: 90px; width: 100%; object-fit: cover; border-color: rgba(245, 158, 11, 0.4) !important;">
+                            <small class="text-white-50 d-block mt-1" style="font-size: 11px;">Reflected on Dashboard Hero Banner</small>
                         </div>
                     </div>
 
@@ -162,4 +179,22 @@
 
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function setPresetCampusImage(url) {
+    const input = document.getElementById('campusImageUrlInput');
+    const preview = document.getElementById('campusPreviewImg');
+    if (input) input.value = url;
+    if (preview) preview.src = url;
+}
+
+function updateCampusPreview(url) {
+    const preview = document.getElementById('campusPreviewImg');
+    if (preview && url) {
+        preview.src = url;
+    }
+}
+</script>
 {% endblock %}
