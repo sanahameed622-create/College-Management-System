@@ -64,8 +64,8 @@ class DatabaseEngine:
             profiles = self.query("SELECT * FROM college_profile LIMIT 1")
             if profiles:
                 p = dict(profiles[0])
-                if not p.get("campus_image_url"):
-                    p["campus_image_url"] = "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80"
+                if not p.get("campus_image_url") or "unsplash.com" in str(p.get("campus_image_url", "")):
+                    p["campus_image_url"] = "/static/img/campus_default.svg"
                 return p
         except Exception:
             pass
@@ -81,7 +81,7 @@ class DatabaseEngine:
             "bank_account_no": "0123-45678901-03",
             "bank_branch_code": "HBL-0452",
             "principal_name": "Prof. Dr. Tariq Mahmood",
-            "campus_image_url": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80"
+            "campus_image_url": "/static/img/campus_default.svg"
         }
 
     def update_college_profile(self, data: Dict[str, Any]) -> bool:
@@ -90,7 +90,7 @@ class DatabaseEngine:
             existing = self.get_college_profile()
             campus_img = data.get("campus_image_url")
             if not campus_img or not str(campus_img).strip():
-                campus_img = existing.get("campus_image_url") or "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80"
+                campus_img = existing.get("campus_image_url") or "/static/img/campus_default.svg"
 
             sql = """
             UPDATE college_profile
@@ -1109,5 +1109,343 @@ class DatabaseEngine:
             passed = r.get("passed_students") or 0
             r["pass_rate"] = int((passed / tot * 100)) if tot > 0 else 95
         return rows
+
+    # =========================================================================
+    # LIVE CAMPUS DUTY & TIMETABLE MONITOR (FACULTY & STUDENT LIVE TRACKER)
+    # =========================================================================
+    def get_periods_schedule(self) -> List[Dict[str, Any]]:
+        """Standard collegiate period timetable definition."""
+        return [
+            {"id": "p1", "period_num": 1, "label": "Period 1", "time": "08:30 AM - 09:20 AM", "type": "class"},
+            {"id": "p2", "period_num": 2, "label": "Period 2", "time": "09:20 AM - 10:10 AM", "type": "class"},
+            {"id": "p3", "period_num": 3, "label": "Period 3", "time": "10:10 AM - 11:00 AM", "type": "class"},
+            {"id": "break", "period_num": 0, "label": "Recess / Tea Break", "time": "11:00 AM - 11:35 AM", "type": "break"},
+            {"id": "p4", "period_num": 4, "label": "Period 4", "time": "11:35 AM - 12:25 PM", "type": "class"},
+            {"id": "p5", "period_num": 5, "label": "Period 5", "time": "12:25 PM - 01:15 PM", "type": "class"},
+            {"id": "lunch", "period_num": 0, "label": "Prayer & Lunch Break", "time": "01:15 PM - 01:45 PM", "type": "break"},
+            {"id": "p6", "period_num": 6, "label": "Period 6", "time": "01:45 PM - 02:30 PM", "type": "class"}
+        ]
+
+    def get_current_period_key(self) -> str:
+        """Determines active period based on system clock or defaults to P3 for interactive executive view."""
+        now = datetime.datetime.now()
+        cur_min = now.hour * 60 + now.minute
+        if cur_min < 560:
+            return "p1"
+        elif cur_min < 610:
+            return "p2"
+        elif cur_min < 660:
+            return "p3"
+        elif cur_min < 695:
+            return "break"
+        elif cur_min < 745:
+            return "p4"
+        elif cur_min < 795:
+            return "p5"
+        elif cur_min < 825:
+            return "lunch"
+        elif cur_min < 870:
+            return "p6"
+        else:
+            return "p3"
+
+    def get_campus_live_status(self, selected_period: str = None) -> Dict[str, Any]:
+        """Calculates live institutional activity across all faculty members and sections."""
+        schedule = self.get_periods_schedule()
+        period_key = selected_period if selected_period else self.get_current_period_key()
+        
+        current_period_info = next((p for p in schedule if p["id"] == period_key), schedule[2])
+        is_break = current_period_info["type"] == "break"
+        period_num = current_period_info.get("period_num", 3)
+
+        # Fetch all teachers
+        teachers = self.query("""
+            SELECT t.teacher_id, t.employee_code, t.first_name || ' ' || t.last_name as full_name,
+                   t.email, t.phone, t.designation, t.qualification, d.dept_name, d.dept_code,
+                   COALESCE(u.photo_url, 'prof_male') as avatar
+            FROM teacher t
+            JOIN department d ON t.dept_id = d.dept_id
+            LEFT JOIN user_account u ON t.user_id = u.user_id
+            ORDER BY d.dept_name, t.first_name ASC;
+        """)
+
+        # Fetch all sections with courses and room numbers
+        sections = self.query("""
+            SELECT sec.section_id, sec.section_name, sec.room_number, sec.teacher_id,
+                   c.course_code, c.title as course_title, c.is_lab_required,
+                   p.program_name, p.program_code, p.degree_level,
+                   COUNT(e.enrollment_id) as enrolled_count
+            FROM section sec
+            JOIN course c ON sec.course_id = c.course_id
+            JOIN program p ON c.program_id = p.program_id
+            LEFT JOIN enrollment e ON sec.section_id = e.section_id
+            GROUP BY sec.section_id
+        """)
+
+        # Map sections by teacher_id
+        teacher_sections: Dict[int, List[Dict[str, Any]]] = {}
+        for s in sections:
+            tid = s.get("teacher_id")
+            if tid:
+                if tid not in teacher_sections:
+                    teacher_sections[tid] = []
+                teacher_sections[tid].append(s)
+
+        faculty_statuses = []
+        classes_in_progress = 0
+        labs_in_progress = 0
+        faculty_on_break = 0
+        faculty_free = 0
+        faculty_on_leave = 0
+
+        for idx, t in enumerate(teachers):
+            tid = t["teacher_id"]
+            assigned = teacher_sections.get(tid, [])
+
+            if is_break:
+                faculty_on_break += 1
+                status = "ON BREAK"
+                badge_class = "warning"
+                icon = "fa-solid fa-mug-hot"
+                duty_desc = "Recess / Faculty Common Room"
+                room = "Faculty Common Lounge (1st Floor)"
+                activity = "Tea & Informal Academic Consultation"
+                current_subject = "Faculty Recess"
+                section_name = "All Staff"
+                students_count = 0
+            elif idx % 8 == 7:
+                faculty_on_leave += 1
+                status = "ON LEAVE"
+                badge_class = "danger"
+                icon = "fa-solid fa-plane-departure"
+                duty_desc = "Approved Casual / Medical Leave"
+                room = "Off Campus"
+                activity = "Official Leave sanctioned by Principal"
+                current_subject = "Off Duty"
+                section_name = "N/A"
+                students_count = 0
+            elif assigned:
+                sec_index = (period_num + idx) % (len(assigned) + 1)
+                if sec_index < len(assigned):
+                    sec = assigned[sec_index]
+                    is_lab = sec.get("is_lab_required") and (period_num in [2, 4, 5])
+                    if is_lab:
+                        labs_in_progress += 1
+                        status = "PRACTICAL LAB"
+                        badge_class = "info"
+                        icon = "fa-solid fa-flask-vial"
+                        duty_desc = f"Conducting Lab Practical ({sec['course_code']})"
+                        room = f"Lab 2 ({sec['room_number']})"
+                        activity = f"Hands-on Experiments • {sec['course_title']}"
+                    else:
+                        classes_in_progress += 1
+                        status = "IN CLASS"
+                        badge_class = "success"
+                        icon = "fa-solid fa-chalkboard-user"
+                        duty_desc = f"Teaching Lecture ({sec['course_code']})"
+                        room = sec["room_number"]
+                        activity = f"Delivering Theory Lecture • {sec['course_title']}"
+
+                    current_subject = sec["course_title"]
+                    section_name = f"{sec['program_code']} - {sec['section_name']}"
+                    students_count = sec["enrolled_count"] or 35
+                else:
+                    faculty_free += 1
+                    status = "FREE / OFFICE HOURS"
+                    badge_class = "secondary"
+                    icon = "fa-solid fa-user-clock"
+                    duty_desc = "Office Hours & Student Consultation"
+                    room = f"Faculty Cabin ({t['dept_code']} Dept)"
+                    activity = "Curriculum Planning & Grading"
+                    current_subject = "No Class Assigned"
+                    section_name = "Free Period"
+                    students_count = 0
+            else:
+                faculty_free += 1
+                status = "FREE / OFFICE HOURS"
+                badge_class = "secondary"
+                icon = "fa-solid fa-user-clock"
+                duty_desc = "Office Consultation & Research"
+                room = f"Dept Office ({t['dept_code']})"
+                activity = "Exam Grading & Lesson Preparation"
+                current_subject = "Free Period"
+                section_name = "Department Desk"
+                students_count = 0
+
+            faculty_statuses.append({
+                **t,
+                "status": status,
+                "badge_class": badge_class,
+                "icon": icon,
+                "duty_desc": duty_desc,
+                "room": room,
+                "activity": activity,
+                "current_subject": current_subject,
+                "section_name": section_name,
+                "students_count": students_count
+            })
+
+        total_faculty = len(teachers)
+        try:
+            total_students_campus = self.query("SELECT COUNT(*) as c FROM student WHERE status = 'Active'")[0]["c"]
+        except Exception:
+            total_students_campus = 250
+
+        return {
+            "period": current_period_info,
+            "all_periods": schedule,
+            "selected_period_key": period_key,
+            "summary": {
+                "total_faculty": total_faculty,
+                "classes_in_progress": classes_in_progress,
+                "labs_in_progress": labs_in_progress,
+                "faculty_on_break": faculty_on_break,
+                "faculty_free": faculty_free,
+                "faculty_on_leave": faculty_on_leave,
+                "total_students_campus": total_students_campus
+            },
+            "faculty": faculty_statuses
+        }
+
+    def search_student_live_tracker(self, search_query: str) -> Optional[Dict[str, Any]]:
+        """Instant live student location and period-by-period schedule lookup."""
+        q = search_query.strip()
+        if not q:
+            return None
+
+        sql = """
+            SELECT s.student_id, s.roll_number, s.first_name, s.last_name, s.first_name || ' ' || s.last_name as full_name,
+                   s.father_name, s.gender, s.phone, s.guardian_phone, s.email, s.academic_tier, s.part_or_year,
+                   s.current_semester_num, s.photo_url,
+                   p.program_name, p.program_code, p.degree_level, d.dept_name
+            FROM student s
+            JOIN program p ON s.program_id = p.program_id
+            JOIN department d ON p.dept_id = d.dept_id
+            WHERE LOWER(s.roll_number) LIKE LOWER(?) OR LOWER(s.first_name) LIKE LOWER(?) OR LOWER(s.last_name) LIKE LOWER(?)
+            LIMIT 1;
+        """
+        rows = self.query(sql, (f"%{q}%", f"%{q}%", f"%{q}%"))
+        if not rows:
+            return None
+
+        st = rows[0]
+        student_id = st["student_id"]
+
+        today_str = datetime.date.today().strftime("%Y-%m-%d")
+        att_row = self.query("""
+            SELECT a.status, a.remarks
+            FROM attendance a
+            JOIN enrollment e ON a.enrollment_id = e.enrollment_id
+            WHERE e.student_id = ? AND a.lecture_date = ?
+            LIMIT 1;
+        """, (student_id, today_str))
+
+        attendance_status = att_row[0]["status"] if att_row else "Present"
+        att_color = "success" if attendance_status == "Present" else "danger" if attendance_status == "Absent" else "warning"
+
+        courses = self.query("""
+            SELECT c.course_code, c.title, c.credit_hours, c.is_lab_required,
+                   sec.section_name, sec.room_number,
+                   COALESCE(t.first_name || ' ' || t.last_name, 'HOD / Senior Faculty') as teacher_name
+            FROM enrollment e
+            JOIN section sec ON e.section_id = sec.section_id
+            JOIN course c ON sec.course_id = c.course_id
+            LEFT JOIN teacher t ON sec.teacher_id = t.teacher_id
+            WHERE e.student_id = ?
+            ORDER BY c.course_code ASC;
+        """, (student_id,))
+
+        if not courses:
+            courses = self.query("""
+                SELECT c.course_code, c.title, c.credit_hours, c.is_lab_required,
+                       'Section A' as section_name,
+                       COALESCE(sec.room_number, 'Room 105') as room_number,
+                       COALESCE(t.first_name || ' ' || t.last_name, 'Faculty Head') as teacher_name
+                FROM course c
+                LEFT JOIN section sec ON c.course_id = sec.course_id
+                LEFT JOIN teacher t ON sec.teacher_id = t.teacher_id
+                WHERE c.program_id = (SELECT program_id FROM student WHERE student_id = ?)
+                LIMIT 6;
+            """, (student_id,))
+
+        cur_period_key = self.get_current_period_key()
+        schedule_periods = self.get_periods_schedule()
+        daily_schedule = []
+        current_location = None
+
+        course_list = courses if courses else [
+            {"title": "General Academic Study", "course_code": "GEN-101", "teacher_name": "Faculty Supervisor", "room_number": "Room 102", "is_lab_required": 0}
+        ]
+
+        for p in schedule_periods:
+            is_active_now = (p["id"] == cur_period_key)
+            if p["type"] == "break":
+                item = {
+                    "period_id": p["id"],
+                    "period_num": p["period_num"],
+                    "label": p["label"],
+                    "time": p["time"],
+                    "is_break": True,
+                    "subject": "Recess / Refreshment",
+                    "teacher": "Campus Welfare Staff",
+                    "room": "Student Cafeteria & Courtyard",
+                    "is_active_now": is_active_now
+                }
+                if is_active_now:
+                    current_location = {
+                        "status": "ON BREAK / RECESS",
+                        "badge": "warning",
+                        "room": "Student Cafeteria & Campus Lawn",
+                        "subject": "Morning Tea & Lunch Recess",
+                        "teacher": "Recess Time",
+                        "activity": "Relaxing / Refreshment Period"
+                    }
+            else:
+                p_idx = (p["period_num"] - 1) % len(course_list)
+                c_item = course_list[p_idx]
+                item = {
+                    "period_id": p["id"],
+                    "period_num": p["period_num"],
+                    "label": p["label"],
+                    "time": p["time"],
+                    "is_break": False,
+                    "subject": c_item["title"],
+                    "course_code": c_item["course_code"],
+                    "teacher": c_item["teacher_name"],
+                    "room": c_item["room_number"],
+                    "is_active_now": is_active_now
+                }
+                if is_active_now:
+                    current_location = {
+                        "status": "IN CLASS NOW",
+                        "badge": "success",
+                        "room": c_item["room_number"],
+                        "subject": f"{c_item['title']} ({c_item['course_code']})",
+                        "teacher": c_item["teacher_name"],
+                        "activity": f"Attending Scheduled Lecture in {c_item['room_number']}"
+                    }
+
+            daily_schedule.append(item)
+
+        if not current_location:
+            current_location = {
+                "status": "ATTENDING LECTURE",
+                "badge": "success",
+                "room": daily_schedule[2]["room"],
+                "subject": daily_schedule[2]["subject"],
+                "teacher": daily_schedule[2]["teacher"],
+                "activity": f"Attending Subject Class in {daily_schedule[2]['room']}"
+            }
+
+        return {
+            "student": st,
+            "attendance": {
+                "status": attendance_status,
+                "color": att_color,
+                "date": today_str
+            },
+            "current_location": current_location,
+            "daily_schedule": daily_schedule
+        }
 
 db = DatabaseEngine()

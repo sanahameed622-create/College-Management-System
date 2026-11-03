@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AcademiaPro • Enterprise College Management System</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome 6 Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts: Plus Jakarta Sans & Cinzel -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --bs-primary: #f59e0b !important;
+            --bs-primary-rgb: 245, 158, 11 !important;
+            --bs-link-color: #f59e0b !important;
+            --bs-link-hover-color: #fbbf24 !important;
+            --bs-body-bg: #060d1f !important;
+            --bs-body-color: #ffffff !important;
+            --bs-border-color: rgba(255, 255, 255, 0.1) !important;
+
+            --bg-canvas: #060d1f;
+            --bg-surface: #0a1530;
+            --bg-surface-elevated: #0e1c3a;
+            --bg-card: rgba(14, 28, 58, 0.85);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --border-gold: rgba(245, 158, 11, 0.4);
+            --gold-primary: #f59e0b;
+            --gold-light: #fbbf24;
+            --gold-dark: #d97706;
+            --gold-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            --navy-gradient: linear-gradient(180deg, #060d1f 0%, #0a1530 100%);
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-canvas);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 7px; height: 7px; }
+        ::-webkit-scrollbar-track { background: #060c1c; }
+        ::-webkit-scrollbar-thumb { background: rgba(245, 158, 11, 0.4); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #f59e0b; }
+
+        /* Topbar Header */
+        .topbar-header {
+            background: #060d1f;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 12px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+        }
+
+        .brand-logo-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .brand-cap-icon {
+            font-size: 26px;
+            color: #f59e0b;
+            filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.5));
+        }
+
+        .brand-title-text {
+            font-size: 18px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.4px;
+            line-height: 1.1;
+        }
+
+        .brand-subtitle-text {
+            font-size: 10px;
+            color: #cbd5e1;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        /* Search Pill */
+        .search-pill-container {
+            flex: 1;
+            max-width: 480px;
+            margin: 0 20px;
+        }
+
+        .search-pill {
+            background: rgba(14, 28, 58, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 9999px;
+            padding: 8px 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.25s ease;
+        }
+
+        .search-pill:focus-within {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+            background: rgba(18, 36, 75, 0.95);
+        }
+
+        .search-input {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-size: 13px;
+            width: 100%;
+            outline: none;
+        }
+
+        .search-input::placeholder { color: #64748b; }
+
+        /* Topbar Controls */
+        .icon-btn-pill {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .icon-btn-pill:hover {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+            border-color: rgba(245, 158, 11, 0.4);
+        }
+
+        .notification-badge-red {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 16px;
+            height: 16px;
+            background: #ef4444;
+            color: #ffffff;
+            border-radius: 50%;
+            font-size: 9px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #060d1f;
+        }
+
+        .user-capsule {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 12px 4px 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar-navy {
+            background: #050c1c;
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            min-height: calc(100vh - 65px);
+            padding: 20px 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .nav-gold-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            color: #94a3b8;
+            font-size: 13.5px;
+            font-weight: 500;
+            border-radius: 10px;
+            text-decoration: none;
+            margin-bottom: 5px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+        }
+
+        .nav-gold-link i {
+            font-size: 15px;
+            width: 20px;
+            text-align: center;
+            color: #64748b;
+            transition: all 0.2s ease;
+        }
+
+        .nav-gold-link:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateX(3px);
+        }
+
+        .nav-gold-link:hover i { color: #f59e0b; }
+
+        .nav-gold-link.active {
+            background: var(--gold-gradient);
+            color: #ffffff;
+            font-weight: 700;
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
+        }
+
+        .nav-gold-link.active i { color: #ffffff; }
+
+        .sidebar-engraving {
+            text-align: center;
+            padding: 16px 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            margin-top: 20px;
+        }
+
+        .sidebar-engraving i {
+            font-size: 30px;
+            color: #f59e0b;
+            opacity: 0.85;
+            margin-bottom: 6px;
+        }
+
+        /* Workspace */
+        .workspace-content {
+            padding: 24px 28px;
+            min-height: calc(100vh - 65px);
+        }
+
+        /* Cards & Gradients */
+        .card-navy-glass {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            padding: 22px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.25s ease;
+        }
+
+        .card-kpi-navy {
+            background: #0a1530;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 4px solid #f59e0b;
+            border-radius: 18px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            transition: all 0.25s ease;
+        }
+
+        .card-kpi-navy:hover {
+            transform: translateY(-4px);
+            border-color: rgba(245, 158, 11, 0.45);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.7), 0 0 20px rgba(245, 158, 11, 0.15);
+        }
+
+        .icon-kpi-gold {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(245, 158, 11, 0.18);
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fbbf24;
+            font-size: 20px;
+        }
+
+        /* Hero Banner */
+        .campus-hero-banner {
+            background-color: #060d1f;
+            background: linear-gradient(135deg, rgba(6, 13, 31, 0.95) 0%, rgba(13, 27, 62, 0.90) 100%),
+                        url('app/static/img/campus_default.svg') center/cover no-repeat;
+            border: 1.5px solid rgba(245, 158, 11, 0.4);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        /* Pulse Animation */
+        .pulse-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #10b981;
+            box-shadow: 0 0 10px #10b981;
+            animation: pulseAnim 1.6s infinite ease-in-out;
+        }
+
+        @keyframes pulseAnim {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.6; }
+        }
+
+        /* Period Switcher Pills */
+        .period-pill-btn {
+            background: rgba(6, 14, 34, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            color: #cbd5e1;
+            padding: 7px 14px;
+            border-radius: 9999px;
+            font-size: 12.5px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .period-pill-btn:hover {
+            background: rgba(245, 158, 11, 0.18);
+            border-color: #f59e0b;
+            color: #fbbf24;
+            transform: translateY(-2px);
+        }
+
+        .period-pill-btn.active {
+            background: var(--gold-gradient) !important;
+            color: #ffffff !important;
+            font-weight: 700;
+            border-color: #f59e0b !important;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+        }
+
+        /* Faculty Duty Card */
+        .faculty-duty-card {
+            background: #0a1530;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 18px;
+            transition: all 0.25s ease;
+            position: relative;
+            height: 100%;
+        }
+
+        .faculty-duty-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(245, 158, 11, 0.4);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
+        }
+
+        .duty-badge-lecture {
+            background: rgba(16, 185, 129, 0.18);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .duty-badge-break {
+            background: rgba(245, 158, 11, 0.18);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .duty-badge-free {
+            background: rgba(59, 130, 246, 0.18);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .room-pill {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fbbf24;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11.5px;
+            font-weight: 700;
+        }
+
+        /* Mobile Bottom Dock */
+        .mobile-bottom-dock {
+            background: rgba(6, 13, 31, 0.96) !important;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-top: 1.5px solid rgba(245, 158, 11, 0.35);
+            padding: 7px 10px;
+            z-index: 1045;
+            box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.7);
+        }
+
+        .bottom-dock-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            min-width: 52px;
+            border: none;
+            background: transparent;
+        }
+
+        .bottom-dock-btn i { font-size: 17px; margin-bottom: 2px; }
+        .bottom-dock-btn.active, .bottom-dock-btn:hover { color: #f59e0b; }
+
+        @media (max-width: 767.98px) {
+            .workspace-content {
+                padding: 16px 14px 90px 14px !important;
+            }
+            .topbar-header { padding: 10px 14px; }
+            .brand-title-text { font-size: 16px; }
+            .brand-subtitle-text { font-size: 9px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOPBAR NAVIGATION BAR -->
+    <header class="topbar-header d-flex align-items-center justify-content-between">
+        
+        <!-- Left Brand Logo & Mobile Toggle -->
+        <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-sm text-warning d-md-none border-0 p-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileNavDrawer" aria-controls="mobileNavDrawer" title="Open Navigation Menu" style="font-size: 20px;">
+                <i class="fa-solid fa-bars-staggered"></i>
+            </button>
+            <a href="javascript:void(0)" onclick="switchTab('dashboard')" class="brand-logo-wrap text-decoration-none">
+                <i class="fa-solid fa-graduation-cap brand-cap-icon"></i>
+                <div>
+                    <div class="brand-title-text">AcademiaPro</div>
+                    <div class="brand-subtitle-text">Punjab Group of Colleges • Multan Campus</div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Center Search Input Pill -->
+        <div class="search-pill-container d-none d-md-block">
+            <div class="search-pill">
+                <i class="fa-solid fa-magnifying-glass text-muted"></i>
+                <input type="text" placeholder="Search students, faculty, rooms, or live duties..." class="search-input" id="globalTopSearch" onkeyup="handleGlobalSearch(this.value)">
+            </div>
+        </div>
+
+        <!-- Right Side Icons & Profile Capsule -->
+        <div class="d-flex align-items-center gap-2 gap-sm-3">
+            
+            <!-- Live Status Pulse Badge -->
+            <span class="badge d-none d-sm-inline-flex align-items-center gap-1 rounded-pill" style="background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.35); font-size: 11px; padding: 5px 12px;">
+                <span class="pulse-dot"></span>
+                <span>SYSTEM ONLINE</span>
+            </span>
+
+            <!-- Notifications Drawer Bell -->
+            <a href="javascript:void(0)" class="icon-btn-pill" data-bs-toggle="offcanvas" data-bs-target="#notificationsOffcanvas" title="Notifications">
+                <i class="fa-regular fa-bell"></i>
+                <span class="notification-badge-red" id="topbarBellBadge">3</span>
+            </a>
+
+            <!-- User Profile Dropdown Capsule -->
+            <div class="dropdown">
+                <div class="user-capsule" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="app/static/avatars/girl.svg" id="navbarAvatarImg" class="rounded-circle border border-2 border-warning" width="32" height="32" style="object-fit: cover;">
+                    <div class="text-start d-none d-sm-block">
+                        <div class="fw-bold text-white small" style="line-height: 1.1;">Admin (Ayesha)</div>
+                        <div class="text-white-50" style="font-size: 10px;">Executive Authority</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-down text-white-50 ms-1" style="font-size: 10px;"></i>
+                </div>
+
+                <ul class="dropdown-menu dropdown-menu-end p-2 mt-2" style="background: #09152e; border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 14px; min-width: 220px;">
+                    <li class="px-3 py-2 text-center border-bottom border-secondary mb-1">
+                        <img src="app/static/avatars/girl.svg" class="rounded-circle border border-2 border-warning mb-2" width="50" height="50">
+                        <div class="fw-bold text-white">Administrator</div>
+                        <span class="badge" style="background: var(--gold-gradient); color: #fff; font-size: 10px;">Executive Suite</span>
+                    </li>
+                    <li>
+                        <a class="dropdown-item text-white small rounded-3" href="javascript:void(0)" onclick="switchTab('live-monitor')">
+                            <i class="fa-solid fa-tower-broadcast me-2 text-warning"></i> Live Duty Monitor
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item text-white small rounded-3" href="javascript:void(0)" onclick="switchTab('student-desk')">
+                            <i class="fa-solid fa-user-graduate me-2 text-warning"></i> Student Records Desk
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider border-secondary my-1"></li>
+                    <li>
+                        <a class="dropdown-item text-danger small rounded-3" href="javascript:void(0)" onclick="alert('AcademiaPro ERP is running in Verified Evaluation Mode.')">
+                            <i class="fa-solid fa-shield-halved me-2"></i> Session Verified
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+    </header>
+
+    <!-- MAIN BODY: SIDEBAR + WORKSPACE -->
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            
+            <!-- LEFT SIDEBAR (DESKTOP) -->
+            <div class="d-none d-md-flex col-md-3 col-lg-2 sidebar-navy">
+                <div>
+                    <ul class="nav flex-column mb-auto">
+                        <li class="nav-item">
+                            <button class="nav-gold-link active" id="side-dashboard" onclick="switchTab('dashboard')">
+                                <i class="fa-solid fa-house"></i>
+                                <span>Dashboard</span>
+                            </button>
+                        </li>
+
+                        <!-- STAR FEATURE: Live Campus Duty & Activity Monitor -->
+                        <li class="nav-item">
+                            <button class="nav-gold-link" id="side-live-monitor" onclick="switchTab('live-monitor')" style="position: relative;">
+                                <i class="fa-solid fa-tower-broadcast text-warning"></i>
+                                <span>Live Duty Monitor</span>
+                                <span class="badge rounded-pill ms-auto" style="background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); font-size: 9px; padding: 2px 6px;">
+                                    <i class="fa-solid fa-circle fa-beat me-1" style="font-size: 6px;"></i>LIVE
+                                </span>
+                            </button>
+                        </li>
+
+                        <li class="nav-item">
+                            <button class="nav-gold-link" id="side-student-desk" onclick="switchTab('student-desk')">
+                                <i class="fa-solid fa-user-graduate"></i>
+                                <span>Students &amp; Desks</span>
+                            </button>
+                        </li>
+
+                        <li class="nav-item">
+                            <button class="nav-gold-link" id="side-faculty-desk" onclick="switchTab('faculty-desk')">
+                                <i class="fa-solid fa-chalkboard-user"></i>
+                                <span>Faculty Roster</span>
+                            </button>
+                        </li>
+
+                        <li class="nav-item">
+                            <button class="nav-gold-link" id="side-attendance-desk" onclick="switchTab('attendance-desk')">
+                                <i class="fa-regular fa-calendar-check"></i>
+                                <span>Attendance</span>
+                            </button>
+                        </li>
+
+                        <li class="nav-item">
+                            <button class="nav-gold-link" id="side-finance-desk" onclick="switchTab('finance-desk')">
+                                <i class="fa-solid fa-file-invoice-dollar"></i>
+                                <span>Finance &amp; Challans</span>
+                            </button>
+                        </li>
+
+                        <li class="nav-item">
+                            <button class="nav-gold-link" id="side-ai-assistant" onclick="switchTab('ai-assistant')">
+                                <i class="fa-solid fa-robot" style="color: #f59e0b;"></i>
+                                <span>AI Assistant</span>
+                                <span class="badge rounded-pill ms-auto" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 9.5px; padding: 2px 7px;">24/7</span>
+                            </button>
+                        </li>
+
+                        <li class="nav-item">
+                            <button class="nav-gold-link d-flex justify-content-between align-items-center" data-bs-toggle="offcanvas" data-bs-target="#notificationsOffcanvas">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="fa-regular fa-bell text-warning"></i>
+                                    <span>Notifications</span>
+                                </div>
+                                <span class="badge bg-danger rounded-pill px-2 py-1" style="font-size: 10px;">3</span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Bottom Sidebar Engraving -->
+                <div class="sidebar-engraving">
+                    <i class="fa-solid fa-building-columns"></i>
+                    <div class="fw-bold" style="font-size: 11px; letter-spacing: 1px; color: #f59e0b; text-transform: uppercase;">Better Education</div>
+                    <div class="text-white-50" style="font-size: 10px;">Brighter Future</div>
+                </div>
+            </div>
+
+            <!-- MAIN WORKSPACE -->
+            <div class="col-12 col-md-9 col-lg-10 workspace-content">
+                
+                <!-- TAB 1: EXECUTIVE DASHBOARD -->
+                <div id="tab-dashboard" class="tab-pane-content">
+                    
+                    <!-- Campus Hero Showcase Banner -->
+                    <div class="campus-hero-banner">
+                        <div class="row g-0 align-items-center">
+                            
+                            <div class="col-lg-7 p-4 text-white">
+                                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                                    <span class="badge px-3 py-1 rounded-pill small fw-bold" style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #fbbf24;">
+                                        <i class="fa-solid fa-building-columns"></i> Affiliated with BISE &amp; HEC
+                                    </span>
+                                    <span class="badge px-3 py-1 rounded-pill small fw-bold" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4);">
+                                        <i class="fa-solid fa-circle-check me-1"></i> Dual-Tier Active
+                                    </span>
+                                    <span class="badge px-3 py-1 rounded-pill small fw-bold" style="background: rgba(255, 255, 255, 0.08); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.15);">
+                                        <i class="fa-regular fa-clock text-warning me-1"></i>
+                                        <span id="bannerClock">10:45 AM</span>
+                                    </span>
+                                </div>
+
+                                <h2 class="fw-bold mb-1 text-white" style="letter-spacing: -0.5px;">Punjab Group of Colleges • Multan</h2>
+                                <p class="mb-3 small text-white-50" style="max-width: 600px; line-height: 1.6;">
+                                    Premier institutional campus for Intermediate (F.Sc Pre-Med/Pre-Eng, ICS, I.Com) and Undergraduate BS Degree Programs.
+                                </p>
+                                
+                                <div class="d-flex flex-wrap gap-2">
+                                    <button onclick="switchTab('live-monitor')" class="btn btn-warning btn-sm fw-bold px-3 py-2 rounded-3 text-dark shadow-sm">
+                                        <i class="fa-solid fa-tower-broadcast fa-beat me-1 text-danger"></i> Live Campus Duty Monitor
+                                    </button>
+                                    <button onclick="switchTab('student-desk')" class="btn btn-outline-warning btn-sm fw-bold px-3 py-2 rounded-3 text-white">
+                                        <i class="fa-solid fa-user-graduate me-1"></i> Student Search Desk
+                                    </button>
+                                    <button onclick="switchTab('attendance-desk')" class="btn btn-outline-light btn-sm fw-semibold px-3 py-2 rounded-3 text-white-50">
+                                        <i class="fa-solid fa-clipboard-user me-1 text-warning"></i> Digital Register
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-5 p-3">
+                                <div class="rounded-4 overflow-hidden shadow-lg border border-warning" style="background: #060e22;">
+                                    <img src="app/static/img/campus_default.svg" alt="Official Campus Facade" class="w-100 d-block" style="min-height: 190px; max-height: 220px; object-fit: cover;">
+                                    <div class="p-2 px-3 d-flex justify-content-between align-items-center" style="background: #08122c;">
+                                        <small class="text-warning fw-bold">Official Campus Facade</small>
+                                        <small class="text-white-50">PGC-GGC Multan</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- 1B. LIVE CAMPUS PULSE QUICK ACCESS CARD -->
+                    <div class="card-navy-glass mb-4 p-3 rounded-4" style="border: 1px solid rgba(245, 158, 11, 0.35); background: linear-gradient(135deg, rgba(10, 21, 48, 0.95) 0%, rgba(6, 13, 31, 0.95) 100%);">
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div style="width: 46px; height: 46px; border-radius: 12px; background: rgba(34, 197, 94, 0.15); border: 1.5px solid rgba(34, 197, 94, 0.4); display: flex; align-items: center; justify-content: center; color: #4ade80; font-size: 20px;">
+                                    <i class="fa-solid fa-tower-broadcast fa-beat"></i>
+                                </div>
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <h6 class="fw-bold text-white mb-0" style="font-size: 15px;">Live Campus Faculty &amp; Student Activity Monitor</h6>
+                                        <span class="badge rounded-pill" style="background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); font-size: 9.5px; padding: 2px 8px;">
+                                            <i class="fa-solid fa-circle fa-beat me-1" style="font-size: 7px;"></i>ACTIVE DUTY
+                                        </span>
+                                    </div>
+                                    <small class="text-white-50" style="font-size: 11.5px;">
+                                        Admin Eye: Track in real-time which teacher is in what room, ongoing lectures, recess breaks, and student locations.
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <button onclick="switchTab('live-monitor')" class="btn btn-sm btn-primary fw-bold px-3 py-2 rounded-3 text-white shadow-sm d-flex align-items-center gap-2">
+                                    <i class="fa-solid fa-eye"></i>
+                                    <span>Launch Live Monitor</span>
+                                    <i class="fa-solid fa-arrow-right small"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. HIGH-IMPACT KPI METRICS (NAVY & GOLD) -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-6 col-xl-3">
+                            <div class="card-kpi-navy h-100">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="text-white-50 small fw-bold text-uppercase" style="font-size: 11px;">Enrolled Students</div>
+                                        <div class="fs-3 fw-bold text-white mt-1">1,480</div>
+                                    </div>
+                                    <div class="icon-kpi-gold"><i class="fa-solid fa-user-graduate"></i></div>
+                                </div>
+                                <div class="d-flex gap-1 mt-2">
+                                    <span class="badge" style="background: rgba(255,255,255,0.06); color: #cbd5e1; font-size: 10px;">Inter: 820</span>
+                                    <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; font-size: 10px;">BS: 660</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-xl-3">
+                            <div class="card-kpi-navy h-100">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="text-white-50 small fw-bold text-uppercase" style="font-size: 11px;">Faculty On Duty</div>
+                                        <div class="fs-3 fw-bold text-white mt-1">48 / 52</div>
+                                    </div>
+                                    <div class="icon-kpi-gold"><i class="fa-solid fa-chalkboard-user"></i></div>
+                                </div>
+                                <div class="d-flex gap-1 mt-2">
+                                    <span class="badge" style="background: rgba(34, 197, 94, 0.2); color: #4ade80; font-size: 10px;">34 Lectures Active</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-xl-3">
+                            <div class="card-kpi-navy h-100">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="text-white-50 small fw-bold text-uppercase" style="font-size: 11px;">Fee Recovery</div>
+                                        <div class="fs-3 fw-bold text-white mt-1">PKR 14.8M</div>
+                                    </div>
+                                    <div class="icon-kpi-gold"><i class="fa-solid fa-receipt"></i></div>
+                                </div>
+                                <div class="d-flex gap-1 mt-2">
+                                    <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-size: 10px;">91.4% Cleared</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-xl-3">
+                            <div class="card-kpi-navy h-100">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="text-white-50 small fw-bold text-uppercase" style="font-size: 11px;">Attendance Today</div>
+                                        <div class="fs-3 fw-bold text-white mt-1">94.2%</div>
+                                    </div>
+                                    <div class="icon-kpi-gold"><i class="fa-regular fa-calendar-check"></i></div>
+                                </div>
+                                <div class="d-flex gap-1 mt-2">
+                                    <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; font-size: 10px;">Register Verified</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. RECENT CAMPUS ALERTS -->
+                    <div class="row g-3">
+                        <div class="col-lg-6">
+                            <div class="card-navy-glass h-100">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="fw-bold text-white mb-0"><i class="fa-solid fa-circle-exclamation text-danger me-2"></i>Short Attendance Debarred Notice</h6>
+                                    <span class="badge bg-danger px-2 py-1" style="font-size: 10px;">HEC / BISE Policy</span>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-sm text-white small mb-0">
+                                        <thead><tr class="text-warning"><th>Roll No</th><th>Student Name</th><th>Subject</th><th>Attended</th></tr></thead>
+                                        <tbody>
+                                            <tr><td>BSCS-22-19</td><td>Bilal Qureshi</td><td>Operating Systems</td><td><span class="badge bg-danger">58.3%</span></td></tr>
+                                            <tr><td>FSC-23-44</td><td>Ali Raza</td><td>Organic Chemistry</td><td><span class="badge bg-danger">61.0%</span></td></tr>
+                                            <tr><td>ICS-23-12</td><td>Usman Shahid</td><td>Physics Lab</td><td><span class="badge bg-danger">64.5%</span></td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="card-navy-glass h-100">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="fw-bold text-white mb-0"><i class="fa-solid fa-clock text-warning me-2"></i>Current Period Schedule Today</h6>
+                                    <span class="badge bg-warning text-dark px-2 py-1" style="font-size: 10px;" id="currentPeriodBadge">Period 3 Active</span>
+                                </div>
+                                <p class="small text-white-50 mb-2">College Bell Timings (Monday to Friday):</p>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="badge bg-secondary p-2">P1: 08:30 - 09:20 AM</span>
+                                    <span class="badge bg-secondary p-2">P2: 09:25 - 10:15 AM</span>
+                                    <span class="badge bg-warning text-dark p-2 fw-bold">P3: 10:20 - 11:10 AM (NOW)</span>
+                                    <span class="badge bg-info text-dark p-2">Recess: 11:10 - 11:40 AM</span>
+                                    <span class="badge bg-secondary p-2">P4: 11:45 - 12:35 PM</span>
+                                    <span class="badge bg-secondary p-2">P5: 12:40 - 01:30 PM</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- TAB 2: LIVE CAMPUS DUTY & ACTIVITY MONITOR (STAR FEATURE) -->
+                <div id="tab-live-monitor" class="tab-pane-content" style="display: none;">
+                    
+                    <!-- 1. LIVE RADAR HEADER -->
+                    <div class="campus-hero-banner p-3 p-sm-4 mb-4" style="background-image: linear-gradient(135deg, rgba(6, 14, 34, 0.95) 0%, rgba(13, 27, 62, 0.90) 100%), url('app/static/img/campus_default.svg');">
+                        <div class="row align-items-center g-3">
+                            <div class="col-lg-8">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <span class="pulse-dot"></span>
+                                    <span class="badge px-3 py-1 rounded-pill fw-bold" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); font-size: 12px;">
+                                        LIVE CAMPUS RADAR ACTIVE
+                                    </span>
+                                    <span class="badge px-3 py-1 rounded-pill small fw-bold" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4);">
+                                        <i class="fa-solid fa-tower-broadcast me-1"></i> Surveillance Mode
+                                    </span>
+                                </div>
+                                <h3 class="fw-bold text-white mb-1">Live Campus Faculty &amp; Student Activity Monitor</h3>
+                                <p class="small text-white-50 mb-0">
+                                    Real-time administrative surveillance: Select any period below to instantly view where every teacher is teaching, which room they are in, or check ongoing student class locations.
+                                </p>
+                            </div>
+                            <div class="col-lg-4 text-lg-end">
+                                <div class="d-inline-block text-start p-3 rounded-3" style="background: rgba(6, 13, 31, 0.85); border: 1px solid rgba(245, 158, 11, 0.35);">
+                                    <div class="small text-white-50 fw-semibold">Master Campus Clock</div>
+                                    <div class="fs-4 fw-bold text-warning" id="liveRadarClock">10:45:12 AM</div>
+                                    <small class="text-white-50" id="liveRadarDate">Tuesday, Nov 03, 2026</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Period Switcher Pills -->
+                        <div class="mt-4 pt-3 border-top border-secondary">
+                            <div class="small fw-bold text-warning text-uppercase mb-2" style="letter-spacing: 0.5px;">
+                                <i class="fa-regular fa-clock me-1"></i> Switch Period To Inspect Duty Roster:
+                            </div>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button class="period-pill-btn" onclick="selectPeriod('p1', this)">Period 1 <small>(08:30-09:20)</small></button>
+                                <button class="period-pill-btn" onclick="selectPeriod('p2', this)">Period 2 <small>(09:25-10:15)</small></button>
+                                <button class="period-pill-btn active" onclick="selectPeriod('p3', this)">Period 3 <span class="badge bg-success ms-1" style="font-size: 9px;">NOW</span></button>
+                                <button class="period-pill-btn" onclick="selectPeriod('recess', this)">☕ Recess / Tea Break</button>
+                                <button class="period-pill-btn" onclick="selectPeriod('p4', this)">Period 4 <small>(11:45-12:35)</small></button>
+                                <button class="period-pill-btn" onclick="selectPeriod('p5', this)">Period 5 <small>(12:40-01:30)</small></button>
+                                <button class="period-pill-btn" onclick="selectPeriod('p6', this)">Period 6 <small>(01:35-02:25)</small></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. STUDENT LIVE LOCATION & TIMETABLE SEARCH BOX -->
+                    <div class="card-navy-glass mb-4" style="border: 1.5px solid rgba(245, 158, 11, 0.45); background: linear-gradient(135deg, rgba(10, 21, 48, 0.95) 0%, rgba(13, 27, 62, 0.90) 100%);">
+                        <div class="row align-items-center g-3">
+                            <div class="col-lg-6">
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <div class="icon-kpi-gold" style="width: 38px; height: 38px; font-size: 16px;"><i class="fa-solid fa-magnifying-glass-location"></i></div>
+                                    <h5 class="fw-bold text-white mb-0">Student Live Location &amp; Timetable Tracker</h5>
+                                </div>
+                                <p class="small text-white-50 mb-0">Type any student's name or roll number to see where they are sitting right now, their teacher, room, and daily schedule.</p>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="input-group">
+                                    <input type="text" id="studentSearchQuery" class="form-control text-white" placeholder="Try 'BSCS-22-01', 'FSC-23-05', or 'Ayesha'..." style="background: #060e22; border-color: #f59e0b; padding: 12px 16px;">
+                                    <button class="btn btn-primary fw-bold px-4" onclick="searchStudentLocation()">
+                                        <i class="fa-solid fa-radar me-1"></i> Locate Student
+                                    </button>
+                                </div>
+                                <div class="mt-2 d-flex flex-wrap gap-2 align-items-center">
+                                    <small class="text-white-50">Quick demo profiles:</small>
+                                    <button class="badge bg-secondary border-0" onclick="quickFillStudent('BSCS-22-01')">Ayesha Khan (BSCS-22-01)</button>
+                                    <button class="badge bg-secondary border-0" onclick="quickFillStudent('FSC-23-05')">Zainab Bibi (FSC-23-05)</button>
+                                    <button class="badge bg-secondary border-0" onclick="quickFillStudent('BSCS-22-04')">Hamza Tariq (BSCS-22-04)</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Result Box (Hidden by default, shown upon search) -->
+                        <div id="studentSearchResult" class="mt-4 pt-3 border-top border-secondary" style="display: none;">
+                            <!-- Injected dynamically via JS -->
+                        </div>
+                    </div>
+
+                    <!-- 3. DUTY KPI CARDS -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-6 col-md-4 col-xl-2">
+                            <div class="card-navy-glass p-3 text-center h-100" style="border-top: 3px solid #10b981;">
+                                <div class="small text-white-50 fw-semibold" style="font-size: 11px;">Active Classes</div>
+                                <div class="fs-4 fw-bold text-success mt-1" id="kpiClasses">28</div>
+                                <small class="text-white-50" style="font-size: 10px;">Ongoing Lectures</small>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4 col-xl-2">
+                            <div class="card-navy-glass p-3 text-center h-100" style="border-top: 3px solid #8b5cf6;">
+                                <div class="small text-white-50 fw-semibold" style="font-size: 11px;">Labs Running</div>
+                                <div class="fs-4 fw-bold text-info mt-1" id="kpiLabs">6</div>
+                                <small class="text-white-50" style="font-size: 10px;">Hands-on Practical</small>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4 col-xl-2">
+                            <div class="card-navy-glass p-3 text-center h-100" style="border-top: 3px solid #f59e0b;">
+                                <div class="small text-white-50 fw-semibold" style="font-size: 11px;">On Break</div>
+                                <div class="fs-4 fw-bold text-warning mt-1" id="kpiBreak">4</div>
+                                <small class="text-white-50" style="font-size: 10px;">Recess / Lunch</small>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4 col-xl-2">
+                            <div class="card-navy-glass p-3 text-center h-100" style="border-top: 3px solid #3b82f6;">
+                                <div class="small text-white-50 fw-semibold" style="font-size: 11px;">Free Faculty</div>
+                                <div class="fs-4 fw-bold text-primary mt-1" id="kpiFree">10</div>
+                                <small class="text-white-50" style="font-size: 10px;">In Staff Room</small>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4 col-xl-2">
+                            <div class="card-navy-glass p-3 text-center h-100" style="border-top: 3px solid #ef4444;">
+                                <div class="small text-white-50 fw-semibold" style="font-size: 11px;">On Leave</div>
+                                <div class="fs-4 fw-bold text-danger mt-1" id="kpiLeave">4</div>
+                                <small class="text-white-50" style="font-size: 10px;">Sanctioned Leave</small>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4 col-xl-2">
+                            <div class="card-navy-glass p-3 text-center h-100" style="border-top: 3px solid #f59e0b;">
+                                <div class="small text-white-50 fw-semibold" style="font-size: 11px;">Total Faculty</div>
+                                <div class="fs-4 fw-bold text-white mt-1">52</div>
+                                <small class="text-white-50" style="font-size: 10px;">College Roster</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. FACULTY DUTY ROSTER GRID -->
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <h5 class="fw-bold text-white mb-0">Campus Faculty Live Duty Assignments</h5>
+                            <span class="badge bg-warning text-dark px-2" id="gridPeriodName">Period 3 (10:20 - 11:10 AM)</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <select id="filterDept" class="form-select form-select-sm text-white" onchange="filterFacultyRoster()" style="background: #060e22; border-color: rgba(255,255,255,0.2); width: auto;">
+                                <option value="all">All Departments</option>
+                                <option value="Computer Science">Computer Science</option>
+                                <option value="Natural Sciences">Natural Sciences</option>
+                                <option value="Commerce">Commerce &amp; Finance</option>
+                                <option value="Humanities">Humanities &amp; English</option>
+                            </select>
+                            <select id="filterStatus" class="form-select form-select-sm text-white" onchange="filterFacultyRoster()" style="background: #060e22; border-color: rgba(255,255,255,0.2); width: auto;">
+                                <option value="all">All Statuses</option>
+                                <option value="LECTURE">In Lecture</option>
+                                <option value="LAB">In Lab</option>
+                                <option value="BREAK">On Break</option>
+                                <option value="FREE">Free Period</option>
+                                <option value="LEAVE">On Leave</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-3" id="facultyGridContainer">
+                        <!-- Cards dynamically rendered via JS -->
+                    </div>
+
+                </div>
+
+                <!-- TAB 3: STUDENTS & DESKS -->
+                <div id="tab-student-desk" class="tab-pane-content" style="display: none;">
+                    <div class="card-navy-glass mb-4">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                            <div>
+                                <h4 class="fw-bold text-white mb-1"><i class="fa-solid fa-user-graduate text-warning me-2"></i>Student Academic Desk &amp; Credentials</h4>
+                                <p class="small text-white-50 mb-0">Browse student profiles, issue roll number slips, and print academic credentials.</p>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover text-white align-middle">
+                                <thead>
+                                    <tr class="text-warning border-secondary">
+                                        <th>Roll Number</th>
+                                        <th>Student Name</th>
+                                        <th>Program / Tier</th>
+                                        <th>Attendance</th>
+                                        <th>Fee Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="fw-bold">BSCS-22-01</td>
+                                        <td>Ayesha Khan</td>
+                                        <td>BS Computer Science <span class="badge bg-primary">BS</span></td>
+                                        <td><span class="badge bg-success">96.5%</span></td>
+                                        <td><span class="badge bg-success">Paid (PKR 45,000)</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-warning py-0 px-2" onclick="quickFillStudent('BSCS-22-01'); switchTab('live-monitor');">Locate Live &rarr;</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">FSC-23-05</td>
+                                        <td>Zainab Bibi</td>
+                                        <td>F.Sc Pre-Medical <span class="badge bg-warning text-dark">Inter</span></td>
+                                        <td><span class="badge bg-success">91.2%</span></td>
+                                        <td><span class="badge bg-success">Paid</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-warning py-0 px-2" onclick="quickFillStudent('FSC-23-05'); switchTab('live-monitor');">Locate Live &rarr;</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">BSCS-22-04</td>
+                                        <td>Hamza Tariq</td>
+                                        <td>BS Computer Science <span class="badge bg-primary">BS</span></td>
+                                        <td><span class="badge bg-warning text-dark">78.0%</span></td>
+                                        <td><span class="badge bg-danger">PKR 12,000 Due</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-warning py-0 px-2" onclick="quickFillStudent('BSCS-22-04'); switchTab('live-monitor');">Locate Live &rarr;</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">ICS-23-14</td>
+                                        <td>Fatima Noor</td>
+                                        <td>ICS Physics <span class="badge bg-warning text-dark">Inter</span></td>
+                                        <td><span class="badge bg-success">89.4%</span></td>
+                                        <td><span class="badge bg-success">Paid</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-warning py-0 px-2" onclick="quickFillStudent('ICS-23-14'); switchTab('live-monitor');">Locate Live &rarr;</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: FACULTY DESK -->
+                <div id="tab-faculty-desk" class="tab-pane-content" style="display: none;">
+                    <div class="card-navy-glass mb-4">
+                        <h4 class="fw-bold text-white mb-3"><i class="fa-solid fa-chalkboard-user text-warning me-2"></i>Institutional Faculty Roster</h4>
+                        <div class="row g-3">
+                            <div class="col-md-6 col-lg-4">
+                                <div class="p-3 rounded-3" style="background: #060e22; border: 1px solid rgba(245, 158, 11, 0.3);">
+                                    <div class="d-flex align-items-center gap-3 mb-2">
+                                        <img src="app/static/avatars/prof_male.svg" width="46" height="46" class="rounded-circle border border-warning">
+                                        <div>
+                                            <div class="fw-bold text-white">Prof. Dr. Tariq Mahmood</div>
+                                            <small class="text-warning">Principal &amp; Prof. Computer Science</small>
+                                        </div>
+                                    </div>
+                                    <div class="small text-white-50">Qualification: Ph.D. in Software Engineering</div>
+                                    <div class="small text-white-50">Email: tariq@faculty.edu.pk</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="p-3 rounded-3" style="background: #060e22; border: 1px solid rgba(245, 158, 11, 0.3);">
+                                    <div class="d-flex align-items-center gap-3 mb-2">
+                                        <img src="app/static/avatars/prof_female.svg" width="46" height="46" class="rounded-circle border border-warning">
+                                        <div>
+                                            <div class="fw-bold text-white">Prof. Sadia Farooq</div>
+                                            <small class="text-warning">Associate Prof. Mathematics</small>
+                                        </div>
+                                    </div>
+                                    <div class="small text-white-50">Qualification: M.Phil Applied Mathematics</div>
+                                    <div class="small text-white-50">Email: sadia.math@college.edu.pk</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="p-3 rounded-3" style="background: #060e22; border: 1px solid rgba(245, 158, 11, 0.3);">
+                                    <div class="d-flex align-items-center gap-3 mb-2">
+                                        <img src="app/static/avatars/prof_male.svg" width="46" height="46" class="rounded-circle border border-warning">
+                                        <div>
+                                            <div class="fw-bold text-white">Prof. Dr. Irfan Hashmi</div>
+                                            <small class="text-warning">Head of Chemistry Dept</small>
+                                        </div>
+                                    </div>
+                                    <div class="small text-white-50">Qualification: Ph.D. Organic Chemistry</div>
+                                    <div class="small text-white-50">Email: irfan.chem@college.edu.pk</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 5: ATTENDANCE DESK -->
+                <div id="tab-attendance-desk" class="tab-pane-content" style="display: none;">
+                    <div class="card-navy-glass mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="fw-bold text-white mb-0"><i class="fa-regular fa-calendar-check text-warning me-2"></i>Daily Digital Attendance Register</h4>
+                            <span class="badge bg-success p-2">Session Verified: Today</span>
+                        </div>
+                        <p class="small text-white-50">Faculty can mark lecture presence in 1-click. Attendance below 75% triggers an automated BISE/HEC examination short attendance warning.</p>
+                        <div class="table-responsive">
+                            <table class="table text-white align-middle">
+                                <thead>
+                                    <tr class="text-warning">
+                                        <th>Roll Number</th>
+                                        <th>Student Name</th>
+                                        <th>Lecture Subject</th>
+                                        <th>Attendance Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>BSCS-22-01</td>
+                                        <td>Ayesha Khan</td>
+                                        <td>Database Systems (CS-301)</td>
+                                        <td><span class="badge bg-success px-3 py-2"><i class="fa-solid fa-check me-1"></i> Present</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>BSCS-22-04</td>
+                                        <td>Hamza Tariq</td>
+                                        <td>Database Systems (CS-301)</td>
+                                        <td><span class="badge bg-success px-3 py-2"><i class="fa-solid fa-check me-1"></i> Present</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>FSC-23-05</td>
+                                        <td>Zainab Bibi</td>
+                                        <td>Physics Mechanics (PHY-101)</td>
+                                        <td><span class="badge bg-success px-3 py-2"><i class="fa-solid fa-check me-1"></i> Present</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 6: FINANCE DESK -->
+                <div id="tab-finance-desk" class="tab-pane-content" style="display: none;">
+                    <div class="card-navy-glass mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="fw-bold text-white mb-0"><i class="fa-solid fa-file-invoice-dollar text-warning me-2"></i>Bank Fee Challan &amp; Cashflow Engine</h4>
+                            <span class="badge bg-warning text-dark p-2">Bank: HBL / NBP Branch</span>
+                        </div>
+                        <p class="small text-white-50">3-Fold Automated Bank Challan: Bank Copy, Accounts Office Copy &amp; Student Copy.</p>
+                        <div class="p-3 rounded-3" style="background: #060e22; border: 1.5px dashed #f59e0b;">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <h5 class="fw-bold text-warning mb-0">HBL University Branch Multan</h5>
+                                    <small class="text-white-50">A/C No: 0123-45678901-03 • Branch Code: 0452</small>
+                                </div>
+                                <span class="badge bg-success">Clearance Verified</span>
+                            </div>
+                            <hr class="border-secondary my-2">
+                            <div class="row g-2 small text-white">
+                                <div class="col-sm-4">Student: <strong>Ayesha Khan (BSCS-22-01)</strong></div>
+                                <div class="col-sm-4">Challan Ref: <strong>#INV-2026-0842</strong></div>
+                                <div class="col-sm-4 text-sm-end">Amount: <strong class="text-warning fs-6">PKR 45,000/-</strong></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 7: AI ASSISTANT -->
+                <div id="tab-ai-assistant" class="tab-pane-content" style="display: none;">
+                    <div class="card-navy-glass mb-4">
+                        <h4 class="fw-bold text-white mb-2"><i class="fa-solid fa-robot text-warning me-2"></i>AcademiaPro 24/7 AI Query Assistant</h4>
+                        <p class="small text-white-50 mb-3">Ask institutional questions, syllabus queries, timetable lookups, or policy inquiries in natural English or Roman Urdu.</p>
+                        
+                        <div id="aiChatBox" class="p-3 rounded-3 mb-3" style="background: #060e22; border: 1px solid rgba(255, 255, 255, 0.1); min-height: 220px; max-height: 350px; overflow-y: auto;">
+                            <div class="d-flex gap-2 mb-3">
+                                <div style="width: 32px; height: 32px; border-radius: 50%; background: #f59e0b; display: flex; align-items: center; justify-content: center; color: #fff;"><i class="fa-solid fa-robot"></i></div>
+                                <div class="p-2 px-3 rounded-3" style="background: #0a1530; border: 1px solid rgba(245, 158, 11, 0.3); font-size: 13px;">
+                                    Assalam-o-Alaikum! Main AcademiaPro ka AI Query Assistant hoon. Aap mujh se teachers ki duties, students ki live location, date sheet, ya fee challan ke baray mein kuch bhi pooch saktay hain.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <input type="text" id="aiUserInput" class="form-control text-white" placeholder="Maslan: 'Dr. Tariq is waqt kahan hain?' ya 'BSCS timetable'..." style="background: #060e22; border-color: #f59e0b; padding: 12px 16px;" onkeypress="if(event.key === 'Enter') sendAIMessage()">
+                            <button class="btn btn-primary fw-bold px-4" onclick="sendAIMessage()">
+                                <i class="fa-solid fa-paper-plane me-1"></i> Send
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <footer class="mt-5 pt-3 border-top border-secondary d-flex justify-content-between align-items-center flex-wrap gap-2 text-white-50" style="font-size: 11.5px;">
+                    <div>&copy; 2026 AcademiaPro Enterprise. All rights reserved.</div>
+                    <div class="d-flex gap-3">
+                        <a href="javascript:void(0)" class="text-white-50 text-decoration-none">Privacy Policy</a>
+                        <a href="javascript:void(0)" class="text-white-50 text-decoration-none">HEC Compliance</a>
+                        <a href="javascript:void(0)" class="text-white-50 text-decoration-none">System Support</a>
+                    </div>
+                </footer>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MOBILE OFFCANVAS DRAWER -->
+    <div class="offcanvas offcanvas-start text-white d-md-none" tabindex="-1" id="mobileNavDrawer" style="background: #050c1c; border-right: 1.5px solid rgba(245, 158, 11, 0.45); width: 280px;">
+        <div class="offcanvas-header border-bottom border-secondary p-3">
+            <div class="d-flex align-items-center gap-2">
+                <i class="fa-solid fa-graduation-cap brand-cap-icon" style="font-size: 22px;"></i>
+                <div>
+                    <div class="brand-title-text" style="font-size: 16px;">AcademiaPro</div>
+                    <div class="brand-subtitle-text" style="font-size: 9.5px;">Mobile ERP Portal</div>
+                </div>
+            </div>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body p-3">
+            <ul class="nav flex-column mb-auto">
+                <li class="nav-item mb-1"><button class="nav-gold-link active" onclick="switchTab('dashboard')" data-bs-dismiss="offcanvas"><i class="fa-solid fa-house"></i><span>Dashboard</span></button></li>
+                <li class="nav-item mb-1"><button class="nav-gold-link" onclick="switchTab('live-monitor')" data-bs-dismiss="offcanvas"><i class="fa-solid fa-tower-broadcast text-warning"></i><span>Live Duty Monitor</span></button></li>
+                <li class="nav-item mb-1"><button class="nav-gold-link" onclick="switchTab('student-desk')" data-bs-dismiss="offcanvas"><i class="fa-solid fa-user-graduate"></i><span>Students</span></button></li>
+                <li class="nav-item mb-1"><button class="nav-gold-link" onclick="switchTab('faculty-desk')" data-bs-dismiss="offcanvas"><i class="fa-solid fa-chalkboard-user"></i><span>Faculty</span></button></li>
+                <li class="nav-item mb-1"><button class="nav-gold-link" onclick="switchTab('attendance-desk')" data-bs-dismiss="offcanvas"><i class="fa-regular fa-calendar-check"></i><span>Attendance</span></button></li>
+                <li class="nav-item mb-1"><button class="nav-gold-link" onclick="switchTab('finance-desk')" data-bs-dismiss="offcanvas"><i class="fa-solid fa-file-invoice-dollar"></i><span>Finance &amp; Challans</span></button></li>
+                <li class="nav-item mb-1"><button class="nav-gold-link" onclick="switchTab('ai-assistant')" data-bs-dismiss="offcanvas"><i class="fa-solid fa-robot text-warning"></i><span>AI Assistant</span></button></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- MOBILE FIXED BOTTOM DOCK (ONE-THUMB EASY NAV) -->
+    <nav class="mobile-bottom-dock d-flex d-md-none justify-content-around align-items-center position-fixed bottom-0 start-0 end-0">
+        <button class="bottom-dock-btn active" id="bot-dashboard" onclick="switchTab('dashboard')">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </button>
+        <button class="bottom-dock-btn position-relative" id="bot-live-monitor" onclick="switchTab('live-monitor')">
+            <i class="fa-solid fa-tower-broadcast"></i>
+            <span>Live Duty</span>
+            <span class="position-absolute badge rounded-pill bg-success" style="font-size: 6px; top: 3px; right: 8px; width: 7px; height: 7px; padding: 0;"></span>
+        </button>
+        <button class="bottom-dock-btn" id="bot-student-desk" onclick="switchTab('student-desk')">
+            <i class="fa-solid fa-user-graduate"></i>
+            <span>Students</span>
+        </button>
+        <button class="bottom-dock-btn" id="bot-attendance-desk" onclick="switchTab('attendance-desk')">
+            <i class="fa-regular fa-calendar-check"></i>
+            <span>Attendance</span>
+        </button>
+        <button class="bottom-dock-btn" data-bs-toggle="offcanvas" data-bs-target="#mobileNavDrawer">
+            <i class="fa-solid fa-bars"></i>
+            <span>Menu</span>
+        </button>
+    </nav>
+
+    <!-- NOTIFICATIONS OFFCANVAS -->
+    <div class="offcanvas offcanvas-end text-white" tabindex="-1" id="notificationsOffcanvas" style="background: #071026; border-left: 1.5px solid #f59e0b; width: 340px;">
+        <div class="offcanvas-header border-bottom border-secondary">
+            <h6 class="offcanvas-title fw-bold text-white"><i class="fa-regular fa-bell text-warning me-2"></i>Campus Announcements</h6>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body p-3">
+            <div class="p-2 rounded-3 mb-2" style="background: #0d1b3e; border: 1px solid rgba(245, 158, 11, 0.3);">
+                <span class="badge bg-warning text-dark mb-1">EXAMINATIONS</span>
+                <div class="fw-bold small text-white">Mid-Term Date Sheet Published</div>
+                <small class="text-white-50">Students with 75% attendance are eligible for admit cards.</small>
+            </div>
+            <div class="p-2 rounded-3 mb-2" style="background: #0d1b3e; border: 1px solid rgba(239, 68, 68, 0.3);">
+                <span class="badge bg-danger mb-1">FINANCE</span>
+                <div class="fw-bold small text-white">Bank Challan Submission Cutoff</div>
+                <small class="text-white-50">HBL / NBP voucher deadline is Nov 10, 2026.</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Master Application State & Data Engine -->
+    <script>
+    // Live Faculty Mock Database
+    const facultyRosterData = [
+        { id: 1, name: "Prof. Dr. Tariq Mahmood", dept: "Computer Science", designation: "Principal & Professor", avatar: "prof_male.svg", status: "LECTURE", badgeClass: "duty-badge-lecture", class: "BSCS-5A (Semester 5)", subject: "Database Systems (CS-301)", room: "Room 204", note: "Teaching Relational Normalization" },
+        { id: 2, name: "Prof. Sadia Farooq", dept: "Natural Sciences", designation: "Associate Professor", avatar: "prof_female.svg", status: "LECTURE", badgeClass: "duty-badge-lecture", class: "F.Sc Pre-Eng (1st Year)", subject: "Calculus & Analytic Geometry", room: "Room 101", note: "Derivatives & Rate of Change" },
+        { id: 3, name: "Prof. Dr. Irfan Hashmi", dept: "Natural Sciences", designation: "HOD Chemistry", avatar: "prof_male.svg", status: "LAB", badgeClass: "duty-badge-break", class: "F.Sc Pre-Med (2nd Year)", subject: "Organic Chemistry Lab", room: "Chemistry Lab 2", note: "Conducting Esterification Practical" },
+        { id: 4, name: "Engr. Salman Bashir", dept: "Computer Science", designation: "Assistant Professor", avatar: "prof_male.svg", status: "LAB", badgeClass: "duty-badge-break", class: "BSCS-3B (Semester 3)", subject: "Data Structures Lab", room: "Software Lab 1", note: "Binary Search Trees Implementation" },
+        { id: 5, name: "Prof. Naila Jameel", dept: "Humanities", designation: "Senior Lecturer", avatar: "prof_female.svg", status: "FREE", badgeClass: "duty-badge-free", class: "None", subject: "English Composition", room: "Staff Room A", note: "Planning Next Week Syllabus" },
+        { id: 6, name: "Prof. Kamran Akram", dept: "Commerce", designation: "Lecturer Finance", avatar: "prof_male.svg", status: "BREAK", badgeClass: "duty-badge-break", class: "None", subject: "Financial Accounting", room: "Faculty Cafeteria", note: "Tea & Refreshment Break" },
+        { id: 7, name: "Prof. Rehana Kausar", dept: "Natural Sciences", designation: "Assistant Professor", avatar: "prof_female.svg", status: "LEAVE", badgeClass: "duty-badge-free", class: "None", subject: "Zoology & Genetics", room: "Off-Campus", note: "Approved Medical Leave" },
+        { id: 8, name: "Dr. Usman Qureshi", dept: "Computer Science", designation: "Assistant Professor", avatar: "prof_male.svg", status: "LECTURE", badgeClass: "duty-badge-lecture", class: "BSCS-7A (Semester 7)", subject: "Artificial Intelligence", room: "Room 305", note: "Heuristic Search Algorithms" }
+    ];
+
+    // Student Database for Instant Live Tracking
+    const studentDB = {
+        "BSCS-22-01": {
+            roll: "BSCS-22-01", name: "Ayesha Khan", program: "BS Computer Science (Semester 5)",
+            currentLocation: { status: "IN CLASS NOW", room: "Room 204", subject: "Database Systems (CS-301)", teacher: "Prof. Dr. Tariq Mahmood", activity: "Attending Relational Query Lecture in Room 204" },
+            attendance: { status: "Present", rate: "96.5%", today: "Present at 08:24 AM" },
+            schedule: [
+                { period: "P1 (08:30-09:20)", subject: "Object Oriented Programming", teacher: "Engr. Salman", room: "Room 202" },
+                { period: "P2 (09:25-10:15)", subject: "Digital Logic Design", teacher: "Dr. Usman", room: "Hardware Lab" },
+                { period: "P3 (10:20-11:10)", subject: "Database Systems", teacher: "Dr. Tariq Mahmood", room: "Room 204", isNow: true },
+                { period: "Recess (11:10-11:40)", subject: "Recess Break", teacher: "Free Time", room: "Student Cafeteria" },
+                { period: "P4 (11:45-12:35)", subject: "Probability & Statistics", teacher: "Prof. Sadia", room: "Room 201" },
+                { period: "P5 (12:40-01:30)", subject: "Database Systems Lab", teacher: "Engr. Salman", room: "Software Lab 1" }
+            ]
+        },
+        "FSC-23-05": {
+            roll: "FSC-23-05", name: "Zainab Bibi", program: "F.Sc Pre-Medical (Part 2)",
+            currentLocation: { status: "IN LAB NOW", room: "Chemistry Lab 2", subject: "Organic Chemistry Practical", teacher: "Prof. Dr. Irfan Hashmi", activity: "Performing Esterification Practical in Lab 2" },
+            attendance: { status: "Present", rate: "91.2%", today: "Present at 08:15 AM" },
+            schedule: [
+                { period: "P1 (08:30-09:20)", subject: "Biology Cell Division", teacher: "Prof. Rehana", room: "Room 104" },
+                { period: "P2 (09:25-10:15)", subject: "Physics Optics", teacher: "Prof. Tahir", room: "Room 102" },
+                { period: "P3 (10:20-11:10)", subject: "Chemistry Practical", teacher: "Dr. Irfan Hashmi", room: "Chemistry Lab 2", isNow: true },
+                { period: "Recess (11:10-11:40)", subject: "Recess Break", teacher: "Free Time", room: "Girls Common Room" },
+                { period: "P4 (11:45-12:35)", subject: "English Grammar", teacher: "Prof. Naila", room: "Room 101" }
+            ]
+        },
+        "BSCS-22-04": {
+            roll: "BSCS-22-04", name: "Hamza Tariq", program: "BS Computer Science (Semester 5)",
+            currentLocation: { status: "IN CLASS NOW", room: "Room 204", subject: "Database Systems (CS-301)", teacher: "Prof. Dr. Tariq Mahmood", activity: "Attending Lecture in Room 204" },
+            attendance: { status: "Present", rate: "78.0%", today: "Present at 08:31 AM" },
+            schedule: [
+                { period: "P1 (08:30-09:20)", subject: "OOP", teacher: "Engr. Salman", room: "Room 202" },
+                { period: "P2 (09:25-10:15)", subject: "DLD", teacher: "Dr. Usman", room: "Hardware Lab" },
+                { period: "P3 (10:20-11:10)", subject: "Database Systems", teacher: "Dr. Tariq Mahmood", room: "Room 204", isNow: true }
+            ]
+        }
+    };
+
+    // Tab Switching Function
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-pane-content').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.nav-gold-link').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.bottom-dock-btn').forEach(el => el.classList.remove('active'));
+
+        const target = document.getElementById('tab-' + tabId);
+        if (target) target.style.display = 'block';
+
+        const sideBtn = document.getElementById('side-' + tabId);
+        if (sideBtn) sideBtn.classList.add('active');
+
+        const botBtn = document.getElementById('bot-' + tabId);
+        if (botBtn) botBtn.classList.add('active');
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Period Switcher
+    function selectPeriod(pKey, btn) {
+        document.querySelectorAll('.period-pill-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const pLabels = {
+            'p1': 'Period 1 (08:30 - 09:20 AM)',
+            'p2': 'Period 2 (09:25 - 10:15 AM)',
+            'p3': 'Period 3 (10:20 - 11:10 AM)',
+            'recess': '☕ Recess / Tea Break (11:10 - 11:40 AM)',
+            'p4': 'Period 4 (11:45 - 12:35 PM)',
+            'p5': 'Period 5 (12:40 - 01:30 PM)',
+            'p6': 'Period 6 (01:35 - 02:25 PM)'
+        };
+
+        const gridLabel = document.getElementById('gridPeriodName');
+        if (gridLabel) gridLabel.innerText = pLabels[pKey] || pKey;
+
+        // If recess selected, update counters
+        if (pKey === 'recess') {
+            document.getElementById('kpiClasses').innerText = '0';
+            document.getElementById('kpiLabs').innerText = '0';
+            document.getElementById('kpiBreak').innerText = '48';
+            document.getElementById('kpiFree').innerText = '0';
+        } else {
+            document.getElementById('kpiClasses').innerText = '28';
+            document.getElementById('kpiLabs').innerText = '6';
+            document.getElementById('kpiBreak').innerText = '4';
+            document.getElementById('kpiFree').innerText = '10';
+        }
+
+        renderFacultyGrid(pKey);
+    }
+
+    // Render Faculty Grid
+    function renderFacultyGrid(period = 'p3', filterDept = 'all', filterStatus = 'all') {
+        const container = document.getElementById('facultyGridContainer');
+        if (!container) return;
+
+        let html = '';
+        facultyRosterData.forEach(f => {
+            if (filterDept !== 'all' && f.dept !== filterDept) return;
+            if (filterStatus !== 'all' && f.status !== filterStatus) return;
+
+            let dutyTitle = f.subject;
+            let dutyRoom = f.room;
+            let dutyStatus = f.status;
+            let badgeHtml = '';
+
+            if (period === 'recess') {
+                dutyTitle = "Recess / Refreshment";
+                dutyRoom = "Faculty Lounge / Cafeteria";
+                dutyStatus = "ON BREAK";
+                badgeHtml = '<span class="duty-badge-break"><i class="fa-solid fa-mug-hot"></i> Recess</span>';
+            } else if (f.status === 'LECTURE') {
+                badgeHtml = '<span class="duty-badge-lecture"><i class="fa-solid fa-chalkboard-user"></i> Lecture Active</span>';
+            } else if (f.status === 'LAB') {
+                badgeHtml = '<span class="duty-badge-break"><i class="fa-solid fa-flask"></i> Lab Session</span>';
+            } else if (f.status === 'BREAK') {
+                badgeHtml = '<span class="duty-badge-break"><i class="fa-solid fa-mug-hot"></i> Break</span>';
+            } else if (f.status === 'FREE') {
+                badgeHtml = '<span class="duty-badge-free"><i class="fa-solid fa-book-open"></i> Free Period</span>';
+            } else if (f.status === 'LEAVE') {
+                badgeHtml = '<span class="badge bg-danger"><i class="fa-solid fa-user-xmark"></i> On Leave</span>';
+            }
+
+            html += `
+                <div class="col-md-6 col-xl-3">
+                    <div class="faculty-duty-card">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="app/static/avatars/${f.avatar}" width="38" height="38" class="rounded-circle border border-warning">
+                                <div>
+                                    <div class="fw-bold text-white small" style="line-height: 1.1;">${f.name}</div>
+                                    <small class="text-white-50" style="font-size: 10px;">${f.dept}</small>
+                                </div>
+                            </div>
+                            ${badgeHtml}
+                        </div>
+                        <div class="p-2 rounded-3 mt-2" style="background: rgba(6, 13, 31, 0.75); border: 1px solid rgba(255,255,255,0.08);">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="text-warning small fw-bold" style="font-size: 11.5px;">${dutyTitle}</span>
+                                <span class="room-pill">${dutyRoom}</span>
+                            </div>
+                            <div class="text-white-50 small" style="font-size: 10.5px;">Class: <strong class="text-white">${f.class}</strong></div>
+                            <div class="text-white-50 small" style="font-size: 10px;">Activity: ${f.note}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+    }
+
+    function filterFacultyRoster() {
+        const dept = document.getElementById('filterDept').value;
+        const status = document.getElementById('filterStatus').value;
+        const activePeriodBtn = document.querySelector('.period-pill-btn.active');
+        const periodKey = activePeriodBtn ? 'p3' : 'p3';
+        renderFacultyGrid(periodKey, dept, status);
+    }
+
+    // Student Search / Location Tracker
+    function quickFillStudent(roll) {
+        document.getElementById('studentSearchQuery').value = roll;
+        searchStudentLocation();
+    }
+
+    function searchStudentLocation() {
+        const query = document.getElementById('studentSearchQuery').value.trim().toUpperCase();
+        const resultContainer = document.getElementById('studentSearchResult');
+        if (!query) {
+            alert("Please enter a student name or roll number.");
+            return;
+        }
+
+        let matched = null;
+        for (const [key, val] of Object.entries(studentDB)) {
+            if (key.includes(query) || val.name.toUpperCase().includes(query)) {
+                matched = val;
+                break;
+            }
+        }
+
+        if (!matched) {
+            resultContainer.style.display = 'block';
+            resultContainer.innerHTML = `
+                <div class="alert alert-warning border-0 small mb-0 rounded-3 text-dark fw-semibold">
+                    <i class="fa-solid fa-circle-exclamation me-1"></i> No student found matching "${query}". Try searching 'BSCS-22-01', 'FSC-23-05', or 'Ayesha'.
+                </div>
+            `;
+            return;
+        }
+
+        let scheduleRows = '';
+        matched.schedule.forEach(s => {
+            scheduleRows += `
+                <tr class="${s.isNow ? 'table-warning fw-bold text-dark' : 'text-white'}">
+                    <td>${s.period}</td>
+                    <td>${s.subject}</td>
+                    <td>${s.teacher}</td>
+                    <td><span class="badge ${s.isNow ? 'bg-dark text-warning' : 'bg-secondary'}">${s.room}</span></td>
+                    <td>${s.isNow ? '<span class="badge bg-success"><i class="fa-solid fa-circle-play me-1"></i>CLASS NOW</span>' : '<span class="text-muted small">Scheduled</span>'}</td>
+                </tr>
+            `;
+        });
+
+        resultContainer.style.display = 'block';
+        resultContainer.innerHTML = `
+            <div class="p-3 rounded-3" style="background: rgba(6, 13, 31, 0.95); border: 1.5px solid #f59e0b;">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <img src="app/static/avatars/girl.svg" width="48" height="48" class="rounded-circle border border-warning">
+                        <div>
+                            <h5 class="fw-bold text-white mb-0">${matched.name}</h5>
+                            <small class="text-warning">${matched.roll} • ${matched.program}</small>
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-success p-2 fs-6"><i class="fa-solid fa-location-dot me-1"></i> ${matched.currentLocation.status}</span>
+                        <div class="small text-white-50 mt-1">Room: <strong class="text-warning">${matched.currentLocation.room}</strong></div>
+                    </div>
+                </div>
+
+                <!-- Live Location Alert Box -->
+                <div class="p-2 px-3 rounded-2 mb-3 d-flex align-items-center justify-content-between flex-wrap gap-2" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35);">
+                    <div class="text-success small fw-bold">
+                        <i class="fa-solid fa-chalkboard-user me-2"></i> ${matched.currentLocation.activity} (Instructor: ${matched.currentLocation.teacher})
+                    </div>
+                    <span class="badge bg-primary">Daily Attendance: ${matched.attendance.rate}</span>
+                </div>
+
+                <div class="small fw-bold text-white mb-2"><i class="fa-regular fa-calendar-days text-warning me-1"></i> Today's Complete Daily Timetable:</div>
+                <div class="table-responsive">
+                    <table class="table table-sm text-white small mb-0">
+                        <thead><tr class="text-warning"><th>Period</th><th>Course</th><th>Instructor</th><th>Room</th><th>Status</th></tr></thead>
+                        <tbody>${scheduleRows}</tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }
+
+    // AI Assistant Chat
+    function sendAIMessage() {
+        const input = document.getElementById('aiUserInput');
+        const box = document.getElementById('aiChatBox');
+        const msg = input.value.trim();
+        if (!msg) return;
+
+        // User message
+        box.innerHTML += `
+            <div class="d-flex gap-2 justify-content-end mb-3">
+                <div class="p-2 px-3 rounded-3 text-white" style="background: #f59e0b; font-size: 13px;">${msg}</div>
+            </div>
+        `;
+        input.value = '';
+        box.scrollTop = box.scrollHeight;
+
+        // Generate response
+        setTimeout(() => {
+            let reply = "Aap ki inquiry register ho chuki hai.";
+            const low = msg.toLowerCase();
+            if (low.includes("tariq") || low.includes("teacher") || low.includes("kahan")) {
+                reply = "Prof. Dr. Tariq Mahmood is waqt **Room 204** mein BSCS-5A ka Database Systems lecture le rahay hain. Unka lecture 11:10 AM tak chalay ga.";
+            } else if (low.includes("ayesha") || low.includes("student") || low.includes("bscs-22-01")) {
+                reply = "Student Ayesha Khan (Roll No: BSCS-22-01) is waqt **Room 204** mein Dr. Tariq Mahmood ki class attend kar rahi hain. Unki attendance 96.5% hai.";
+            } else if (low.includes("fee") || low.includes("challan")) {
+                reply = "HBL aur NBP fee challan jama karwane ki aakhri tareekh **Nov 10, 2026** hai.";
+            } else if (low.includes("exam") || low.includes("date sheet")) {
+                reply = "Mid-Term exams ki date sheet publish ho chuki hai. Kam az kam 75% attendance walay students admit card download kar saktay hain.";
+            }
+
+            box.innerHTML += `
+                <div class="d-flex gap-2 mb-3">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: #f59e0b; display: flex; align-items: center; justify-content: center; color: #fff;"><i class="fa-solid fa-robot"></i></div>
+                    <div class="p-2 px-3 rounded-3" style="background: #0a1530; border: 1px solid rgba(245, 158, 11, 0.3); font-size: 13px;">${reply}</div>
+                </div>
+            `;
+            box.scrollTop = box.scrollHeight;
+        }, 600);
+    }
+
+    // Master Live Clock
+    function updateMasterClock() {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const shortTimeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        const bClock = document.getElementById('bannerClock');
+        if (bClock) bClock.innerText = shortTimeStr;
+
+        const rClock = document.getElementById('liveRadarClock');
+        if (rClock) rClock.innerText = timeStr;
+    }
+    setInterval(updateMasterClock, 1000);
+
+    // Initial Load
+    document.addEventListener("DOMContentLoaded", () => {
+        updateMasterClock();
+        renderFacultyGrid('p3');
+    });
+    </script>
+</body>
+</html>

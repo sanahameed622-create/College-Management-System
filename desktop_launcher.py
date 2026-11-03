@@ -19,13 +19,25 @@ def is_server_running(host="127.0.0.1", port=APP_PORT):
         s.settimeout(0.5)
         return s.connect_ex((host, port)) == 0
 
+def get_local_ip():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return "127.0.0.1"
+
 def start_flask_server():
     base_dir = os.path.dirname(os.path.abspath(__file__))
     app_dir = os.path.join(base_dir, "app")
     sys.path.insert(0, app_dir)
     from app import app
+    local_ip = get_local_ip()
     print(f"[*] Starting AcademiaPro Engine on {APP_URL}...")
-    app.run(host="127.0.0.1", port=APP_PORT, debug=False, use_reloader=False)
+    print(f"[*] Mobile Phone / LAN Access URL: http://{local_ip}:{APP_PORT}")
+    app.run(host="0.0.0.0", port=APP_PORT, debug=False, use_reloader=False)
 
 def launch_native_window():
     # Wait for Flask to come online

@@ -26,8 +26,9 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             min-height: 100vh;
-            background: linear-gradient(to right, rgba(6, 14, 34, 0.18) 0%, rgba(6, 14, 34, 0.40) 50%, rgba(4, 10, 24, 0.88) 85%, rgba(4, 10, 24, 0.95) 100%),
-                        url('{{ college.campus_image_url or "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1920&q=80" }}') center/cover no-repeat fixed;
+            background-color: #060e22;
+            background: linear-gradient(to right, rgba(6, 14, 34, 0.25) 0%, rgba(6, 14, 34, 0.50) 50%, rgba(4, 10, 24, 0.88) 85%, rgba(4, 10, 24, 0.96) 100%),
+                        url('{{ college.campus_image_url or "/static/img/campus_default.svg" }}') center/cover no-repeat;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -35,6 +36,48 @@
             color: #ffffff;
             position: relative;
             overflow-x: hidden;
+        }
+
+        /* Responsive Mobile & Tablet Optimizations */
+        @media (max-width: 991.98px) {
+            body {
+                background: linear-gradient(180deg, rgba(6, 14, 34, 0.90) 0%, rgba(10, 21, 48, 0.94) 50%, #060e22 100%),
+                            url('{{ college.campus_image_url or "/static/img/campus_default.svg" }}') center/cover no-repeat;
+                padding: 20px 12px;
+                display: block;
+            }
+            .ambient-orb {
+                display: none !important;
+            }
+            .main-hero-container {
+                padding: 0 4px;
+            }
+            .login-card-gold {
+                padding: 24px 18px !important;
+                border-radius: 18px !important;
+                margin-bottom: 24px;
+            }
+            .hero-left-headline {
+                font-size: clamp(24px, 6vw, 32px) !important;
+                margin-bottom: 8px;
+            }
+            .custom-dark-control {
+                font-size: 16px !important; /* Prevents auto-zoom on mobile iOS & Android */
+                padding: 12px 14px 12px 42px !important;
+                min-height: 48px;
+            }
+            .btn-gold-login, .btn-biometric-gold {
+                min-height: 48px;
+                font-size: 15px;
+            }
+            .role-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            .role-chip-btn {
+                padding: 10px 8px;
+                font-size: 12.5px;
+            }
         }
 
         /* Ambient Gold/Blue Orbs */
@@ -393,8 +436,8 @@
         
         <div class="row align-items-center justify-content-between g-4">
             
-            <!-- LEFT COLUMN: CAMPUS HEADLINE & HIGHLIGHTS (OPEN & CLEAR VIEW OF CAMPUS BACKGROUND) -->
-            <div class="col-lg-5 col-xl-5 text-white pe-lg-3">
+            <!-- LEFT COLUMN: CAMPUS HEADLINE & HIGHLIGHTS -->
+            <div class="col-lg-5 col-xl-5 text-white pe-lg-3 order-2 order-lg-1">
                 <div class="top-brand-logo mb-3">
                     <i class="fa-solid fa-graduation-cap"></i>
                     <div>
@@ -447,8 +490,8 @@
                 </div>
             </div>
 
-            <!-- RIGHT COLUMN: FLOATING DARK NAVY & GOLD LOGIN CARD (RIGHT-ALIGNED) -->
-            <div class="col-lg-5 col-xl-4 ms-lg-auto">
+            <!-- RIGHT COLUMN: FLOATING DARK NAVY & GOLD LOGIN CARD -->
+            <div class="col-lg-5 col-xl-4 ms-lg-auto order-1 order-lg-2">
                 <div class="login-card-gold">
                     
                     <div class="card-inner-brand">

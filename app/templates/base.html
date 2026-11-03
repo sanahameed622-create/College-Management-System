@@ -424,6 +424,62 @@
             background: rgba(245, 158, 11, 0.2);
             color: #ffffff;
         }
+
+        /* Mobile Responsive Bottom Dock & Padding */
+        .mobile-bottom-dock {
+            background: rgba(6, 13, 31, 0.96) !important;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-top: 1.5px solid rgba(245, 158, 11, 0.35);
+            padding: 7px 10px;
+            z-index: 1045;
+            box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.7);
+        }
+
+        .bottom-dock-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 10.5px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            min-width: 54px;
+        }
+
+        .bottom-dock-btn i {
+            font-size: 17px;
+            margin-bottom: 2px;
+        }
+
+        .bottom-dock-btn.active, .bottom-dock-btn:hover {
+            color: #f59e0b;
+        }
+
+        @media (max-width: 767.98px) {
+            .workspace-content {
+                padding: 16px 14px 90px 14px !important;
+            }
+            .topbar-header {
+                padding: 10px 14px;
+            }
+            .brand-title-text {
+                font-size: 16px;
+            }
+            .brand-subtitle-text {
+                font-size: 9.5px;
+            }
+            .user-capsule {
+                padding: 3px 8px;
+            }
+            .brand-cap-icon {
+                font-size: 22px;
+            }
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -432,14 +488,19 @@
     <!-- TOPBAR NAVIGATION BAR -->
     <header class="topbar-header d-flex align-items-center justify-content-between">
         
-        <!-- Left Brand Logo -->
-        <a href="{{ url_for('dashboard') }}" class="brand-logo-wrap">
-            <i class="fa-solid fa-graduation-cap brand-cap-icon"></i>
-            <div>
-                <div class="brand-title-text">AcademiaPro</div>
-                <div class="brand-subtitle-text">College Management System</div>
-            </div>
-        </a>
+        <!-- Left Brand Logo & Mobile Toggle -->
+        <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-sm text-warning d-md-none border-0 p-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileNavDrawer" aria-controls="mobileNavDrawer" title="Open Navigation Menu" style="font-size: 20px;">
+                <i class="fa-solid fa-bars-staggered"></i>
+            </button>
+            <a href="{{ url_for('dashboard') }}" class="brand-logo-wrap">
+                <i class="fa-solid fa-graduation-cap brand-cap-icon"></i>
+                <div>
+                    <div class="brand-title-text">AcademiaPro</div>
+                    <div class="brand-subtitle-text">College Management System</div>
+                </div>
+            </a>
+        </div>
 
         <!-- Center Search Input Pill -->
         <div class="search-pill-container d-none d-md-block">
@@ -509,8 +570,8 @@
     <div class="container-fluid p-0">
         <div class="row g-0">
             
-            <!-- LEFT SIDEBAR -->
-            <div class="col-md-3 col-lg-2 sidebar-navy">
+            <!-- LEFT SIDEBAR (DESKTOP) -->
+            <div class="d-none d-md-flex col-md-3 col-lg-2 sidebar-navy">
                 <div>
                     <ul class="nav flex-column mb-auto">
                         <li class="nav-item">
@@ -519,6 +580,19 @@
                                 <span>Dashboard</span>
                             </a>
                         </li>
+
+                        <!-- Live Campus Duty & Activity Monitor (Admin/Faculty Real-Time Eye) -->
+                        {% if logged_role != 'Student' %}
+                        <li class="nav-item">
+                            <a href="{{ url_for('campus_live_monitor') }}" class="nav-gold-link {% if request.path == '/campus-live-monitor' %}active{% endif %}" style="position: relative;">
+                                <i class="fa-solid fa-tower-broadcast text-warning"></i>
+                                <span>Live Duty Monitor</span>
+                                <span class="badge rounded-pill ms-auto" style="background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); font-size: 9px; padding: 2px 6px;">
+                                    <i class="fa-solid fa-circle fa-beat me-1" style="font-size: 6px;"></i>LIVE
+                                </span>
+                            </a>
+                        </li>
+                        {% endif %}
                         
                         <!-- AI Query Assistant (Always Prominent & Accessible For All Roles) -->
                         <li class="nav-item">
@@ -641,7 +715,7 @@
             </div>
 
             <!-- MAIN WORKSPACE -->
-            <div class="col-md-9 col-lg-10 workspace-content">
+            <div class="col-12 col-md-9 col-lg-10 workspace-content">
                 
                 <!-- Flash Messages -->
                 {% with messages = get_flashed_messages(with_categories=true) %}
@@ -809,6 +883,176 @@
             </div>
         </div>
     </div>
+
+    <!-- MOBILE NAVIGATION OFFCANVAS DRAWER -->
+    <div class="offcanvas offcanvas-start text-white d-md-none" tabindex="-1" id="mobileNavDrawer" aria-labelledby="mobileNavDrawerLabel" style="background: #050c1c; border-right: 1.5px solid rgba(245, 158, 11, 0.45); width: 290px;">
+        <div class="offcanvas-header border-bottom border-secondary p-3" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+            <a href="{{ url_for('dashboard') }}" class="brand-logo-wrap text-decoration-none">
+                <i class="fa-solid fa-graduation-cap brand-cap-icon" style="font-size: 24px;"></i>
+                <div>
+                    <div class="brand-title-text" style="font-size: 16px;">AcademiaPro</div>
+                    <div class="brand-subtitle-text" style="font-size: 9.5px;">Mobile ERP Suite</div>
+                </div>
+            </a>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body p-3 d-flex flex-column justify-content-between">
+            <ul class="nav flex-column mb-auto">
+                <li class="nav-item">
+                    <a href="{{ url_for('dashboard') }}" class="nav-gold-link {% if request.path == '/' %}active{% endif %}">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+
+                {% if logged_role != 'Student' %}
+                <li class="nav-item">
+                    <a href="{{ url_for('campus_live_monitor') }}" class="nav-gold-link {% if request.path == '/campus-live-monitor' %}active{% endif %}">
+                        <i class="fa-solid fa-tower-broadcast text-warning"></i>
+                        <span>Live Duty Monitor</span>
+                        <span class="badge rounded-pill ms-auto" style="background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); font-size: 9px; padding: 2px 6px;">
+                            <i class="fa-solid fa-circle fa-beat me-1" style="font-size: 6px;"></i>LIVE
+                        </span>
+                    </a>
+                </li>
+                {% endif %}
+
+                <li class="nav-item">
+                    <a href="{{ url_for('ai_assistant') }}" class="nav-gold-link {% if request.path == '/ai-assistant' %}active{% endif %}">
+                        <i class="fa-solid fa-robot text-warning"></i>
+                        <span>AI Assistant</span>
+                        <span class="badge rounded-pill ms-auto" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 9px; padding: 2px 6px;">24/7</span>
+                    </a>
+                </li>
+
+                {% if logged_role != 'Student' %}
+                <li class="nav-item">
+                    <a href="{{ url_for('admissions') }}" class="nav-gold-link {% if request.path == '/admissions' %}active{% endif %}">
+                        <i class="fa-solid fa-user-graduate"></i>
+                        <span>Students</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('academics', tab='faculty') }}" class="nav-gold-link {% if request.path == '/academics' and request.args.get('tab') == 'faculty' %}active{% endif %}">
+                        <i class="fa-solid fa-chalkboard-user"></i>
+                        <span>Faculty</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('academics', tab='students') }}" class="nav-gold-link {% if request.path == '/academics' and request.args.get('tab') != 'faculty' %}active{% endif %}">
+                        <i class="fa-solid fa-book-open"></i>
+                        <span>Academic Records</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a href="{{ url_for('student_desk', roll_number=session.get('username','')) }}" class="nav-gold-link active">
+                        <i class="fa-solid fa-book-open"></i>
+                        <span>My Academic Records</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                <li class="nav-item">
+                    <a href="{{ url_for('attendance') }}" class="nav-gold-link {% if request.path == '/attendance' %}active{% endif %}">
+                        <i class="fa-regular fa-calendar-check"></i>
+                        <span>Attendance</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{{ url_for('student_desk') }}" target="_blank" class="nav-gold-link">
+                        <i class="fa-solid fa-file-signature"></i>
+                        <span>Examinations</span>
+                    </a>
+                </li>
+
+                {% if logged_role != 'Student' and logged_role != 'Teacher' %}
+                <li class="nav-item">
+                    <a href="{{ url_for('finance') }}" class="nav-gold-link {% if request.path == '/finance' %}active{% endif %}">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                        <span>Finance &amp; Challans</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('library') }}" class="nav-gold-link {% if request.path == '/library' %}active{% endif %}">
+                        <i class="fa-solid fa-book-bookmark"></i>
+                        <span>Library Catalog</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('inventory') }}" class="nav-gold-link {% if request.path == '/inventory' %}active{% endif %}">
+                        <i class="fa-solid fa-boxes-stacked"></i>
+                        <span>Inventory</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('security_audit') }}" class="nav-gold-link {% if request.path == '/security-audit' %}active{% endif %}">
+                        <i class="fa-solid fa-chart-simple"></i>
+                        <span>Reports &amp; Analytics</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('settings') }}" class="nav-gold-link {% if request.path == '/settings' %}active{% endif %}">
+                        <i class="fa-solid fa-gear"></i>
+                        <span>College Settings</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+
+            <div class="pt-3 border-top border-secondary mt-3">
+                <div class="d-flex align-items-center gap-2 mb-3 px-1">
+                    <img src="{{ avatar_src }}" class="rounded-circle border border-warning" width="34" height="34" style="object-fit: cover;">
+                    <div style="line-height: 1.2;">
+                        <div class="fw-bold text-white small">{{ logged_user }}</div>
+                        <small class="text-white-50" style="font-size: 10px;">{{ logged_role }}</small>
+                    </div>
+                </div>
+                <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline-danger w-100 rounded-3">
+                    <i class="fa-solid fa-right-from-bracket me-1"></i> Logout
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOBILE FIXED BOTTOM DOCK (ONE-THUMB EASY NAV) -->
+    <nav class="mobile-bottom-dock d-flex d-md-none justify-content-around align-items-center position-fixed bottom-0 start-0 end-0">
+        <a href="{{ url_for('dashboard') }}" class="bottom-dock-btn {% if request.path == '/' %}active{% endif %}">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </a>
+
+        {% if logged_role != 'Student' %}
+        <a href="{{ url_for('campus_live_monitor') }}" class="bottom-dock-btn {% if request.path == '/campus-live-monitor' %}active{% endif %} position-relative">
+            <i class="fa-solid fa-tower-broadcast"></i>
+            <span>Live Duty</span>
+            <span class="position-absolute badge rounded-pill bg-success" style="font-size: 6px; top: 4px; right: 8px; width: 7px; height: 7px; padding: 0;"></span>
+        </a>
+        {% endif %}
+
+        {% if logged_role != 'Student' %}
+        <a href="{{ url_for('admissions') }}" class="bottom-dock-btn {% if request.path == '/admissions' %}active{% endif %}">
+            <i class="fa-solid fa-user-graduate"></i>
+            <span>Students</span>
+        </a>
+        {% else %}
+        <a href="{{ url_for('student_desk', roll_number=session.get('username','')) }}" class="bottom-dock-btn active">
+            <i class="fa-solid fa-book-open"></i>
+            <span>Records</span>
+        </a>
+        {% endif %}
+
+        <a href="{{ url_for('attendance') }}" class="bottom-dock-btn {% if request.path == '/attendance' %}active{% endif %}">
+            <i class="fa-regular fa-calendar-check"></i>
+            <span>Attendance</span>
+        </a>
+
+        <a href="javascript:void(0)" class="bottom-dock-btn" data-bs-toggle="offcanvas" data-bs-target="#mobileNavDrawer">
+            <i class="fa-solid fa-bars"></i>
+            <span>Menu</span>
+        </a>
+    </nav>
 
     <!-- Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

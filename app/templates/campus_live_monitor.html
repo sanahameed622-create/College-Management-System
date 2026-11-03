@@ -1,0 +1,630 @@
+{% extends "base.html" %}
+
+{% block title %}Live Campus Duty & Activity Monitor • AcademiaPro{% endblock %}
+{% block page_title %}📡 Live Campus Duty & Activity Monitor{% endblock %}
+{% block page_subtitle %}Real-time administrative surveillance of faculty duty assignments, ongoing lectures, and student live locations{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Gold & Navy Theme Accents */
+    :root {
+        --gold-glow: rgba(245, 158, 11, 0.35);
+        --navy-surface: #0a1530;
+        --navy-card: rgba(14, 28, 58, 0.85);
+    }
+
+    /* Live Pulse Header Card */
+    .live-pulse-banner {
+        background-color: #060d1f;
+        background: linear-gradient(135deg, rgba(6, 14, 34, 0.95) 0%, rgba(13, 27, 62, 0.90) 100%),
+                    url('{{ college.campus_image_url or "/static/img/campus_default.svg" }}') center/cover no-repeat;
+        border: 1.5px solid rgba(245, 158, 11, 0.4);
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(245, 158, 11, 0.12);
+        margin-bottom: 24px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .pulse-dot {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #10b981;
+        box-shadow: 0 0 12px #10b981;
+        animation: pulseAnimation 1.6s infinite ease-in-out;
+    }
+
+    @keyframes pulseAnimation {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.4); opacity: 0.6; }
+    }
+
+    /* Period Filter Pills */
+    .period-pill-btn {
+        background: rgba(6, 14, 34, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        color: #cbd5e1;
+        padding: 8px 16px;
+        border-radius: 9999px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.25s ease;
+        cursor: pointer;
+    }
+
+    .period-pill-btn:hover {
+        background: rgba(245, 158, 11, 0.15);
+        border-color: #f59e0b;
+        color: #fbbf24;
+        transform: translateY(-2px);
+    }
+
+    .period-pill-btn.active {
+        background: var(--gold-gradient) !important;
+        color: #ffffff !important;
+        font-weight: 700;
+        border-color: #f59e0b !important;
+        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.45);
+    }
+
+    /* Stats Counter Cards */
+    .stat-duty-card {
+        background: var(--navy-surface);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-top: 3px solid #f59e0b;
+        border-radius: 16px;
+        padding: 18px 20px;
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5);
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .stat-duty-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(245, 158, 11, 0.5);
+    }
+
+    /* Faculty Duty Card */
+    .faculty-duty-card {
+        background: var(--navy-card);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 18px;
+        padding: 20px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+        transition: all 0.25s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .faculty-duty-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(245, 158, 11, 0.45);
+        box-shadow: 0 16px 35px rgba(0, 0, 0, 0.65), 0 0 15px rgba(245, 158, 11, 0.15);
+    }
+
+    /* Status Badges */
+    .duty-badge-class {
+        background: rgba(16, 185, 129, 0.18);
+        color: #34d399;
+        border: 1px solid rgba(16, 185, 129, 0.4);
+        padding: 5px 12px;
+        border-radius: 9999px;
+        font-size: 11.5px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .duty-badge-break {
+        background: rgba(245, 158, 11, 0.18);
+        color: #fbbf24;
+        border: 1px solid rgba(245, 158, 11, 0.4);
+        padding: 5px 12px;
+        border-radius: 9999px;
+        font-size: 11.5px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .duty-badge-free {
+        background: rgba(59, 130, 246, 0.18);
+        color: #60a5fa;
+        border: 1px solid rgba(59, 130, 246, 0.4);
+        padding: 5px 12px;
+        border-radius: 9999px;
+        font-size: 11.5px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .duty-badge-lab {
+        background: rgba(168, 85, 247, 0.18);
+        color: #c084fc;
+        border: 1px solid rgba(168, 85, 247, 0.4);
+        padding: 5px 12px;
+        border-radius: 9999px;
+        font-size: 11.5px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .duty-badge-leave {
+        background: rgba(239, 68, 68, 0.18);
+        color: #f87171;
+        border: 1px solid rgba(239, 68, 68, 0.4);
+        padding: 5px 12px;
+        border-radius: 9999px;
+        font-size: 11.5px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* Student Search Box */
+    .student-search-card {
+        background: linear-gradient(135deg, rgba(10, 21, 48, 0.95) 0%, rgba(13, 27, 62, 0.90) 100%);
+        border: 1.5px solid rgba(245, 158, 11, 0.4);
+        border-radius: 20px;
+        padding: 24px;
+        margin-bottom: 28px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .student-search-input {
+        background: #060e22 !important;
+        border: 1.5px solid rgba(245, 158, 11, 0.45) !important;
+        color: #ffffff !important;
+        border-radius: 12px !important;
+        padding: 14px 18px !important;
+        font-size: 15px !important;
+    }
+
+    .student-search-input:focus {
+        box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.25) !important;
+        border-color: #f59e0b !important;
+    }
+
+    /* Live Room Tag */
+    .room-pill {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #fbbf24;
+        padding: 3px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    /* Responsive mobile overrides */
+    @media (max-width: 768px) {
+        .live-pulse-banner {
+            padding: 16px;
+        }
+        .period-pill-btn {
+            font-size: 12px;
+            padding: 6px 12px;
+        }
+        .faculty-duty-card {
+            padding: 16px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-content">
+
+    <!-- 1. LIVE CAMPUS PULSE BANNER -->
+    <div class="live-pulse-banner">
+        <div class="row align-items-center g-3">
+            <div class="col-lg-8">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="pulse-dot"></span>
+                    <span class="badge px-3 py-1 rounded-pill fw-bold" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); font-size: 12px;">
+                        REAL-TIME CAMPUS PULSE ACTIVE
+                    </span>
+                    <span class="text-white-50 small ms-2 d-none d-sm-inline">Institutional Oversight System</span>
+                </div>
+                <h2 class="text-white fw-bold mb-1" style="letter-spacing: -0.5px;">
+                    {{ college.college_name }} • Live Duty Board
+                </h2>
+                <p class="text-white-50 mb-3 small">
+                    Currently Viewing: <span class="text-warning fw-bold fs-6">{{ live.period.label }}</span> 
+                    <span class="badge bg-dark border border-secondary text-white px-2 py-1 ms-1">🕒 {{ live.period.time }}</span>
+                </p>
+
+                <!-- Period Quick Switcher (Simulate / View Any Period of the Day) -->
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <span class="text-warning small fw-bold me-1"><i class="fa-regular fa-clock me-1"></i>Select Period:</span>
+                    {% for p in live.all_periods %}
+                    <a href="{{ url_for('campus_live_monitor', period=p.id) }}" 
+                       class="period-pill-btn {% if live.selected_period_key == p.id %}active{% endif %}">
+                        {% if p.type == 'break' %}
+                            <i class="fa-solid fa-mug-hot"></i> {{ p.label }}
+                        {% else %}
+                            <i class="fa-solid fa-chalkboard"></i> {{ p.label }}
+                        {% endif %}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-lg-4 text-lg-end text-start">
+                <div class="d-inline-block text-start p-3 rounded-4" style="background: rgba(6, 14, 34, 0.8); border: 1px solid rgba(245, 158, 11, 0.3); backdrop-filter: blur(10px);">
+                    <div class="text-warning small fw-bold text-uppercase mb-1">
+                        <i class="fa-solid fa-satellite-dish me-1"></i> Official Master Clock
+                    </div>
+                    <div class="fs-3 fw-bold text-white font-monospace" id="liveMonitorClock">
+                        {{ live_time_formatted }}
+                    </div>
+                    <div class="text-white-50 small">
+                        {{ live_date_formatted }} • Academic Year 2026
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. QUICK CAMPUS COUNTER KPIS -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="stat-duty-card text-center">
+                <div class="text-white-50 small text-uppercase fw-bold mb-1">Active Classes</div>
+                <div class="fs-3 fw-bold text-success">{{ live.summary.classes_in_progress }}</div>
+                <small class="text-white-50">Lectures In Session</small>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="stat-duty-card text-center" style="border-top-color: #c084fc;">
+                <div class="text-white-50 small text-uppercase fw-bold mb-1">Practical Labs</div>
+                <div class="fs-3 fw-bold" style="color: #c084fc;">{{ live.summary.labs_in_progress }}</div>
+                <small class="text-white-50">Science &amp; Comp Labs</small>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="stat-duty-card text-center" style="border-top-color: #fbbf24;">
+                <div class="text-white-50 small text-uppercase fw-bold mb-1">On Break / Recess</div>
+                <div class="fs-3 fw-bold text-warning">{{ live.summary.faculty_on_break }}</div>
+                <small class="text-white-50">Staff Lounge / Tea</small>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="stat-duty-card text-center" style="border-top-color: #60a5fa;">
+                <div class="text-white-50 small text-uppercase fw-bold mb-1">Free / Office</div>
+                <div class="fs-3 fw-bold text-info">{{ live.summary.faculty_free }}</div>
+                <small class="text-white-50">Faculty Research</small>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="stat-duty-card text-center" style="border-top-color: #f87171;">
+                <div class="text-white-50 small text-uppercase fw-bold mb-1">On Leave</div>
+                <div class="fs-3 fw-bold text-danger">{{ live.summary.faculty_on_leave }}</div>
+                <small class="text-white-50">Sanctioned Leave</small>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="stat-duty-card text-center" style="border-top-color: #f59e0b;">
+                <div class="text-white-50 small text-uppercase fw-bold mb-1">Total Faculty</div>
+                <div class="fs-3 fw-bold text-white">{{ live.summary.total_faculty }}</div>
+                <small class="text-white-50">Permanent Staff</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. STUDENT LIVE TRACKER & LOCATION SEARCH BAR (ADMIN KILLER FEATURE) -->
+    <div class="student-search-card">
+        <div class="row align-items-center g-3">
+            <div class="col-lg-6">
+                <h5 class="fw-bold text-white mb-1">
+                    <i class="fa-solid fa-location-crosshairs text-warning me-2"></i>Live Student Location &amp; Timetable Tracker
+                </h5>
+                <p class="text-white-50 small mb-0">
+                    Search any student by <strong>Name</strong> or <strong>Roll Number</strong> to see exactly which room/lecture they are in right now and their full daily schedule.
+                </p>
+            </div>
+            <div class="col-lg-6">
+                <form id="studentTrackerForm" onsubmit="handleStudentTrackerSearch(event)" class="d-flex gap-2">
+                    <input type="text" id="studentTrackerInput" class="form-control student-search-input" 
+                           placeholder="Type Roll No or Name (e.g. FSC-2024-001 or Ahmed)..." required>
+                    <button type="submit" class="btn btn-primary px-4 fw-bold" style="white-space: nowrap;">
+                        <i class="fa-solid fa-magnifying-glass me-1"></i> Locate Student
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Quick Sample Student Chips -->
+        <div class="d-flex flex-wrap align-items-center gap-2 mt-3 pt-3 border-top border-secondary">
+            <span class="text-white-50 small">Quick Locate:</span>
+            {% for st in sample_students %}
+            <button type="button" class="btn btn-sm btn-outline-warning rounded-pill py-1 px-3 small" onclick="quickLocate('{{ st.roll_number }}')">
+                <i class="fa-solid fa-user me-1"></i>{{ st.full_name }} ({{ st.roll_number }})
+            </button>
+            {% endfor %}
+        </div>
+
+        <!-- Container for Live Student Search Result Display -->
+        <div id="studentLiveResultContainer" class="mt-4" style="display: none;"></div>
+    </div>
+
+    <!-- 4. FACULTY LIVE DUTY ROSTER & LOCATION BOARD -->
+    <div class="card p-4" style="background: #0a1530; border: 1px solid rgba(255,255,255,0.08); border-radius: 20px;">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+            <div>
+                <h4 class="text-white fw-bold mb-1">
+                    <i class="fa-solid fa-chalkboard-user text-warning me-2"></i>Faculty Live Duty &amp; Location Roster
+                </h4>
+                <p class="text-white-50 small mb-0">
+                    Active assignments for <strong>{{ live.period.label }} ({{ live.period.time }})</strong>
+                </p>
+            </div>
+
+            <!-- Department Filter & Search -->
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                <div class="search-pill" style="min-width: 240px; background: #060e22;">
+                    <i class="fa-solid fa-filter text-muted"></i>
+                    <input type="text" id="facultyLiveFilterInput" class="search-input" placeholder="Search teacher or subject..." onkeyup="filterFacultyLiveBoard()">
+                </div>
+                <select id="facultyDeptSelect" class="form-select form-select-sm" style="width: auto; background: #060e22; border-color: rgba(255,255,255,0.15); color: #fff;" onchange="filterFacultyLiveBoard()">
+                    <option value="ALL">All Departments</option>
+                    {% for d in departments %}
+                    <option value="{{ d.dept_name }}">{{ d.dept_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Faculty Cards Grid -->
+        <div class="row g-3" id="facultyLiveGrid">
+            {% for f in live.faculty %}
+            <div class="col-md-6 col-xl-4 faculty-card-item" data-name="{{ f.full_name | lower }}" data-dept="{{ f.dept_name }}" data-subject="{{ f.current_subject | lower }}" data-status="{{ f.status }}">
+                <div class="faculty-duty-card">
+                    <!-- Top Info -->
+                    <div>
+                        <div class="d-flex align-items-start justify-content-between mb-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <img src="/static/avatars/{{ f.avatar }}.svg" class="rounded-circle border border-2 border-warning" width="46" height="46" style="object-fit: cover; background: #060e22;">
+                                <div>
+                                    <div class="text-white fw-bold fs-6 mb-0">{{ f.full_name }}</div>
+                                    <div class="text-white-50 small">{{ f.designation }} • {{ f.dept_code }}</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Status Badge -->
+                            {% if f.status == 'IN CLASS' %}
+                                <span class="duty-badge-class"><i class="{{ f.icon }}"></i> In Class</span>
+                            {% elif f.status == 'ON BREAK' %}
+                                <span class="duty-badge-break"><i class="{{ f.icon }}"></i> On Break</span>
+                            {% elif f.status == 'PRACTICAL LAB' %}
+                                <span class="duty-badge-lab"><i class="{{ f.icon }}"></i> Practical Lab</span>
+                            {% elif f.status == 'ON LEAVE' %}
+                                <span class="duty-badge-leave"><i class="{{ f.icon }}"></i> On Leave</span>
+                            {% else %}
+                                <span class="duty-badge-free"><i class="{{ f.icon }}"></i> Office / Free</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Current Assignment Box -->
+                        <div class="p-3 rounded-3 mb-3" style="background: rgba(6, 14, 34, 0.7); border: 1px solid rgba(255,255,255,0.06);">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="text-white-50 small text-uppercase fw-bold">Current Subject</span>
+                                <span class="room-pill"><i class="fa-solid fa-door-open me-1"></i>{{ f.room }}</span>
+                            </div>
+                            <div class="text-warning fw-bold small fs-6 mb-1">
+                                {{ f.current_subject }}
+                            </div>
+                            <div class="text-white-50 small d-flex justify-content-between">
+                                <span><i class="fa-solid fa-users-rectangle me-1 text-info"></i>{{ f.section_name }}</span>
+                                {% if f.students_count > 0 %}
+                                <span class="text-success"><i class="fa-solid fa-user-check me-1"></i>{{ f.students_count }} Students</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="text-white-50 small mb-2">
+                            <i class="fa-solid fa-list-check text-warning me-1"></i><strong>Activity:</strong> {{ f.activity }}
+                        </div>
+                    </div>
+
+                    <!-- Footer Action -->
+                    <div class="pt-3 border-top border-secondary d-flex justify-content-between align-items-center mt-2">
+                        <small class="text-white-50"><i class="fa-solid fa-envelope me-1"></i>{{ f.email }}</small>
+                        <a href="{{ url_for('academics', tab='faculty') }}" class="btn btn-sm btn-outline-warning rounded-pill px-3 py-1 small">
+                            Full Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+<!-- Interactive JavaScript for Live Student Tracker and Faculty Filtering -->
+<script>
+// Filter Faculty Cards in real time
+function filterFacultyLiveBoard() {
+    const searchVal = document.getElementById('facultyLiveFilterInput').value.toLowerCase().trim();
+    const deptVal = document.getElementById('facultyDeptSelect').value;
+    const cards = document.querySelectorAll('.faculty-card-item');
+
+    cards.forEach(card => {
+        const name = card.getAttribute('data-name');
+        const dept = card.getAttribute('data-dept');
+        const subject = card.getAttribute('data-subject');
+        
+        const matchesSearch = !searchVal || name.includes(searchVal) || subject.includes(searchVal);
+        const matchesDept = (deptVal === 'ALL') || (dept === deptVal);
+
+        if (matchesSearch && matchesDept) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+function quickLocate(rollNumber) {
+    document.getElementById('studentTrackerInput').value = rollNumber;
+    fetchStudentLocation(rollNumber);
+}
+
+function handleStudentTrackerSearch(e) {
+    e.preventDefault();
+    const query = document.getElementById('studentTrackerInput').value.trim();
+    if (query) {
+        fetchStudentLocation(query);
+    }
+}
+
+function fetchStudentLocation(query) {
+    const container = document.getElementById('studentLiveResultContainer');
+    container.style.display = 'block';
+    container.innerHTML = `
+        <div class="p-4 text-center rounded-3" style="background: rgba(6, 14, 34, 0.8); border: 1px dashed rgba(245, 158, 11, 0.4);">
+            <i class="fa-solid fa-spinner fa-spin text-warning fs-3 mb-2"></i>
+            <div class="text-white fw-bold">Connecting to Academic Core... Locating Student...</div>
+        </div>
+    `;
+
+    fetch('/api/campus/search-student', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: query })
+    })
+    .then(res => res.json())
+    .then(res => {
+        if (!res.success) {
+            container.innerHTML = `
+                <div class="alert alert-danger py-3 px-4 rounded-3 border-0 text-white" style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4) !important;">
+                    <i class="fa-solid fa-triangle-exclamation me-2 text-danger"></i>${res.error}
+                </div>
+            `;
+            return;
+        }
+
+        const data = res.data;
+        const st = data.student;
+        const loc = data.current_location;
+        const att = data.attendance;
+        const sched = data.daily_schedule;
+
+        let scheduleRowsHtml = '';
+        sched.forEach(item => {
+            const activeBadge = item.is_active_now 
+                ? '<span class="badge bg-success ms-1"><i class="fa-solid fa-circle-play me-1"></i>NOW</span>' 
+                : '';
+            const rowClass = item.is_active_now ? 'style="background: rgba(16, 185, 129, 0.15);"' : '';
+            scheduleRowsHtml += `
+                <tr ${rowClass}>
+                    <td class="fw-bold text-warning">${item.label}</td>
+                    <td class="small text-white-50">${item.time}</td>
+                    <td class="fw-bold text-white">${item.subject} ${activeBadge}</td>
+                    <td class="small text-info">${item.teacher}</td>
+                    <td><span class="room-pill">${item.room}</span></td>
+                </tr>
+            `;
+        });
+
+        container.innerHTML = `
+            <div class="p-4 rounded-4" style="background: #081128; border: 1.5px solid rgba(245, 158, 11, 0.5); box-shadow: 0 10px 30px rgba(0,0,0,0.7);">
+                <div class="row align-items-center g-3 mb-4 pb-3 border-bottom border-secondary">
+                    <div class="col-md-7 d-flex align-items-center gap-3">
+                        <img src="/static/avatars/${st.photo_url || (st.gender === 'Female' ? 'girl' : 'boy')}.svg" 
+                             class="rounded-circle border border-2 border-warning" width="60" height="60" style="object-fit: cover; background: #060e22;">
+                        <div>
+                            <div class="d-flex align-items-center gap-2">
+                                <h4 class="text-white fw-bold mb-0">${st.full_name}</h4>
+                                <span class="badge bg-warning text-dark fw-bold">${st.roll_number}</span>
+                            </div>
+                            <div class="text-white-50 small mt-1">
+                                ${st.program_name} (${st.academic_tier || 'Undergraduate'}) • Semester ${st.current_semester_num || 1}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-5 text-md-end">
+                        <div class="d-inline-block text-start p-2 px-3 rounded-3" style="background: rgba(6, 14, 34, 0.8); border: 1px solid rgba(255,255,255,0.1);">
+                            <span class="text-white-50 small d-block">Today's Attendance:</span>
+                            <span class="badge bg-${att.color} fs-6 px-3 py-1">
+                                <i class="fa-solid fa-check me-1"></i>${att.status} (${att.date})
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Location Card -->
+                <div class="p-3 rounded-3 mb-4" style="background: rgba(16, 185, 129, 0.12); border: 1.5px solid rgba(16, 185, 129, 0.4);">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <div>
+                            <span class="badge bg-success text-white px-3 py-1 rounded-pill fw-bold mb-1">
+                                <i class="fa-solid fa-location-dot me-1"></i>CURRENT REAL-TIME LOCATION
+                            </span>
+                            <h5 class="text-white fw-bold mb-1 mt-2">
+                                <i class="fa-solid fa-door-open text-warning me-2"></i>${loc.room}
+                            </h5>
+                            <div class="text-white small">${loc.activity} • <strong>${loc.subject}</strong></div>
+                        </div>
+                        <div class="text-end">
+                            <span class="text-white-50 small d-block">Assigned Faculty:</span>
+                            <span class="text-warning fw-bold fs-6">${loc.teacher}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Today's Timetable Schedule Table -->
+                <h6 class="text-warning fw-bold text-uppercase mb-3">
+                    <i class="fa-solid fa-calendar-day me-2"></i>Today's Daily Timetable &amp; Schedule
+                </h6>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Period</th>
+                                <th>Timing</th>
+                                <th>Subject / Lecture</th>
+                                <th>Faculty / Instructor</th>
+                                <th>Room / Lab</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${scheduleRowsHtml}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    })
+    .catch(err => {
+        container.innerHTML = '<div class="alert alert-danger py-2">Error connecting to student tracking server.</div>';
+    });
+}
+
+// Keep live digital clock updated
+setInterval(() => {
+    const clock = document.getElementById('liveMonitorClock');
+    if (clock) {
+        const now = new Date();
+        clock.innerText = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+    }
+}, 1000);
+</script>
+{% endblock %}

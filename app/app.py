@@ -549,6 +549,57 @@ def api_attendance_mark():
     return jsonify(res)
 
 # ==========================================
+# 4C. LIVE CAMPUS ACTIVITY & DUTY MONITOR
+# ==========================================
+@app.route("/campus-live-monitor")
+def campus_live_monitor():
+    user_role = session.get("user_role", "Admin")
+    if user_role == "Student":
+        flash("Institutional Access Notice: Live campus oversight is reserved for College Administration and Faculty.", "warning")
+        return redirect(url_for("student_desk"))
+
+    selected_period = request.args.get("period", "").strip() or None
+    status_data = db.get_campus_live_status(selected_period=selected_period)
+    departments = db.query("SELECT * FROM department ORDER BY dept_name ASC")
+
+    sample_students = db.query("""
+        SELECT student_id, roll_number, first_name || ' ' || last_name as full_name, academic_tier, part_or_year
+        FROM student WHERE status = 'Active' ORDER BY student_id DESC LIMIT 5
+    """)
+
+    return render_template(
+        "campus_live_monitor.html",
+        live=status_data,
+        departments=departments,
+        sample_students=sample_students,
+        is_admin=(user_role in ["Admin", "Administrator", "Evaluator"])
+    )
+
+@app.route("/api/campus/live-status")
+def api_campus_live_status():
+    selected_period = request.args.get("period", "").strip() or None
+    status_data = db.get_campus_live_status(selected_period=selected_period)
+    return jsonify({"success": True, "data": status_data})
+
+@app.route("/api/campus/search-student", methods=["GET", "POST"])
+def api_campus_search_student():
+    if request.method == "POST":
+        data = request.get_json() or {}
+        query = data.get("query", "").strip()
+    else:
+        query = request.args.get("query", "").strip()
+
+    if not query:
+        return jsonify({"success": False, "error": "Please provide student name or roll number."})
+
+    res = db.search_student_live_tracker(query)
+    if not res:
+        return jsonify({"success": False, "error": f"No active student found matching '{query}'."})
+
+    return jsonify({"success": True, "data": res})
+
+
+# ==========================================
 # 5. FINANCE & FEES MODULE
 # ==========================================
 @app.route("/finance")
