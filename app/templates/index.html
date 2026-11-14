@@ -158,6 +158,9 @@
                 </p>
                 
                 <div class="d-flex flex-wrap gap-2">
+                    <a href="{{ url_for('security_audit') }}" class="btn btn-sm fw-bold px-3 py-2 rounded-3 text-white shadow-sm" style="background: rgba(239, 68, 68, 0.25); border: 1.5px solid rgba(239, 68, 68, 0.65);">
+                        <i class="fa-solid fa-shield-virus me-1 text-danger"></i> Security &amp; Audit Logs
+                    </a>
                     <a href="{{ url_for('campus_live_monitor') }}" class="btn btn-warning btn-sm fw-bold px-3 py-2 rounded-3 text-dark shadow-sm">
                         <i class="fa-solid fa-tower-broadcast fa-beat me-1 text-danger"></i> Live Duty Monitor
                     </a>
@@ -522,6 +525,9 @@
 
                 <!-- Quick Inquiry Suggestion Chips -->
                 <div class="d-flex flex-wrap gap-2 mb-3">
+                    <button class="badge border bg-transparent text-warning py-2 px-3 rounded-pill dash-preset-btn fw-bold" style="border-color: rgba(245, 158, 11, 0.5) !important; cursor: pointer;" data-query="kya koi suspicious activity ya attack hua hai? Check threats">
+                        🛡️ Check Suspicious Activity
+                    </button>
                     <button class="badge border bg-transparent text-white-50 py-2 px-3 rounded-pill dash-preset-btn" style="border-color: rgba(245, 158, 11, 0.3) !important; cursor: pointer;" data-query="What is my current semester fee status and balance?">
                         💰 Fee Status
                     </button>

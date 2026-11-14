@@ -30,6 +30,78 @@ def save_uploaded_image(file):
     file.save(filepath)
     return filename
 
+def get_live_notifications():
+    """Compiles real-time security alerts and institutional notifications."""
+    telemetry = shield.get_dashboard_summary()
+    blocked_ips = telemetry.get("active_blocked_ips", [])
+    locked_accounts = telemetry.get("active_locked_accounts", [])
+
+    security_notifications = []
+    for b in blocked_ips:
+        security_notifications.append({
+            "id": f"sec_ip_{b['ip']}",
+            "type": "CRITICAL_SECURITY",
+            "category": "SECURITY ALERT",
+            "title": f"Suspicious IP Auto-Banned: {b['ip']}",
+            "message": f"{b['reason']} - Access blocked for ~{b['remaining_mins']}m.",
+            "time_ago": f"{b['blocked_at']} Today",
+            "icon": "fa-solid fa-shield-virus text-danger",
+            "badge_color": "danger",
+            "action_url": url_for("security_audit")
+        })
+
+    for la in locked_accounts:
+        security_notifications.append({
+            "id": f"sec_acc_{la['username']}",
+            "type": "WARNING_SECURITY",
+            "category": "ACCOUNT LOCKOUT",
+            "title": f"Brute-Force Lockout: {la['username']}",
+            "message": f"Account temporarily locked after {la['failed_attempts']} consecutive failed attempts.",
+            "time_ago": f"~{la['remaining_mins']}m remaining",
+            "icon": "fa-solid fa-user-lock text-warning",
+            "badge_color": "warning text-dark",
+            "action_url": url_for("security_audit")
+        })
+
+    standard_notifications = [
+        {
+            "id": "notif_exam",
+            "type": "INFO",
+            "category": "EXAMINATIONS",
+            "title": "Mid-Term Date Sheet & Roll Slips",
+            "message": "Examination admit cards are generated. Students with 75% attendance can download slips.",
+            "time_ago": "10 mins ago",
+            "icon": "fa-solid fa-file-signature text-warning",
+            "badge_color": "warning text-dark",
+            "action_url": url_for("student_desk")
+        },
+        {
+            "id": "notif_fin",
+            "type": "INFO",
+            "category": "FINANCE",
+            "title": "Bank Fee Challan Cutoff Date",
+            "message": "Final deadline for HBL/NBP fee submission is approaching. Automated challan verification enabled.",
+            "time_ago": "2 hours ago",
+            "icon": "fa-solid fa-receipt text-danger",
+            "badge_color": "danger",
+            "action_url": url_for("finance")
+        },
+        {
+            "id": "notif_att",
+            "type": "INFO",
+            "category": "ATTENDANCE",
+            "title": "75% Lecture Eligibility Alert",
+            "message": "Automated lecture register check has flagged short attendance warnings.",
+            "time_ago": "Today",
+            "icon": "fa-solid fa-clipboard-user text-success",
+            "badge_color": "success",
+            "action_url": url_for("attendance")
+        }
+    ]
+
+    all_notifs = security_notifications + standard_notifications
+    return all_notifs, len(security_notifications)
+
 @app.context_processor
 def inject_global_context():
     avatar_choice = session.get("user_avatar", "girl")
@@ -39,6 +111,7 @@ def inject_global_context():
         avatar_src = f"/static/avatars/{avatar_choice}.svg"
     
     now = datetime.datetime.now()
+    notifs, sec_count = get_live_notifications()
     return {
         "college": db.get_college_profile(),
         "logged_user": session.get("user_name", "Ayesha Khan"),
@@ -51,7 +124,10 @@ def inject_global_context():
         "live_day": now.day,
         "live_month": now.month,
         "live_year": now.year,
-        "live_month_name": now.strftime("%B %Y")
+        "live_month_name": now.strftime("%B %Y"),
+        "system_notifications": notifs,
+        "notification_count": len(notifs),
+        "security_alerts_count": sec_count
     }
 
 def get_client_ip():
@@ -222,6 +298,16 @@ def api_unlock_account():
         shield.unlock_account(username)
         return jsonify({"success": True, "message": f"Account '{username}' unlocked successfully."})
     return jsonify({"success": False, "error": "Username missing."}), 400
+
+@app.route("/api/notifications/poll", methods=["GET"])
+def api_poll_notifications():
+    notifs, sec_count = get_live_notifications()
+    return jsonify({
+        "success": True,
+        "total_count": len(notifs),
+        "security_count": sec_count,
+        "notifications": notifs
+    })
 
 @app.route("/api/biometric-login", methods=["POST"])
 def api_biometric_login():
@@ -919,6 +1005,8 @@ def api_ai_query():
     direct_sql_keywords = ['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'DROP', 'ALTER', 'TRUNCATE']
     if any(upper_query.startswith(kw) for kw in direct_sql_keywords):
         sql = query_text.strip()
+    elif any(tk in query_lower for tk in ["suspicious", "suspecious", "activity", "threat", "attack", "hacker", "blocked ip", "banned ip", "security status", "kya koi attack", "kya koi suspicious", "koi masla", "koi block", "security report", "audit report", "rate limit", "security audit"]):
+        sql = "-- THREAT_SHIELD_SECURITY_AUDIT"
     elif "fee" in query_lower or "invoice" in query_lower or "due" in query_lower or "balance" in query_lower:
         if user_role == "Student":
             sql = f"SELECT invoice_number, total_amount, paid_amount, balance_due, status FROM student_invoice WHERE student_id = {user_id};"

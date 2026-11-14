@@ -452,11 +452,21 @@
         <!-- Right Side Icons & Profile Capsule -->
         <div class="d-flex align-items-center gap-3">
             
-            <!-- Notification Bell with Red Badge (Opens Interactive Notifications Drawer!) -->
-            <a href="javascript:void(0)" class="icon-btn-pill" data-bs-toggle="offcanvas" data-bs-target="#notificationsOffcanvas" title="Notifications">
-                <i class="fa-regular fa-bell"></i>
-                <span class="notification-badge-red" id="topbarBellBadge">3</span>
+            <!-- Notification Bell with Dynamic Badge (Opens Interactive Notifications Drawer!) -->
+            <a href="javascript:void(0)" class="icon-btn-pill {% if security_alerts_count > 0 %}border-danger{% endif %}" data-bs-toggle="offcanvas" data-bs-target="#notificationsOffcanvas" title="Notifications">
+                <i class="fa-regular fa-bell {% if security_alerts_count > 0 %}text-danger fa-shake{% endif %}"></i>
+                <span class="notification-badge-red {% if security_alerts_count > 0 %}bg-danger{% endif %}" id="topbarBellBadge">{{ notification_count or 0 }}</span>
             </a>
+
+            <!-- Quick Direct Security & Audit Pill for Admin -->
+            {% if logged_role == 'Administrator' or logged_role == 'Admin' %}
+            <a href="{{ url_for('security_audit') }}" class="icon-btn-pill {% if security_alerts_count > 0 %}border-danger text-danger{% endif %}" title="Security & Threat Audit Logs">
+                <i class="fa-solid fa-shield-halved"></i>
+                {% if security_alerts_count > 0 %}
+                <span class="notification-badge-red bg-danger">{{ security_alerts_count }}</span>
+                {% endif %}
+            </a>
+            {% endif %}
 
             <!-- Day / Sun Mode Toggle -->
             <a href="javascript:void(0)" class="icon-btn-pill" title="Theme Mode">
@@ -614,10 +624,10 @@
                         <li class="nav-item">
                             <a href="javascript:void(0)" class="nav-gold-link d-flex justify-content-between align-items-center" data-bs-toggle="offcanvas" data-bs-target="#notificationsOffcanvas">
                                 <div class="d-flex align-items-center gap-2">
-                                    <i class="fa-regular fa-bell text-warning"></i>
+                                    <i class="fa-regular fa-bell {% if security_alerts_count > 0 %}text-danger fa-shake{% else %}text-warning{% endif %}"></i>
                                     <span>Notifications</span>
                                 </div>
-                                <span class="badge bg-danger rounded-pill px-2 py-1" id="sidebarNotifBadge" style="font-size: 10px;">3</span>
+                                <span class="badge {% if security_alerts_count > 0 %}bg-danger{% else %}bg-secondary{% endif %} rounded-pill px-2 py-1" id="sidebarNotifBadge" style="font-size: 10px;">{{ notification_count or 0 }}</span>
                             </a>
                         </li>
 
@@ -689,80 +699,52 @@
         </div>
         <div class="offcanvas-body p-3">
             <div class="d-flex justify-content-between align-items-center mb-3 px-1">
-                <span class="badge" id="notifStatusBadge" style="background: rgba(245, 158, 11, 0.18); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35); font-size: 11px;">
-                    3 Active Alerts
-                </span>
+                <div>
+                    <span class="badge" id="notifStatusBadge" style="background: rgba(245, 158, 11, 0.18); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35); font-size: 11px;">
+                        {{ notification_count or 0 }} Active Alerts
+                    </span>
+                    {% if security_alerts_count > 0 %}
+                    <span class="badge bg-danger ms-1" style="font-size: 10px;">
+                        <i class="fa-solid fa-shield-virus me-1"></i>{{ security_alerts_count }} Threat(s)
+                    </span>
+                    {% endif %}
+                </div>
                 <a href="javascript:void(0)" onclick="clearAllNotifications()" class="small text-warning text-decoration-none fw-semibold" style="font-size: 11.5px;">
                     <i class="fa-solid fa-check-double me-1"></i> Mark All as Read
                 </a>
             </div>
 
             <div id="notificationsList">
-                <!-- Alert 1: Exams -->
-                <div class="p-3 rounded-3 mb-2 notification-card-item" style="background: rgba(14, 28, 58, 0.85); border: 1px solid rgba(245, 158, 11, 0.35);">
-                    <div class="d-flex align-items-start gap-3">
-                        <div class="rounded-circle p-2 text-center" style="width: 38px; height: 38px; background: rgba(245, 158, 11, 0.2); color: #fbbf24; flex-shrink: 0;">
-                            <i class="fa-solid fa-file-signature"></i>
-                        </div>
-                        <div>
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <span class="badge bg-warning text-dark px-2 py-0" style="font-size: 9.5px;">EXAMINATIONS</span>
-                                <small class="text-white-50" style="font-size: 10px;">10 mins ago</small>
+                {% if system_notifications %}
+                    {% for notif in system_notifications %}
+                    <div class="p-3 rounded-3 mb-2 notification-card-item" style="background: rgba(14, 28, 58, 0.85); border: 1.5px solid {% if 'SECURITY' in notif.type %}rgba(239, 68, 68, 0.65){% elif 'WARNING' in notif.type %}rgba(245, 158, 11, 0.5){% else %}rgba(245, 158, 11, 0.25){% endif %};">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="rounded-circle p-2 text-center" style="width: 38px; height: 38px; background: {% if 'SECURITY' in notif.type %}rgba(239, 68, 68, 0.25){% elif 'WARNING' in notif.type %}rgba(245, 158, 11, 0.25){% else %}rgba(59, 130, 246, 0.2){% endif %}; flex-shrink: 0;">
+                                <i class="{{ notif.icon }}"></i>
                             </div>
-                            <h6 class="fw-bold text-white mb-1" style="font-size: 13px;">Mid-Term Date Sheet &amp; Roll Slips</h6>
-                            <p class="small text-white-50 mb-2" style="font-size: 11.5px; line-height: 1.4;">
-                                Examination admit cards are generated. Students with 75% attendance can download slips.
-                            </p>
-                            <a href="/student-desk" class="btn btn-sm btn-outline-warning py-0 px-2 rounded-pill" style="font-size: 11px;">
-                                View Roll Slips &rarr;
-                            </a>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="badge bg-{{ notif.badge_color }} px-2 py-0" style="font-size: 9.5px;">{{ notif.category }}</span>
+                                    <small class="text-white-50" style="font-size: 10px;">{{ notif.time_ago }}</small>
+                                </div>
+                                <h6 class="fw-bold text-white mb-1" style="font-size: 13px;">{{ notif.title }}</h6>
+                                <p class="small text-white-50 mb-2" style="font-size: 11.5px; line-height: 1.4;">
+                                    {{ notif.message }}
+                                </p>
+                                <a href="{{ notif.action_url }}" class="btn btn-sm {% if 'SECURITY' in notif.type %}btn-outline-danger{% elif 'WARNING' in notif.type %}btn-outline-warning{% else %}btn-outline-primary{% endif %} py-0 px-2 rounded-pill" style="font-size: 11px;">
+                                    {% if 'SECURITY' in notif.type %}Investigate Threat in Audit &rarr;{% elif 'WARNING' in notif.type %}Unlock Account &rarr;{% else %}View Details &rarr;{% endif %}
+                                </a>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Alert 2: Fee -->
-                <div class="p-3 rounded-3 mb-2 notification-card-item" style="background: rgba(14, 28, 58, 0.85); border: 1px solid rgba(239, 68, 68, 0.35);">
-                    <div class="d-flex align-items-start gap-3">
-                        <div class="rounded-circle p-2 text-center" style="width: 38px; height: 38px; background: rgba(239, 68, 68, 0.2); color: #f87171; flex-shrink: 0;">
-                            <i class="fa-solid fa-receipt"></i>
-                        </div>
-                        <div>
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <span class="badge bg-danger px-2 py-0" style="font-size: 9.5px;">FINANCE</span>
-                                <small class="text-white-50" style="font-size: 10px;">2 hours ago</small>
-                            </div>
-                            <h6 class="fw-bold text-white mb-1" style="font-size: 13px;">Bank Fee Challan Cutoff Date</h6>
-                            <p class="small text-white-50 mb-2" style="font-size: 11.5px; line-height: 1.4;">
-                                Final deadline for HBL/NBP fee submission is Nov 10, 2026. Late surcharge applies after cutoff.
-                            </p>
-                            <a href="/finance" class="btn btn-sm btn-outline-danger py-0 px-2 rounded-pill" style="font-size: 11px;">
-                                Fee Clearance &rarr;
-                            </a>
-                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-4 text-white-50">
+                        <i class="fa-regular fa-bell-slash fs-2 mb-2 d-block text-secondary"></i>
+                        No active notifications.
                     </div>
-                </div>
-
-                <!-- Alert 3: Attendance -->
-                <div class="p-3 rounded-3 mb-2 notification-card-item" style="background: rgba(14, 28, 58, 0.85); border: 1px solid rgba(16, 185, 129, 0.35);">
-                    <div class="d-flex align-items-start gap-3">
-                        <div class="rounded-circle p-2 text-center" style="width: 38px; height: 38px; background: rgba(16, 185, 129, 0.2); color: #34d399; flex-shrink: 0;">
-                            <i class="fa-solid fa-clipboard-user"></i>
-                        </div>
-                        <div>
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <span class="badge bg-success px-2 py-0" style="font-size: 9.5px;">ATTENDANCE</span>
-                                <small class="text-white-50" style="font-size: 10px;">Today</small>
-                            </div>
-                            <h6 class="fw-bold text-white mb-1" style="font-size: 13px;">75% Lecture Eligibility Alert</h6>
-                            <p class="small text-white-50 mb-2" style="font-size: 11.5px; line-height: 1.4;">
-                                Automated BISE/HEC lecture register check has flagged short attendance warnings.
-                            </p>
-                            <a href="/attendance" class="btn btn-sm btn-outline-success py-0 px-2 rounded-pill" style="font-size: 11px;">
-                                Digital Register &rarr;
-                            </a>
-                        </div>
-                    </div>
-                </div>
+                {% endif %}
+            </div>
             </div>
         </div>
     </div>
@@ -835,6 +817,39 @@
             `;
         }
     }
+
+    // Auto-polling for real-time security alerts (Every 10 seconds)
+    function pollSecurityAlerts() {
+        fetch('/api/notifications/poll')
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    const topBadge = document.getElementById('topbarBellBadge');
+                    const sideBadge = document.getElementById('sidebarNotifBadge');
+                    const statusBadge = document.getElementById('notifStatusBadge');
+
+                    if (topBadge) {
+                        topBadge.innerText = data.total_count;
+                        if (data.security_count > 0) {
+                            topBadge.style.display = 'inline-block';
+                            topBadge.className = 'notification-badge-red bg-danger';
+                        }
+                    }
+                    if (sideBadge) {
+                        sideBadge.innerText = data.total_count;
+                        if (data.security_count > 0) {
+                            sideBadge.style.display = 'inline-block';
+                            sideBadge.className = 'badge bg-danger rounded-pill px-2 py-1';
+                        }
+                    }
+                    if (statusBadge && data.total_count > 0) {
+                        statusBadge.innerText = data.total_count + ' Active Alerts';
+                    }
+                }
+            })
+            .catch(() => {});
+    }
+    setInterval(pollSecurityAlerts, 10000);
 
     let avatarModalInstance = null;
     function openAvatarModal() {

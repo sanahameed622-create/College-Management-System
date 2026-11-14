@@ -978,6 +978,70 @@ class DatabaseEngine:
                 "row_count": 4
             }
 
+        # 0.1 Security & Suspicious Activity Inquiry Handler (Admin / Security Inquiries)
+        threat_keywords = [
+            "suspicious", "suspecious", "activity", "threat", "attack", "hacker", 
+            "blocked ip", "banned ip", "locked account", "security status", "threat shield",
+            "kya koi attack", "kya koi suspicious", "koi masla", "koi block", "security report",
+            "audit report", "koi fraud", "rate limit", "security audit", "security log"
+        ]
+        if any(tk in query_lower for tk in threat_keywords):
+            from security_shield import shield
+            telemetry = shield.get_dashboard_summary()
+            metrics = telemetry.get("metrics", {})
+            blocked_ips = telemetry.get("active_blocked_ips", [])
+            locked_accounts = telemetry.get("active_locked_accounts", [])
+            recent_events = telemetry.get("recent_events", [])
+
+            rows = []
+            if blocked_ips:
+                for b in blocked_ips:
+                    rows.append({
+                        "Threat Type": "🚫 Blocked IP (Auto-Ban)",
+                        "Target": b["ip"],
+                        "Incident Diagnostic": b["reason"],
+                        "Status": f"Active Ban (~{b['remaining_mins']}m left)"
+                    })
+            if locked_accounts:
+                for la in locked_accounts:
+                    rows.append({
+                        "Threat Type": "🔒 Account Lockout (Brute-Force)",
+                        "Target": la["username"],
+                        "Incident Diagnostic": f"{la['failed_attempts']} consecutive failed login attempts",
+                        "Status": f"Locked (~{la['remaining_mins']}m left)"
+                    })
+            if not rows and recent_events:
+                for ev in recent_events[:6]:
+                    rows.append({
+                        "Threat Type": ev["event_type"],
+                        "Target": ev["target"],
+                        "Incident Diagnostic": ev["details"],
+                        "Status": "Forensic Logged"
+                    })
+            if not rows:
+                rows.append({
+                    "Threat Type": "🛡️ Threat Shield Telemetry",
+                    "Target": "All Network Endpoints",
+                    "Incident Diagnostic": "Zero suspicious anomalies or unauthorized credential attacks detected.",
+                    "Status": "100% Secure & Optimal"
+                })
+
+            if blocked_ips or locked_accounts:
+                summary_msg = f"⚠️ Alert: System par {len(blocked_ips)} Suspicious IP(s) block hain aur {len(locked_accounts)} Account(s) brute-force attacks ki wajah se locked hain. System ne total {metrics.get('total_screened_requests', 0)} requests ko inspect kar ke {metrics.get('rate_limit_hits', 0)} rate violations block ki hain."
+            else:
+                summary_msg = f"🛡️ Security Status Clean: System par koi suspicious activity ya attack detected nahi hai! Total {metrics.get('total_screened_requests', 0)} requests inspect hui hain. CAPTCHA, Suspicious IP Auto-Ban, Rate Limiting aur Account Throttling sab 100% active hain."
+
+            self.log_ai_message(user_id, user_role, user_query, "-- SECURITY FORENSIC TELEMETRY", "SUCCESS", len(rows), summary_msg)
+            return {
+                "success": True,
+                "is_security": True,
+                "summary": summary_msg,
+                "sql": "-- SELECT * FROM v_threat_shield_forensics WHERE threat_level > 0;",
+                "rows": rows,
+                "row_count": len(rows),
+                "columns": ["Threat Type", "Target", "Incident Diagnostic", "Status"]
+            }
+
         # 1. Multi-Tier Role-Based Security & Privacy Policy
         if user_role == "Student":
             # Guard against students inquiring on teacher presence/attendance or staff
