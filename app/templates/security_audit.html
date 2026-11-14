@@ -21,6 +21,11 @@
             <i class="fa-solid fa-user-shield me-1"></i> RBAC Matrix & DCL Grants
         </button>
     </li>
+    <li class="nav-item">
+        <button class="nav-link" id="threat-tab" data-bs-toggle="tab" data-bs-target="#threat" type="button">
+            <i class="fa-solid fa-shield-virus me-1 text-danger"></i> Threat Shield & Cyber Defenses
+        </button>
+    </li>
 </ul>
 
 <div class="tab-content" id="securityTabContent">
@@ -198,5 +203,254 @@
             </div>
         </div>
     </div>
+
+    <!-- Threat Shield & Active Cyber Defenses Tab -->
+    <div class="tab-pane fade" id="threat" role="tabpanel">
+        <!-- 4 Defensive KPI Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-3 p-3 bg-white border-start border-4 border-success">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-muted fw-bold text-uppercase" style="font-size: 11px;">Rate Limiter</small>
+                            <h4 class="mb-0 fw-bold text-success">120 / min</h4>
+                            <small class="text-success"><i class="fa-solid fa-circle-check me-1"></i>Sliding Window Active</small>
+                        </div>
+                        <div class="rounded-circle bg-success bg-opacity-10 p-3 text-success fs-4">
+                            <i class="fa-solid fa-gauge-high"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-3 p-3 bg-white border-start border-4 border-primary">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-muted fw-bold text-uppercase" style="font-size: 11px;">Screened Requests</small>
+                            <h4 class="mb-0 fw-bold text-primary">{{ shield_telemetry.metrics.total_screened_requests or 0 }}</h4>
+                            <small class="text-muted"><i class="fa-solid fa-shield-halved me-1"></i>Traffic Inspected</small>
+                        </div>
+                        <div class="rounded-circle bg-primary bg-opacity-10 p-3 text-primary fs-4">
+                            <i class="fa-solid fa-traffic-light"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-3 p-3 bg-white border-start border-4 border-danger">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-muted fw-bold text-uppercase" style="font-size: 11px;">Blocked Suspicious IPs</small>
+                            <h4 class="mb-0 fw-bold text-danger">{{ shield_telemetry.active_blocked_ips|length }}</h4>
+                            <small class="text-danger"><i class="fa-solid fa-ban me-1"></i>Automated Ban Filter</small>
+                        </div>
+                        <div class="rounded-circle bg-danger bg-opacity-10 p-3 text-danger fs-4">
+                            <i class="fa-solid fa-shield-virus"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-3 p-3 bg-white border-start border-4 border-warning">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-muted fw-bold text-uppercase" style="font-size: 11px;">Throttled Accounts</small>
+                            <h4 class="mb-0 fw-bold text-warning">{{ shield_telemetry.active_locked_accounts|length }}</h4>
+                            <small class="text-warning"><i class="fa-solid fa-user-lock me-1"></i>Brute-Force Lockout</small>
+                        </div>
+                        <div class="rounded-circle bg-warning bg-opacity-10 p-3 text-warning fs-4">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Blocked Suspicious IPs -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm rounded-3 h-100">
+                    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 fw-bold text-danger"><i class="fa-solid fa-ban me-2"></i>Active Suspicious Blocked IPs</h6>
+                        <span class="badge bg-danger">{{ shield_telemetry.active_blocked_ips|length }} Blocked</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>IP Address</th>
+                                        <th>Reason</th>
+                                        <th>Remaining</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if shield_telemetry.active_blocked_ips %}
+                                        {% for item in shield_telemetry.active_blocked_ips %}
+                                        <tr>
+                                            <td><code class="text-danger fw-bold">{{ item.ip }}</code></td>
+                                            <td class="small">{{ item.reason }}</td>
+                                            <td><span class="badge bg-secondary">~{{ item.remaining_mins }}m</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-success" onclick="unblockIP('{{ item.ip }}')">
+                                                    <i class="fa-solid fa-unlock me-1"></i> Unblock
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="4" class="text-center text-muted py-4">
+                                                <i class="fa-solid fa-shield-heart fs-3 text-success d-block mb-2"></i>
+                                                Zero blocked IPs currently. All incoming traffic is behaving within security thresholds.
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Throttled & Locked Accounts -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm rounded-3 h-100">
+                    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 fw-bold text-warning"><i class="fa-solid fa-user-lock me-2"></i>Brute-Force Locked Accounts</h6>
+                        <span class="badge bg-warning text-dark">{{ shield_telemetry.active_locked_accounts|length }} Locked</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Account / Username</th>
+                                        <th>Failed Attempts</th>
+                                        <th>Cooldown</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if shield_telemetry.active_locked_accounts %}
+                                        {% for acc in shield_telemetry.active_locked_accounts %}
+                                        <tr>
+                                            <td class="fw-semibold">{{ acc.username }}</td>
+                                            <td><span class="badge bg-danger">{{ acc.failed_attempts }} Fails</span></td>
+                                            <td><span class="badge bg-secondary">~{{ acc.remaining_mins }}m</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary" onclick="unlockAccount('{{ acc.username }}')">
+                                                    <i class="fa-solid fa-key me-1"></i> Unlock
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="4" class="text-center text-muted py-4">
+                                                <i class="fa-solid fa-user-check fs-3 text-primary d-block mb-2"></i>
+                                                Zero locked accounts. No accounts have exceeded brute-force failure thresholds.
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Real-time Defense Event Stream -->
+            <div class="col-12">
+                <div class="card border-0 shadow-sm rounded-3">
+                    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 fw-bold"><i class="fa-solid fa-radar me-2 text-primary"></i>Live Forensic Event Stream (Threat Shield Log)</h6>
+                        <span class="badge bg-dark">In-Memory Real-Time Buffer</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Event Type</th>
+                                        <th>Target</th>
+                                        <th>Diagnostic Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if shield_telemetry.recent_events %}
+                                        {% for ev in shield_telemetry.recent_events %}
+                                        <tr>
+                                            <td class="small text-muted font-monospace">{{ ev.timestamp }}</td>
+                                            <td>
+                                                {% if 'BLOCK' in ev.event_type %}
+                                                    <span class="badge bg-danger">{{ ev.event_type }}</span>
+                                                {% elif 'LOCK' in ev.event_type %}
+                                                    <span class="badge bg-warning text-dark">{{ ev.event_type }}</span>
+                                                {% elif 'RATE' in ev.event_type %}
+                                                    <span class="badge bg-secondary">{{ ev.event_type }}</span>
+                                                {% elif 'SUCCESS' in ev.event_type %}
+                                                    <span class="badge bg-success">{{ ev.event_type }}</span>
+                                                {% else %}
+                                                    <span class="badge bg-info text-dark">{{ ev.event_type }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="fw-semibold font-monospace small">{{ ev.target }}</td>
+                                            <td class="small text-secondary">{{ ev.details }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="4" class="text-center text-muted py-3">No defense events recorded yet.</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+function unblockIP(ip) {
+    if (!confirm('Are you sure you want to release the security ban on IP: ' + ip + '?')) return;
+    fetch('/api/security/unblock-ip', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ip: ip })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    });
+}
+
+function unlockAccount(username) {
+    if (!confirm('Are you sure you want to unlock user account: ' + username + '?')) return;
+    fetch('/api/security/unlock-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: username })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    });
+}
+</script>
 {% endblock %}

@@ -489,6 +489,24 @@
                             </button>
                         </div>
 
+                        <!-- Anti-Bot Human Verification (CAPTCHA) Layer -->
+                        <div class="captcha-box mb-3 p-2 rounded-3" style="background: rgba(10, 21, 48, 0.7); border: 1px solid rgba(245, 158, 11, 0.35);">
+                            <div class="d-flex justify-content-between align-items-center mb-1 px-1">
+                                <label class="text-white-50 small mb-0" style="font-size: 11px;">
+                                    <i class="fa-solid fa-shield-halved text-warning me-1"></i> Human Verification
+                                </label>
+                                <button type="button" class="btn btn-link p-0 text-warning text-decoration-none" onclick="refreshCaptcha()" title="New Puzzle" style="font-size: 11px;">
+                                    <i class="fa-solid fa-rotate me-1" id="captchaSpinner"></i> Refresh
+                                </button>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="px-2 py-1 rounded text-center flex-shrink-0" style="background: rgba(4, 10, 24, 0.95); border: 1px dashed rgba(245, 158, 11, 0.5); min-width: 105px;">
+                                    <span class="text-warning fw-bold fs-6 font-monospace" id="captchaQuestionDisplay">{{ captcha_question or '7 + 5' }} = ?</span>
+                                </div>
+                                <input type="number" name="captcha_input" id="captcha_field" class="custom-dark-control text-center fw-bold text-warning" placeholder="Answer" required autocomplete="off" style="padding-left: 10px !important; min-height: 42px;">
+                            </div>
+                        </div>
+
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="rememberMe">
@@ -600,6 +618,32 @@
     function autofillLogin(user, pass) {
         document.getElementById("login_user").value = user;
         document.getElementById("pass_field").value = pass;
+        const cap = document.getElementById("captcha_field");
+        if (cap) {
+            cap.focus();
+        }
+    }
+
+    function refreshCaptcha() {
+        const spinner = document.getElementById("captchaSpinner");
+        if (spinner) spinner.classList.add("fa-spin");
+        fetch('/api/security/refresh-captcha')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const disp = document.getElementById("captchaQuestionDisplay");
+                    if (disp) disp.innerText = data.question + " = ?";
+                    const cap = document.getElementById("captcha_field");
+                    if (cap) {
+                        cap.value = "";
+                        cap.focus();
+                    }
+                }
+            })
+            .catch(err => console.error("Captcha refresh error:", err))
+            .finally(() => {
+                if (spinner) setTimeout(() => spinner.classList.remove("fa-spin"), 400);
+            });
     }
 
     function triggerBiometricScan() {

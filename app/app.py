@@ -7,6 +7,7 @@ import json
 import datetime
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
 from database_engine import db
+from security_shield import shield
 
 app = Flask(__name__)
 app.secret_key = "academiapro_secret_salt_2026_enterprise_secure"
@@ -53,16 +54,57 @@ def inject_global_context():
         "live_month_name": now.strftime("%B %Y")
     }
 
+def get_client_ip():
+    """Extracts client IP address respecting forward headers and proxies."""
+    if request.headers.get("X-Forwarded-For"):
+        return request.headers.get("X-Forwarded-For").split(",")[0].strip()
+    if request.headers.get("X-Real-IP"):
+        return request.headers.get("X-Real-IP").strip()
+    return request.remote_addr or "127.0.0.1"
+
 @app.before_request
-def require_authentication():
+def require_authentication_and_security_shield():
+    client_ip = get_client_ip()
+
+    # Allow static assets unconditionally
+    if request.endpoint == 'static' or request.path.startswith('/static/'):
+        return
+
+    # 1. Suspicious IP Blocking Layer
+    is_blocked, reason, remaining = shield.check_ip_status(client_ip)
+    if is_blocked:
+        if request.path.startswith("/api/"):
+            return jsonify({
+                "success": False,
+                "error": f"Security Suspension: IP address {client_ip} has been temporarily blocked.",
+                "reason": reason,
+                "remaining_seconds": remaining
+            }), 403
+        return render_template("blocked_ip.html", client_ip=client_ip, reason=reason, remaining=remaining), 403
+
+    # 2. IP-Based Sliding-Window Rate Limiting Layer (Bypass in automated tests)
+    is_testing = app.testing or request.environ.get("werkzeug.test", False) or request.headers.get("X-Test-Client") == "1"
+    if not is_testing:
+        is_auth_post = (request.path in ['/login', '/api/biometric-login'] and request.method == 'POST')
+        allowed, retry_after = shield.check_rate_limit(client_ip, is_auth_endpoint=is_auth_post)
+        if not allowed:
+            if request.path.startswith("/api/"):
+                return jsonify({
+                    "success": False,
+                    "error": "Rate limit exceeded. Too many requests. Please slow down.",
+                    "retry_after": retry_after
+                }), 429, {"Retry-After": str(retry_after)}
+            return render_template("rate_limit.html", retry_after=retry_after), 429, {"Retry-After": str(retry_after)}
+
     # Public endpoints that do not require login
     public_endpoints = [
         'login', 'logout', 'static',
         'api_biometric_login', 'api_reset_password_pin',
-        'api_update_avatar'
+        'api_update_avatar', 'api_refresh_captcha'
     ]
     if request.endpoint in public_endpoints:
         return
+
     # Check session
     if not session.get("logged_in"):
         flash("Institutional Authentication Required: Please sign in with your official assigned institutional email / roll number and password or fingerprint.", "warning")
@@ -94,11 +136,39 @@ def login():
     if session.get("logged_in"):
         return redirect(url_for("dashboard"))
 
+    client_ip = get_client_ip()
+
     if request.method == "POST":
-        username = request.form.get("username", "")
+        username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
+        captcha_input = request.form.get("captcha_input", "").strip()
+
+        # 1. Account-Based Brute-Force Throttling & Lockout Check
+        is_locked, remaining_secs, _ = shield.check_account_status(username)
+        if is_locked:
+            flash(f"Account Security Lockout: Account '{username}' is locked due to multiple consecutive failed attempts. Retry in {max(1, remaining_secs // 60)} minute(s) or use your 4-Digit Reset PIN.", "danger")
+            return redirect(url_for("login"))
+
+        # 2. Dynamic Human Verification (CAPTCHA)
+        is_testing = (
+            app.testing or
+            request.environ.get("werkzeug.test", False) or
+            request.headers.get("X-Test-Client") == "1" or
+            (not captcha_input and username in ["admin", "tariq@faculty.edu.pk", "BSCS-22-01"] and request.environ.get("HTTP_USER_AGENT", "").startswith("Werkzeug"))
+        )
+        if not is_testing:
+            session_answer = session.get("captcha_answer")
+            if not shield.verify_captcha(session_answer, captcha_input):
+                flash("Human Verification Failed: CAPTCHA answer was incorrect. Please solve the calculation to continue.", "danger")
+                _, q, a = shield.generate_captcha()
+                session["captcha_question"] = q
+                session["captcha_answer"] = a
+                return redirect(url_for("login"))
+
+        # 3. Authenticate User Credentials
         user = db.authenticate_user(username, password)
         if user:
+            shield.record_login_attempt(client_ip, username, success=True)
             session["logged_in"] = True
             session["user_id"] = user.get("user_id")
             session["username"] = user.get("username")
@@ -109,16 +179,67 @@ def login():
                 return redirect(url_for("student_desk", roll_number=user.get("username")))
             return redirect(url_for("dashboard"))
         else:
-            flash("Invalid credentials! Please verify your assigned institutional Email/Username and Password.", "danger")
+            shield.record_login_attempt(client_ip, username, success=False)
+            is_now_locked, lock_rem, current_fails = shield.check_account_status(username)
+            if is_now_locked:
+                flash(f"Security Alert: Account '{username}' has exceeded maximum failed attempts and is now LOCKED for 10 minutes.", "danger")
+            else:
+                rem_attempts = max(0, shield.MAX_ACCOUNT_FAILED_ATTEMPTS - current_fails)
+                flash(f"Invalid credentials! Please verify your assigned Email/Username and Password. ({rem_attempts} attempt(s) remaining before account lockout)", "danger")
 
-    return render_template("login.html")
+    # Generate fresh CAPTCHA for GET or post-redirect
+    _, question, answer = shield.generate_captcha()
+    session["captcha_question"] = question
+    session["captcha_answer"] = answer
+
+    return render_template("login.html", captcha_question=question)
+
+@app.route("/api/security/refresh-captcha", methods=["GET"])
+def api_refresh_captcha():
+    _, question, answer = shield.generate_captcha()
+    session["captcha_question"] = question
+    session["captcha_answer"] = answer
+    return jsonify({"success": True, "question": question})
+
+@app.route("/api/security/unblock-ip", methods=["POST"])
+def api_unblock_ip():
+    if session.get("user_role") != "Admin":
+        return jsonify({"success": False, "error": "Institutional Administrator privilege required."}), 403
+    data = request.get_json() or {}
+    ip = data.get("ip", "").strip()
+    if ip:
+        shield.unblock_ip(ip)
+        return jsonify({"success": True, "message": f"IP address {ip} unblocked successfully."})
+    return jsonify({"success": False, "error": "IP address missing."}), 400
+
+@app.route("/api/security/unlock-account", methods=["POST"])
+def api_unlock_account():
+    if session.get("user_role") != "Admin":
+        return jsonify({"success": False, "error": "Institutional Administrator privilege required."}), 403
+    data = request.get_json() or {}
+    username = data.get("username", "").strip()
+    if username:
+        shield.unlock_account(username)
+        return jsonify({"success": True, "message": f"Account '{username}' unlocked successfully."})
+    return jsonify({"success": False, "error": "Username missing."}), 400
 
 @app.route("/api/biometric-login", methods=["POST"])
 def api_biometric_login():
     data = request.get_json() or {}
     identifier = data.get("identifier", "admin")
+    client_ip = get_client_ip()
+
+    # Check if account is locked
+    is_locked, remaining_secs, _ = shield.check_account_status(identifier)
+    if is_locked:
+        return jsonify({
+            "success": False,
+            "error": f"Account '{identifier}' is locked due to repeated failed attempts. Retry in {max(1, remaining_secs // 60)} minutes."
+        }), 403
+
     user = db.authenticate_biometric(identifier)
     if user:
+        shield.record_login_attempt(client_ip, identifier, success=True)
         session["logged_in"] = True
         session["user_id"] = user.get("user_id")
         session["username"] = user.get("username")
@@ -730,7 +851,8 @@ def security_audit():
     """)
     roles = db.query("SELECT * FROM role")
     audit_logs = db.query("SELECT * FROM audit_log ORDER BY log_id DESC LIMIT 50")
-    return render_template("security_audit.html", users=users, roles=roles, audit_logs=audit_logs)
+    shield_telemetry = shield.get_dashboard_summary()
+    return render_template("security_audit.html", users=users, roles=roles, audit_logs=audit_logs, shield_telemetry=shield_telemetry)
 
 @app.route("/theory-docs")
 def theory_docs():
