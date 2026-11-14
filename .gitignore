@@ -9,12 +9,11 @@ __pycache__/
 .env.*
 *.env
 
-# Database files
-*.db
+# Database files (Track main pre-seeded academiapro.db for cloud deployment, ignore backups & local scratch)
 *.sqlite
 *.sqlite3
-academiapro.db
 academiapro_backup.db
+!academiapro.db
 
 # Virtual environments
 venv/
