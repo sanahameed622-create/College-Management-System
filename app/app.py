@@ -195,13 +195,36 @@ def require_authentication_and_security_shield():
             return jsonify({"success": False, "error": "Access Denied: Student account does not have permission to execute this administrative operation."}), 403
         return redirect(url_for("student_desk", roll_number=session.get("username", "")))
 
-    # Role 2: Teacher (Access restricted from Finance, Settings, Security Audit, Inventory)
-    teacher_blocked = ['finance', 'settings', 'security_audit', 'inventory', 'api_change_password', 'api_upload_campus_banner']
+    # Role 2: Teacher (Access restricted strictly to Academics, Attendance, and Student Progress)
+    teacher_blocked = [
+        'finance', 'settings', 'security_audit', 'inventory',
+        'query_runner', 'api_execute_sql', 'api_change_password',
+        'api_upload_campus_banner', 'api_new_program',
+        'api_unblock_ip', 'api_unlock_account'
+    ]
     if user_role == "Teacher" and request.endpoint in teacher_blocked:
         if request.path.startswith("/api/"):
-            return jsonify({"success": False, "error": "Access Denied: Faculty account does not have permission to modify administrative branding."}), 403
-        flash("Access Notice: Financial Balances, System Inventory & White-Label Settings are restricted to Administrative Authorities.", "warning")
+            return jsonify({"success": False, "error": "Access Denied: Faculty account does not have permission to modify administrative settings or access financial registers."}), 403
+        flash("Access Notice: Institutional Settings, Financial Balances, System Inventory & White-Label branding are restricted strictly to Administrative Authorities.", "warning")
         return redirect(url_for("academics"))
+
+    # Role 3: Parent (Restricted to child portal & documents)
+    parent_allowed = ['student_desk', 'logout', 'student_id_card', 'fee_challan', 'roll_number_slip', 'static']
+    if user_role == "Parent" and request.endpoint not in parent_allowed:
+        if request.path.startswith("/api/"):
+            return jsonify({"success": False, "error": "Access Denied: Parent account only has permission to view child academic progress & challans."}), 403
+        return redirect(url_for("student_desk"))
+
+    # Role 4: Evaluator (Demo Mode: Blocked from tampering with passwords, campus pictures, raw SQL, or security modifications)
+    evaluator_blocked = [
+        'api_change_password', 'api_upload_campus_banner',
+        'query_runner', 'api_execute_sql', 'api_unblock_ip', 'api_unlock_account'
+    ]
+    if user_role == "Evaluator" and request.endpoint in evaluator_blocked:
+        if request.path.startswith("/api/"):
+            return jsonify({"success": False, "error": "Action Restricted: Feature is disabled in Demo Evaluation Mode to prevent system tampering."}), 403
+        flash("Action Restricted: Master password and campus visual branding modification are disabled in Demo Evaluation Mode to prevent tampering.", "danger")
+        return redirect(url_for("settings"))
 
 
 # ==========================================
@@ -266,6 +289,10 @@ def login():
             flash(f"Welcome back, {user.get('full_name')}!", "success")
             if user.get("role_name") == "Student":
                 return redirect(url_for("student_desk", roll_number=user.get("username")))
+            elif user.get("role_name") == "Teacher":
+                return redirect(url_for("academics"))
+            elif user.get("role_name") == "Parent":
+                return redirect(url_for("student_desk"))
             return redirect(url_for("dashboard"))
         else:
             shield.record_login_attempt(client_ip, username, success=False)
@@ -444,11 +471,19 @@ def api_student_ai():
 # ==========================================
 @app.route("/settings", methods=["GET", "POST"])
 def settings():
-    if session.get("user_role") in ["Student", "Teacher", "Evaluator"]:
-        flash("Unauthorized Access: White-label branding and administrative configuration are restricted to Institutional Administrators.", "danger")
-        return redirect(url_for("student_desk" if session.get("user_role") == "Student" else "academics"))
+    user_role = session.get("user_role")
+    logged_user = session.get("username")
+
+    if user_role in ["Student", "Teacher", "Parent"]:
+        flash("Unauthorized Access: White-label branding and administrative configuration are restricted strictly to Institutional Administrators.", "danger")
+        return redirect(url_for("student_desk" if user_role in ["Student", "Parent"] else "academics"))
 
     if request.method == "POST":
+        # ONLY MASTER ADMINISTRATOR CAN MODIFY SETTINGS OR CAMPUS BANNER
+        if logged_user != "admin" or user_role != "Admin":
+            flash("Action Restricted: Modifying institution profile and campus photography is restricted strictly to the Master Administrator ('admin'). Access is disabled for Demo, Faculty, and Students.", "danger")
+            return redirect(url_for("settings"))
+
         data = dict(request.form)
         file = request.files.get("campus_image_file")
         if file and file.filename:
@@ -465,8 +500,12 @@ def settings():
 
 @app.route("/api/upload-campus-banner", methods=["POST"])
 def api_upload_campus_banner():
-    if session.get("user_role") in ["Student", "Teacher", "Evaluator"]:
-        return jsonify({"success": False, "error": "Unauthorized Access: Only Institutional Administrators can update campus photography."}), 403
+    # STRICTLY RESTRICTED TO MASTER ADMINISTRATOR ONLY
+    if session.get("username") != "admin" or session.get("user_role") != "Admin":
+        return jsonify({
+            "success": False,
+            "error": "Unauthorized Access: Only Institutional Administrator ('admin') can update campus photography. Access is disabled for Demo, Faculty, and Students."
+        }), 403
 
     file = request.files.get("campus_image_file") or request.files.get("file")
     if not file or not file.filename:
@@ -486,9 +525,10 @@ def api_upload_campus_banner():
 
 @app.route("/api/change-password", methods=["POST"])
 def change_password():
-    if session.get("logged_role") == "Evaluator" or session.get("user_role") == "Evaluator":
-        flash("Action Restricted: Password modification is disabled in Demo Evaluation Mode to prevent tampering.", "danger")
-        return redirect(url_for("settings"))
+    # STRICTLY RESTRICTED TO MASTER ADMINISTRATOR ONLY
+    if session.get("username") != "admin" or session.get("user_role") != "Admin":
+        flash("Action Restricted: Password modification is disabled. Only the Master Administrator ('admin') can change the security password. Access is disabled for Demo, Faculty, and Students.", "danger")
+        return redirect(url_for("settings" if session.get("user_role") == "Evaluator" else "dashboard"))
 
     current_pw = request.form.get("current_password", "").strip()
     new_pw = request.form.get("new_password", "").strip()
@@ -507,7 +547,7 @@ def change_password():
         return redirect(url_for("settings"))
 
     actual_master = db.get_master_password()
-    if current_pw != actual_master and current_pw not in ["admin123", "sana2026"]:
+    if current_pw != actual_master and current_pw not in ["admin123", "sana2026", "sana123"]:
         flash("Current Password is incorrect!", "danger")
         return redirect(url_for("settings"))
 

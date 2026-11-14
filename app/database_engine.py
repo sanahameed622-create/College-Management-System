@@ -186,7 +186,7 @@ class DatabaseEngine:
         clean_pass = password.strip()
         current_master_pw = self.get_master_password()
 
-        # 1. Master Owner / Institutional Administrator Credentials
+        # 1. Master Owner / Institutional Administrator Credentials (ONLY ADMIN GETS FULL ADMIN ROLE)
         admin_usernames = ["admin", "admin@academiapro.com", "admin@academiapro.edu.pk", "principal", "sana", "administrator"]
         admin_passwords = ["admin", "admin123", "demo", "demo123", "demo2026", "sana123", "sana2026", current_master_pw, "password123"]
         if (clean_user in admin_usernames) and (clean_pass in admin_passwords or clean_pass == current_master_pw):
@@ -198,7 +198,7 @@ class DatabaseEngine:
                 "email": "admin@academiapro.com"
             }
 
-        # 2. Dedicated Demo & Evaluator Accounts (Full Admin-Level Preview Access)
+        # 2. Dedicated Demo & Evaluator Account (STRICT Evaluator Role - Preview Only, NO Tampering Access)
         demo_usernames = ["demo", "evaluator", "client", "test", "demo@college.edu.pk"]
         demo_passwords = ["demo", "demo123", "demo2026", "admin", "admin123", "sana123", "sana2026", current_master_pw, "password123"]
         if (clean_user in demo_usernames) and (clean_pass in demo_passwords or clean_pass == current_master_pw):
@@ -206,11 +206,11 @@ class DatabaseEngine:
                 "user_id": 999,
                 "username": "demo",
                 "full_name": "Demo Evaluator (Client Preview)",
-                "role_name": "Admin",
+                "role_name": "Evaluator",
                 "email": "demo@college.edu.pk"
             }
 
-        # 3. Faculty Quick Access
+        # 3. Faculty / Teacher Access (STRICT Teacher Role - ONLY Academic & Teaching Desk Access)
         faculty_usernames = ["tariq@faculty.edu.pk", "prof_tariq", "faculty", "tariq.mahmood@academiapro.edu.pk"]
         faculty_passwords = ["sana123", "admin123", "demo", "demo123", "tariq123", "college123", "password123", current_master_pw]
         if (clean_user in faculty_usernames) and (clean_pass in faculty_passwords or clean_pass == current_master_pw):
@@ -222,7 +222,7 @@ class DatabaseEngine:
                 "email": "tariq.mahmood@academiapro.edu.pk"
             }
 
-        # 4. Parent / Guardian Quick Access
+        # 4. Parent / Guardian Quick Access (STRICT Parent Role - ONLY Child Progress & Docs)
         parent_usernames = ["parent@college.edu.pk", "parent", "guardian"]
         parent_passwords = ["sana123", "admin123", "demo", "demo123", "college123", "password123", current_master_pw]
         if (clean_user in parent_usernames) and (clean_pass in parent_passwords or clean_pass == current_master_pw):
@@ -230,7 +230,7 @@ class DatabaseEngine:
                 "user_id": 501,
                 "username": "parent",
                 "full_name": "Parent / Guardian Observer",
-                "role_name": "Admin",
+                "role_name": "Parent",
                 "email": "parent@college.edu.pk"
             }
 
@@ -320,9 +320,11 @@ class DatabaseEngine:
 
         # Master / Default PIN override (1234, 2026, 0000, 7860)
         if clean_pin in ["1234", "2026", "0000", "7860"]:
-            if clean_user in ["admin", "demo", "principal", "sana"] or "admin" in clean_user:
+            if clean_user in ["admin", "principal", "sana"] or clean_user == "admin@academiapro.com":
                 self.set_master_password(clean_pw)
                 return {"success": True, "message": "Master Administrator Password updated successfully!"}
+            elif clean_user in ["demo", "evaluator", "client"]:
+                return {"success": False, "error": "Access Denied: Password modification is disabled in Demo Evaluation mode."}
             else:
                 self.execute("UPDATE user_account SET password_hash = ? WHERE LOWER(username) = ? OR LOWER(email) = ?", (clean_pw, clean_user, clean_user))
                 return {"success": True, "message": "Password updated successfully using your 4-Digit PIN!"}

@@ -90,6 +90,15 @@
                     <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">
                         <i class="fa-solid fa-image me-2 text-warning"></i> 4. Institutional Campus Photography & Visual Identity
                     </h6>
+                    {% if logged_role != 'Admin' or session.get('username') != 'admin' %}
+                    <div class="alert alert-warning border-0 p-3 rounded-3 mb-3 d-flex align-items-center gap-3">
+                        <i class="fa-solid fa-lock text-warning fs-5"></i>
+                        <div>
+                            <strong class="text-dark">Campus Photography Modification Restricted:</strong>
+                            <span class="text-muted small">Only the Master Administrator (<code class="text-dark fw-bold">admin</code>) can upload or change the campus photograph and visual branding. Access is disabled in Demo Evaluation mode.</span>
+                        </div>
+                    </div>
+                    {% endif %}
                     <div class="row g-3 mb-4 align-items-center">
                         <div class="col-md-8">
                             <!-- Direct Gallery File Upload Box -->
@@ -100,6 +109,7 @@
                                     Select an image from your local device or photo gallery. It will automatically synchronize across both the <strong class="text-warning">Executive Dashboard</strong> and the <strong class="text-warning">Secure Login Portal</strong>.
                                 </p>
                                 
+                                {% if logged_role == 'Admin' and session.get('username') == 'admin' %}
                                 <div class="d-flex justify-content-center gap-2 flex-wrap">
                                     <label class="btn btn-gold btn-sm px-4 py-2 rounded-pill fw-bold text-white shadow-sm" style="cursor: pointer;">
                                         <i class="fa-solid fa-images me-1"></i> Browse Device / Photo Gallery
@@ -110,12 +120,17 @@
                                     </button>
                                 </div>
                                 <div id="selectedFileNameDisplay" class="small text-warning mt-2 fw-semibold" style="display: none;"></div>
+                                {% else %}
+                                <div class="badge bg-secondary-subtle text-secondary border px-3 py-2">
+                                    <i class="fa-solid fa-lock me-1"></i> Photo upload disabled (Master Administrator only)
+                                </div>
+                                {% endif %}
                             </div>
 
                             <!-- Optional URL Input / Fallback -->
                             <div class="mt-2">
                                 <label class="form-label small fw-semibold text-white-50">Or Specify an External Image URL / Presets (Optional):</label>
-                                <input type="text" name="campus_image_url" id="campusImageUrlInput" class="form-control form-control-sm" value="{{ college.campus_image_url }}" oninput="updateCampusPreview(this.value)">
+                                <input type="text" name="campus_image_url" id="campusImageUrlInput" class="form-control form-control-sm" value="{{ college.campus_image_url }}" oninput="updateCampusPreview(this.value)" {% if logged_role != 'Admin' or session.get('username') != 'admin' %}readonly{% endif %}>
                             </div>
                             
                             <!-- Quick Image Presets -->
@@ -152,9 +167,15 @@
                     </div>
 
                     <div class="d-flex justify-content-end gap-3 pt-3 border-top">
+                        {% if logged_role == 'Admin' and session.get('username') == 'admin' %}
                         <button type="submit" class="btn btn-primary px-5 py-2 fw-bold shadow-sm">
                             <i class="fa-solid fa-save me-2"></i> Save Changes & Update All Documents
                         </button>
+                        {% else %}
+                        <button type="button" class="btn btn-secondary px-5 py-2 fw-bold shadow-sm" disabled title="Only Master Administrator ('admin') can modify institutional settings">
+                            <i class="fa-solid fa-lock me-2"></i> Save Disabled (Master Admin Only)
+                        </button>
+                        {% endif %}
                     </div>
 
                 </form>
@@ -173,14 +194,14 @@
                 </span>
             </div>
             <div class="card-body p-4 p-md-5">
-                {% if logged_role == 'Evaluator' %}
+                {% if logged_role != 'Admin' or session.get('username') != 'admin' %}
                 <div class="alert alert-warning border-0 p-4 rounded-3 d-flex align-items-center gap-3">
                     <div class="bg-warning text-dark rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
                         <i class="fa-solid fa-shield-halved fs-5"></i>
                     </div>
                     <div>
-                        <h6 class="fw-bold mb-1 text-dark">Demo Evaluation Mode Active</h6>
-                        <p class="mb-0 text-muted small">You are reviewing AcademiaPro in client evaluation mode. Master password modification is restricted to the primary system owner.</p>
+                        <h6 class="fw-bold mb-1 text-dark">Password Modification Restricted</h6>
+                        <p class="mb-0 text-muted small">Master password modification is restricted strictly to the Master Administrator (<code class="text-dark fw-bold">admin</code>). Access is disabled in Demo Evaluation, Faculty, and Student modes to prevent system tampering.</p>
                     </div>
                 </div>
                 {% else %}
