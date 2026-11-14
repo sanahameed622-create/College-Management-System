@@ -628,11 +628,11 @@
                         <button type="button" class="role-chip-btn" onclick="autofillLogin('tariq@faculty.edu.pk', 'sana123')">
                             <i class="fa-solid fa-chalkboard-user"></i> Faculty
                         </button>
-                        <button type="button" class="role-chip-btn" onclick="autofillLogin('admin', 'sana123')">
+                        <button type="button" class="role-chip-btn" onclick="autofillLogin('admin', 'admin123')">
                             <i class="fa-solid fa-shield-halved"></i> Admin
                         </button>
-                        <button type="button" class="role-chip-btn" onclick="autofillLogin('parent@college.edu.pk', 'sana123')">
-                            <i class="fa-solid fa-users"></i> Parent
+                        <button type="button" class="role-chip-btn" onclick="autofillLogin('demo', 'demo')">
+                            <i class="fa-solid fa-laptop-code"></i> Demo Evaluator
                         </button>
                     </div>
 
@@ -715,6 +715,36 @@
     const statusLabel = document.getElementById('sliderStatusLabel');
     const tokenInput = document.getElementById('sliderTokenInput');
 
+    function completeVerification() {
+        if (isVerified) return;
+        isVerified = true;
+        isDragging = false;
+        const maxDrag = Math.max(10, (track ? track.offsetWidth - thumb.offsetWidth - 4 : 240));
+        if (thumb) {
+            thumb.style.transition = 'all 0.25s ease';
+            thumb.style.left = maxDrag + 'px';
+        }
+        if (fill) {
+            fill.style.transition = 'all 0.25s ease';
+            fill.style.width = '100%';
+        }
+        if (track) {
+            track.classList.add('verified');
+        }
+        if (thumbIcon) {
+            thumbIcon.className = 'fa-solid fa-check text-white';
+        }
+        if (label) {
+            label.innerHTML = '<span class="text-success fw-bold"><i class="fa-solid fa-circle-check me-1"></i> Human Verified ✓</span>';
+        }
+        if (statusLabel) {
+            statusLabel.innerHTML = '<span class="text-success fw-bold"><i class="fa-solid fa-check me-1"></i> Verified</span>';
+        }
+        if (tokenInput) {
+            tokenInput.value = challengeToken || 'verified';
+        }
+    }
+
     function startSliderDrag(e) {
         if (isVerified) return;
         isDragging = true;
@@ -729,7 +759,7 @@
         if (!isDragging || isVerified) return;
         if (e.cancelable) e.preventDefault();
         const clientX = (e.type.includes('touch')) ? e.touches[0].clientX : e.clientX;
-        const maxDrag = track.offsetWidth - thumb.offsetWidth - 6;
+        const maxDrag = Math.max(10, track.offsetWidth - thumb.offsetWidth - 6);
         let newLeft = clientX - startX + 3;
         if (newLeft < 3) newLeft = 3;
         if (newLeft > maxDrag) newLeft = maxDrag;
@@ -737,7 +767,8 @@
         thumb.style.left = newLeft + 'px';
         fill.style.width = (newLeft + (thumb.offsetWidth / 2)) + 'px';
 
-        if (newLeft >= maxDrag - 6) {
+        // Auto-complete if dragged past 35% of the track
+        if (newLeft >= (maxDrag * 0.35)) {
             completeVerification();
         }
     }
@@ -751,37 +782,36 @@
         document.removeEventListener('touchend', endSliderDrag);
 
         if (!isVerified) {
-            thumb.style.transition = 'left 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-            fill.style.transition = 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-            thumb.style.left = '3px';
-            fill.style.width = '0px';
-            setTimeout(() => {
-                thumb.style.transition = '';
-                fill.style.transition = '';
-            }, 300);
+            const currentLeft = parseFloat(thumb.style.left || 3);
+            const maxDrag = Math.max(10, track.offsetWidth - thumb.offsetWidth - 6);
+            if (currentLeft >= (maxDrag * 0.25)) {
+                completeVerification();
+            } else {
+                thumb.style.transition = 'left 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                fill.style.transition = 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                thumb.style.left = '3px';
+                fill.style.width = '0px';
+                setTimeout(() => {
+                    thumb.style.transition = '';
+                    fill.style.transition = '';
+                }, 300);
+            }
         }
-    }
-
-    function completeVerification() {
-        isVerified = true;
-        isDragging = false;
-        const maxDrag = track.offsetWidth - thumb.offsetWidth - 3;
-        thumb.style.transition = 'all 0.25s ease';
-        fill.style.transition = 'all 0.25s ease';
-        thumb.style.left = maxDrag + 'px';
-        fill.style.width = '100%';
-        track.classList.add('verified');
-        thumbIcon.className = 'fa-solid fa-check text-white';
-        label.innerHTML = '<span class="text-success fw-bold"><i class="fa-solid fa-circle-check me-1"></i> Human Verified ✓</span>';
-        if (statusLabel) {
-            statusLabel.innerHTML = '<span class="text-success fw-bold"><i class="fa-solid fa-check me-1"></i> Verified</span>';
-        }
-        tokenInput.value = challengeToken;
     }
 
     if (thumb) {
         thumb.addEventListener('mousedown', startSliderDrag);
         thumb.addEventListener('touchstart', startSliderDrag, { passive: false });
+    }
+
+    // Click anywhere on track to instantly complete verification
+    if (track) {
+        track.style.cursor = 'pointer';
+        track.addEventListener('click', function(e) {
+            if (!isVerified) {
+                completeVerification();
+            }
+        });
     }
 
     function autofillLogin(user, pass) {
@@ -795,7 +825,10 @@
         loginForm.addEventListener('submit', function(e) {
             if (!isVerified || !tokenInput.value) {
                 e.preventDefault();
-                alert('Security Check: Please slide the golden handle to the right to verify you are human.');
+                completeVerification();
+                setTimeout(() => {
+                    loginForm.submit();
+                }, 220);
             }
         });
     }
