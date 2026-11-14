@@ -109,7 +109,7 @@ def login():
                 return redirect(url_for("student_desk", roll_number=user.get("username")))
             return redirect(url_for("dashboard"))
         else:
-            flash("Invalid credentials! Master Admin: admin / sana123 or check your assigned Gmail/Password.", "danger")
+            flash("Invalid credentials! Please verify your assigned institutional Email/Username and Password.", "danger")
 
     return render_template("login.html")
 

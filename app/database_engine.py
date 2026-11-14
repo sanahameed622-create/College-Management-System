@@ -64,8 +64,8 @@ class DatabaseEngine:
             profiles = self.query("SELECT * FROM college_profile LIMIT 1")
             if profiles:
                 p = dict(profiles[0])
-                if not p.get("campus_image_url") or "unsplash.com" in str(p.get("campus_image_url", "")):
-                    p["campus_image_url"] = "/static/img/campus_default.svg"
+                if not p.get("campus_image_url"):
+                    p["campus_image_url"] = "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80"
                 return p
         except Exception:
             pass
@@ -81,7 +81,7 @@ class DatabaseEngine:
             "bank_account_no": "0123-45678901-03",
             "bank_branch_code": "HBL-0452",
             "principal_name": "Prof. Dr. Tariq Mahmood",
-            "campus_image_url": "/static/img/campus_default.svg"
+            "campus_image_url": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80"
         }
 
     def update_college_profile(self, data: Dict[str, Any]) -> bool:
@@ -90,7 +90,7 @@ class DatabaseEngine:
             existing = self.get_college_profile()
             campus_img = data.get("campus_image_url")
             if not campus_img or not str(campus_img).strip():
-                campus_img = existing.get("campus_image_url") or "/static/img/campus_default.svg"
+                campus_img = existing.get("campus_image_url") or "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80"
 
             sql = """
             UPDATE college_profile
