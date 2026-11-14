@@ -358,6 +358,88 @@
             color: #ffffff;
         }
 
+        /* Luxury Slider CAPTCHA */
+        .slider-captcha-wrapper {
+            margin-bottom: 16px;
+        }
+
+        .slider-track {
+            position: relative;
+            width: 100%;
+            height: 46px;
+            background: rgba(10, 21, 48, 0.95);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            border-radius: 23px;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            display: flex;
+            align-items: center;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+        }
+
+        .slider-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, rgba(245, 158, 11, 0.25), rgba(16, 185, 129, 0.45));
+            border-radius: 23px;
+        }
+
+        .slider-label {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 0.5px;
+            pointer-events: none;
+            z-index: 2;
+            transition: all 0.2s ease;
+        }
+
+        .slider-thumb {
+            position: absolute;
+            left: 3px;
+            top: 3px;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #060e22;
+            cursor: grab;
+            z-index: 3;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+            touch-action: none;
+        }
+
+        .slider-thumb:active {
+            cursor: grabbing;
+        }
+
+        .slider-track.verified {
+            border-color: rgba(16, 185, 129, 0.7) !important;
+            background: rgba(6, 30, 22, 0.95) !important;
+        }
+
+        .slider-track.verified .slider-fill {
+            width: 100% !important;
+            background: rgba(16, 185, 129, 0.35) !important;
+        }
+
+        .slider-track.verified .slider-thumb {
+            background: #10b981 !important;
+            color: #ffffff !important;
+            cursor: default !important;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.6) !important;
+        }
+
         /* Far Right Quote Box */
         .right-quote-card {
             background: rgba(8, 19, 44, 0.65);
@@ -489,22 +571,27 @@
                             </button>
                         </div>
 
-                        <!-- Anti-Bot Human Verification (CAPTCHA) Layer -->
-                        <div class="captcha-box mb-3 p-2 rounded-3" style="background: rgba(10, 21, 48, 0.7); border: 1px solid rgba(245, 158, 11, 0.35);">
+                        <!-- Interactive Anti-Bot Slider Verification -->
+                        <div class="slider-captcha-wrapper mb-3">
                             <div class="d-flex justify-content-between align-items-center mb-1 px-1">
                                 <label class="text-white-50 small mb-0" style="font-size: 11px;">
-                                    <i class="fa-solid fa-shield-halved text-warning me-1"></i> Human Verification
+                                    <i class="fa-solid fa-shield-halved text-warning me-1"></i> Security Verification
                                 </label>
-                                <button type="button" class="btn btn-link p-0 text-warning text-decoration-none" onclick="refreshCaptcha()" title="New Puzzle" style="font-size: 11px;">
-                                    <i class="fa-solid fa-rotate me-1" id="captchaSpinner"></i> Refresh
-                                </button>
+                                <span class="text-white-50 small" id="sliderStatusLabel" style="font-size: 11px;">
+                                    <i class="fa-solid fa-lock me-1"></i> Slide to unlock
+                                </span>
                             </div>
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="px-2 py-1 rounded text-center flex-shrink-0" style="background: rgba(4, 10, 24, 0.95); border: 1px dashed rgba(245, 158, 11, 0.5); min-width: 105px;">
-                                    <span class="text-warning fw-bold fs-6 font-monospace" id="captchaQuestionDisplay">{{ captcha_question or '7 + 5' }} = ?</span>
+                            
+                            <div class="slider-track" id="sliderTrack">
+                                <div class="slider-fill" id="sliderFill"></div>
+                                <span class="slider-label" id="sliderLabel">
+                                    <i class="fa-solid fa-angles-right me-1 text-warning"></i> Slide right to verify
+                                </span>
+                                <div class="slider-thumb" id="sliderThumb">
+                                    <i class="fa-solid fa-arrow-right" id="sliderThumbIcon"></i>
                                 </div>
-                                <input type="number" name="captcha_input" id="captcha_field" class="custom-dark-control text-center fw-bold text-warning" placeholder="Answer" required autocomplete="off" style="padding-left: 10px !important; min-height: 42px;">
                             </div>
+                            <input type="hidden" name="slider_token" id="sliderTokenInput" value="">
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -615,35 +702,102 @@
         }
     }
 
-    function autofillLogin(user, pass) {
-        document.getElementById("login_user").value = user;
-        document.getElementById("pass_field").value = pass;
-        const cap = document.getElementById("captcha_field");
-        if (cap) {
-            cap.focus();
+    let isVerified = false;
+    let isDragging = false;
+    let startX = 0;
+    const challengeToken = "{{ slider_token }}";
+
+    const track = document.getElementById('sliderTrack');
+    const thumb = document.getElementById('sliderThumb');
+    const fill = document.getElementById('sliderFill');
+    const label = document.getElementById('sliderLabel');
+    const thumbIcon = document.getElementById('sliderThumbIcon');
+    const statusLabel = document.getElementById('sliderStatusLabel');
+    const tokenInput = document.getElementById('sliderTokenInput');
+
+    function startSliderDrag(e) {
+        if (isVerified) return;
+        isDragging = true;
+        startX = (e.type.includes('touch')) ? e.touches[0].clientX : e.clientX;
+        document.addEventListener('mousemove', onSliderDrag);
+        document.addEventListener('mouseup', endSliderDrag);
+        document.addEventListener('touchmove', onSliderDrag, { passive: false });
+        document.addEventListener('touchend', endSliderDrag);
+    }
+
+    function onSliderDrag(e) {
+        if (!isDragging || isVerified) return;
+        if (e.cancelable) e.preventDefault();
+        const clientX = (e.type.includes('touch')) ? e.touches[0].clientX : e.clientX;
+        const maxDrag = track.offsetWidth - thumb.offsetWidth - 6;
+        let newLeft = clientX - startX + 3;
+        if (newLeft < 3) newLeft = 3;
+        if (newLeft > maxDrag) newLeft = maxDrag;
+
+        thumb.style.left = newLeft + 'px';
+        fill.style.width = (newLeft + (thumb.offsetWidth / 2)) + 'px';
+
+        if (newLeft >= maxDrag - 6) {
+            completeVerification();
         }
     }
 
-    function refreshCaptcha() {
-        const spinner = document.getElementById("captchaSpinner");
-        if (spinner) spinner.classList.add("fa-spin");
-        fetch('/api/security/refresh-captcha')
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    const disp = document.getElementById("captchaQuestionDisplay");
-                    if (disp) disp.innerText = data.question + " = ?";
-                    const cap = document.getElementById("captcha_field");
-                    if (cap) {
-                        cap.value = "";
-                        cap.focus();
-                    }
-                }
-            })
-            .catch(err => console.error("Captcha refresh error:", err))
-            .finally(() => {
-                if (spinner) setTimeout(() => spinner.classList.remove("fa-spin"), 400);
-            });
+    function endSliderDrag() {
+        if (!isDragging) return;
+        isDragging = false;
+        document.removeEventListener('mousemove', onSliderDrag);
+        document.removeEventListener('mouseup', endSliderDrag);
+        document.removeEventListener('touchmove', onSliderDrag);
+        document.removeEventListener('touchend', endSliderDrag);
+
+        if (!isVerified) {
+            thumb.style.transition = 'left 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+            fill.style.transition = 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+            thumb.style.left = '3px';
+            fill.style.width = '0px';
+            setTimeout(() => {
+                thumb.style.transition = '';
+                fill.style.transition = '';
+            }, 300);
+        }
+    }
+
+    function completeVerification() {
+        isVerified = true;
+        isDragging = false;
+        const maxDrag = track.offsetWidth - thumb.offsetWidth - 3;
+        thumb.style.transition = 'all 0.25s ease';
+        fill.style.transition = 'all 0.25s ease';
+        thumb.style.left = maxDrag + 'px';
+        fill.style.width = '100%';
+        track.classList.add('verified');
+        thumbIcon.className = 'fa-solid fa-check text-white';
+        label.innerHTML = '<span class="text-success fw-bold"><i class="fa-solid fa-circle-check me-1"></i> Human Verified ✓</span>';
+        if (statusLabel) {
+            statusLabel.innerHTML = '<span class="text-success fw-bold"><i class="fa-solid fa-check me-1"></i> Verified</span>';
+        }
+        tokenInput.value = challengeToken;
+    }
+
+    if (thumb) {
+        thumb.addEventListener('mousedown', startSliderDrag);
+        thumb.addEventListener('touchstart', startSliderDrag, { passive: false });
+    }
+
+    function autofillLogin(user, pass) {
+        document.getElementById("login_user").value = user;
+        document.getElementById("pass_field").value = pass;
+        completeVerification();
+    }
+
+    const loginForm = document.querySelector('form[action*="login"]');
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            if (!isVerified || !tokenInput.value) {
+                e.preventDefault();
+                alert('Security Check: Please slide the golden handle to the right to verify you are human.');
+            }
+        });
     }
 
     function triggerBiometricScan() {

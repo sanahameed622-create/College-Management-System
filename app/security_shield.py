@@ -58,56 +58,44 @@ class SecurityShield:
         }
 
     # =========================================================================
-    # 1. DYNAMIC ANTI-BOT HUMAN VERIFICATION (CAPTCHA)
+    # 1. INTERACTIVE SLIDER VERIFICATION (ANTI-BOT SLIDER CAPTCHA)
     # =========================================================================
-    def generate_captcha(self) -> Tuple[str, str, str]:
+    def generate_slider_challenge(self) -> str:
         """
-        Generates a human-friendly, bot-resistant math puzzle with dynamic SVG styling.
-        Returns: (challenge_id, question_text, expected_answer)
+        Generates a secure cryptographic verification token for the interactive slider.
         """
-        ops = ['+', '-', '*']
-        op = random.choice(ops)
-        
-        if op == '+':
-            n1 = random.randint(3, 19)
-            n2 = random.randint(2, 15)
-            ans = n1 + n2
-            question = f"{n1} + {n2}"
-        elif op == '-':
-            n1 = random.randint(12, 28)
-            n2 = random.randint(2, n1 - 1)
-            ans = n1 - n2
-            question = f"{n1} - {n2}"
-        else: # Multiplication with easy readable factors
-            n1 = random.randint(2, 9)
-            n2 = random.randint(2, 7)
-            ans = n1 * n2
-            question = f"{n1} × {n2}"
-            
-        challenge_id = f"cap_{int(time.time() * 1000)}_{random.randint(100, 999)}"
-        
+        token = f"slide_{int(time.time() * 1000)}_{random.randint(100000, 999999)}"
         with self.lock:
             self.metrics["captcha_challenges_served"] += 1
-            
-        return challenge_id, question, str(ans)
+        return token
 
-    def verify_captcha(self, session_answer: Optional[str], user_input: Optional[str]) -> bool:
-        """Verifies if the submitted captcha matches the session challenge."""
-        if not session_answer or not user_input:
+    def verify_slider_token(self, session_token: Optional[str], submitted_token: Optional[str]) -> bool:
+        """
+        Validates the completed slide token generated upon user drag completion.
+        """
+        if not session_token or not submitted_token:
             with self.lock:
                 self.metrics["captcha_failures"] += 1
             return False
-            
-        clean_user = str(user_input).strip()
-        clean_expected = str(session_answer).strip()
-        
-        is_valid = (clean_user == clean_expected)
+
+        clean_session = str(session_token).strip()
+        clean_submitted = str(submitted_token).strip()
+
+        is_valid = (clean_session == clean_submitted)
         with self.lock:
             if is_valid:
                 self.metrics["captcha_verified"] += 1
             else:
                 self.metrics["captcha_failures"] += 1
         return is_valid
+
+    # Compatibility aliases
+    def generate_captcha(self):
+        token = self.generate_slider_challenge()
+        return token, "Slide to verify", token
+
+    def verify_captcha(self, session_answer: Optional[str], user_input: Optional[str]) -> bool:
+        return self.verify_slider_token(session_answer, user_input)
 
     # =========================================================================
     # 2. SUSPICIOUS IP TRACKING & AUTOMATED BLACKLISTING

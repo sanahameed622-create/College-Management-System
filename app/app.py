@@ -217,7 +217,7 @@ def login():
     if request.method == "POST":
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
-        captcha_input = request.form.get("captcha_input", "").strip()
+        slider_token = request.form.get("slider_token", "").strip() or request.form.get("captcha_input", "").strip()
 
         # 1. Account-Based Brute-Force Throttling & Lockout Check
         is_locked, remaining_secs, _ = shield.check_account_status(username)
@@ -225,20 +225,19 @@ def login():
             flash(f"Account Security Lockout: Account '{username}' is locked due to multiple consecutive failed attempts. Retry in {max(1, remaining_secs // 60)} minute(s) or use your 4-Digit Reset PIN.", "danger")
             return redirect(url_for("login"))
 
-        # 2. Dynamic Human Verification (CAPTCHA)
+        # 2. Interactive Anti-Bot Slider Verification
         is_testing = (
             app.testing or
             request.environ.get("werkzeug.test", False) or
             request.headers.get("X-Test-Client") == "1" or
-            (not captcha_input and username in ["admin", "tariq@faculty.edu.pk", "BSCS-22-01"] and request.environ.get("HTTP_USER_AGENT", "").startswith("Werkzeug"))
+            (not slider_token and username in ["admin", "tariq@faculty.edu.pk", "BSCS-22-01"] and request.environ.get("HTTP_USER_AGENT", "").startswith("Werkzeug"))
         )
         if not is_testing:
-            session_answer = session.get("captcha_answer")
-            if not shield.verify_captcha(session_answer, captcha_input):
-                flash("Human Verification Failed: CAPTCHA answer was incorrect. Please solve the calculation to continue.", "danger")
-                _, q, a = shield.generate_captcha()
-                session["captcha_question"] = q
-                session["captcha_answer"] = a
+            session_token = session.get("slider_token")
+            if not shield.verify_slider_token(session_token, slider_token):
+                flash("Human Verification Required: Please complete the slider check to verify you are human.", "danger")
+                new_token = shield.generate_slider_challenge()
+                session["slider_token"] = new_token
                 return redirect(url_for("login"))
 
         # 3. Authenticate User Credentials
@@ -263,19 +262,18 @@ def login():
                 rem_attempts = max(0, shield.MAX_ACCOUNT_FAILED_ATTEMPTS - current_fails)
                 flash(f"Invalid credentials! Please verify your assigned Email/Username and Password. ({rem_attempts} attempt(s) remaining before account lockout)", "danger")
 
-    # Generate fresh CAPTCHA for GET or post-redirect
-    _, question, answer = shield.generate_captcha()
-    session["captcha_question"] = question
-    session["captcha_answer"] = answer
+    # Generate fresh Slider Challenge Token for GET or post-redirect
+    slider_token = shield.generate_slider_challenge()
+    session["slider_token"] = slider_token
 
-    return render_template("login.html", captcha_question=question)
+    return render_template("login.html", slider_token=slider_token)
 
 @app.route("/api/security/refresh-captcha", methods=["GET"])
+@app.route("/api/security/refresh-slider", methods=["GET"])
 def api_refresh_captcha():
-    _, question, answer = shield.generate_captcha()
-    session["captcha_question"] = question
-    session["captcha_answer"] = answer
-    return jsonify({"success": True, "question": question})
+    slider_token = shield.generate_slider_challenge()
+    session["slider_token"] = slider_token
+    return jsonify({"success": True, "token": slider_token, "question": "Slide to verify"})
 
 @app.route("/api/security/unblock-ip", methods=["POST"])
 def api_unblock_ip():

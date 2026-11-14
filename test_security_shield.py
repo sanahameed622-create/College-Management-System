@@ -20,14 +20,14 @@ print("============================================================")
 
 client = app.test_client()
 
-# TEST 1: CAPTCHA GENERATION & VERIFICATION
-print("\n[TEST 1] Verifying Dynamic Anti-Bot CAPTCHA Challenge Engine...")
-cid, question, expected_ans = shield.generate_captcha()
-print(f"Generated Challenge: ID={cid}, Question='{question} = ?', Answer={expected_ans}")
-assert shield.verify_captcha(expected_ans, expected_ans) is True, "Expected correct answer to pass"
-assert shield.verify_captcha(expected_ans, "999999") is False, "Expected wrong answer to fail"
-assert shield.verify_captcha(expected_ans, "") is False, "Expected empty answer to fail"
-print("[PASS] Dynamic CAPTCHA Generation & Math Calculation Validated!")
+# TEST 1: SLIDER VERIFICATION CHALLENGE & VALIDATION
+print("\n[TEST 1] Verifying Interactive Anti-Bot Slider Challenge Engine...")
+stoken = shield.generate_slider_challenge()
+print(f"Generated Slider Token: '{stoken}'")
+assert shield.verify_slider_token(stoken, stoken) is True, "Expected matching slider token to pass"
+assert shield.verify_slider_token(stoken, "fake_token_123") is False, "Expected wrong token to fail"
+assert shield.verify_slider_token(stoken, "") is False, "Expected empty token to fail"
+print("[PASS] Interactive Slider Verification Validated!")
 
 # TEST 2: ACCOUNT-BASED BRUTE-FORCE THROTTLING
 print("\n[TEST 2] Verifying Account-Based Brute-Force Throttling & Lockout...")
