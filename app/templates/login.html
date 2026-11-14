@@ -300,39 +300,7 @@
         .or-divider:not(:empty)::before { margin-right: 10px; }
         .or-divider:not(:empty)::after { margin-left: 10px; }
 
-        /* Role Quick Buttons */
-        .role-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin-bottom: 18px;
-        }
 
-        .role-chip-btn {
-            background: rgba(6, 14, 34, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 8px 10px;
-            color: #cbd5e1;
-            font-size: 12px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .role-chip-btn i {
-            color: #f59e0b;
-        }
-
-        .role-chip-btn:hover {
-            background: rgba(245, 158, 11, 0.18);
-            border-color: #f59e0b;
-            color: #ffffff;
-        }
 
         /* Biometric Button */
         .btn-biometric-gold {
@@ -613,32 +581,14 @@
                     </form>
 
                     <!-- Biometric Fingerprint Option -->
-                    <button type="button" class="btn-biometric-gold" onclick="triggerBiometricScan()">
+                    <button type="button" class="btn-biometric-gold mb-3" onclick="triggerBiometricScan()">
                         <i class="fa-solid fa-fingerprint"></i>
                         <span id="fpStatusText">Biometric Touch / Fingerprint Login</span>
                     </button>
 
-                    <div class="or-divider">OR</div>
-
-                    <!-- 4 Role Quick Buttons (Matching Reference!) -->
-                    <div class="role-grid">
-                        <button type="button" class="role-chip-btn" onclick="autofillLogin('BSCS-22-01', 'sana123')">
-                            <i class="fa-solid fa-user-graduate"></i> Student
-                        </button>
-                        <button type="button" class="role-chip-btn" onclick="autofillLogin('tariq@faculty.edu.pk', 'sana123')">
-                            <i class="fa-solid fa-chalkboard-user"></i> Faculty
-                        </button>
-                        <button type="button" class="role-chip-btn" onclick="autofillLogin('admin', 'admin123')">
-                            <i class="fa-solid fa-shield-halved"></i> Admin
-                        </button>
-                        <button type="button" class="role-chip-btn" onclick="autofillLogin('demo', 'demo')">
-                            <i class="fa-solid fa-laptop-code"></i> Demo Evaluator
-                        </button>
-                    </div>
-
                     <div class="text-center mt-3 pt-2 border-top border-secondary">
                         <small class="text-white-50" style="font-size: 11.5px;">
-                            New to AcademiaPro? <a href="{{ url_for('admissions') }}" class="text-warning text-decoration-none fw-bold">Create an Account</a>
+                            Official Institutional ERP Portal • <span class="text-warning fw-semibold">AcademiaPro Enterprise</span>
                         </small>
                     </div>
 

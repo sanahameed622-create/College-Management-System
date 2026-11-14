@@ -318,7 +318,11 @@ class DatabaseEngine:
         if len(clean_pw) < 4:
             return {"success": False, "error": "New password must be at least 4 characters long."}
 
-        # Master / Default PIN override (1234, 2026, 0000, 7860)
+        # Check if student roll number was provided, get associated student email
+        st_rows = self.query("SELECT email FROM student WHERE LOWER(roll_number) = ? LIMIT 1", (clean_user,))
+        matched_email = st_rows[0]["email"].lower() if st_rows else None
+
+        # Master / Default Recovery PIN override (1234, 2026, 0000, 7860)
         if clean_pin in ["1234", "2026", "0000", "7860"]:
             if clean_user in ["admin", "principal", "sana"] or clean_user == "admin@academiapro.com":
                 self.set_master_password(clean_pw)
@@ -326,16 +330,16 @@ class DatabaseEngine:
             elif clean_user in ["demo", "evaluator", "client"]:
                 return {"success": False, "error": "Access Denied: Password modification is disabled in Demo Evaluation mode."}
             else:
-                self.execute("UPDATE user_account SET password_hash = ? WHERE LOWER(username) = ? OR LOWER(email) = ?", (clean_pw, clean_user, clean_user))
-                return {"success": True, "message": "Password updated successfully using your 4-Digit PIN!"}
+                self.execute("UPDATE user_account SET password_hash = ? WHERE LOWER(username) = ? OR LOWER(email) = ? OR LOWER(email) = ?", (clean_pw, clean_user, clean_user, matched_email or ""))
+                return {"success": True, "message": "Password updated successfully using your 4-Digit Recovery PIN!"}
 
-        # Check database security_pin
-        rows = self.query("SELECT security_pin FROM user_account WHERE LOWER(username) = ? OR LOWER(email) = ?", (clean_user, clean_user))
+        # Check database security_pin in user_account
+        rows = self.query("SELECT security_pin FROM user_account WHERE LOWER(username) = ? OR LOWER(email) = ? OR LOWER(email) = ?", (clean_user, clean_user, matched_email or ""))
         if rows and str(rows[0].get("security_pin")) == clean_pin:
-            self.execute("UPDATE user_account SET password_hash = ? WHERE LOWER(username) = ? OR LOWER(email) = ?", (clean_pw, clean_user, clean_user))
-            return {"success": True, "message": "Password updated successfully using your 4-Digit PIN!"}
+            self.execute("UPDATE user_account SET password_hash = ? WHERE LOWER(username) = ? OR LOWER(email) = ? OR LOWER(email) = ?", (clean_pw, clean_user, clean_user, matched_email or ""))
+            return {"success": True, "message": "Password updated successfully using your 4-Digit Recovery PIN!"}
 
-        return {"success": False, "error": "Invalid 4-Digit Security PIN. Please contact the College Accounts Office."}
+        return {"success": False, "error": "Invalid 4-Digit Security Recovery PIN. Default PIN is 1234. If you have forgotten your PIN, please contact the College Accounts Office."}
 
     def get_kpis(self) -> Dict[str, Any]:
         """Calculates multi-tier executive dashboard metrics and chart series."""
