@@ -523,14 +523,26 @@
             <div class="col-md-3 col-lg-2 sidebar-navy">
                 <div>
                     <ul class="nav flex-column mb-auto">
+                        {% if logged_role != 'Teacher' and logged_role != 'Student' %}
                         <li class="nav-item">
                             <a href="{{ url_for('dashboard') }}" class="nav-gold-link {% if request.path == '/' %}active{% endif %}">
                                 <i class="fa-solid fa-house"></i>
                                 <span>Dashboard</span>
                             </a>
                         </li>
+                        {% endif %}
+
+                        {% if logged_role == 'Teacher' %}
+                        <!-- Teacher Dedicated Workspace: My Teaching Desk -->
+                        <li class="nav-item">
+                            <a href="{{ url_for('academics') }}" class="nav-gold-link {% if request.path == '/academics' %}active{% endif %}">
+                                <i class="fa-solid fa-chalkboard-user" style="color: #f59e0b;"></i>
+                                <span>My Teaching Desk</span>
+                            </a>
+                        </li>
+                        {% endif %}
                         
-                        <!-- AI Query Assistant (Always Prominent & Accessible For All Roles) -->
+                        <!-- AI Query Assistant (Accessible For All Roles) -->
                         <li class="nav-item">
                             <a href="{{ url_for('ai_assistant') }}" class="nav-gold-link {% if request.path == '/ai-assistant' %}active{% endif %}" style="position: relative;">
                                 <i class="fa-solid fa-robot" style="color: #f59e0b;"></i>
@@ -539,7 +551,7 @@
                             </a>
                         </li>
                         
-                        {% if logged_role != 'Student' %}
+                        {% if logged_role != 'Student' and logged_role != 'Teacher' %}
                         <li class="nav-item">
                             <a href="{{ url_for('admissions') }}" class="nav-gold-link {% if request.path == '/admissions' %}active{% endif %}">
                                 <i class="fa-solid fa-user-graduate"></i>
@@ -562,7 +574,7 @@
                                 <span>Academic Records</span>
                             </a>
                         </li>
-                        {% else %}
+                        {% elif logged_role == 'Student' %}
                         <!-- For Logged-in Students: Direct Academic Records Desk -->
                         <li class="nav-item">
                             <a href="{{ url_for('student_desk', roll_number=session.get('username','')) }}" class="nav-gold-link active">

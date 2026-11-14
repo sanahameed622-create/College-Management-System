@@ -197,6 +197,7 @@ def require_authentication_and_security_shield():
 
     # Role 2: Teacher (Access restricted strictly to Academics, Attendance, and Student Progress)
     teacher_blocked = [
+        'dashboard', 'admissions', 'campus_live_monitor',
         'finance', 'settings', 'security_audit', 'inventory',
         'query_runner', 'api_execute_sql', 'api_change_password',
         'api_upload_campus_banner', 'api_new_program',
@@ -204,8 +205,8 @@ def require_authentication_and_security_shield():
     ]
     if user_role == "Teacher" and request.endpoint in teacher_blocked:
         if request.path.startswith("/api/"):
-            return jsonify({"success": False, "error": "Access Denied: Faculty account does not have permission to modify administrative settings or access financial registers."}), 403
-        flash("Access Notice: Institutional Settings, Financial Balances, System Inventory & White-Label branding are restricted strictly to Administrative Authorities.", "warning")
+            return jsonify({"success": False, "error": "Access Denied: Faculty account is restricted from administrative operations, financial registers, and white-label branding."}), 403
+        flash("Faculty Desk: You have been routed to your designated Academic & Teaching Portal.", "info")
         return redirect(url_for("academics"))
 
     # Role 3: Parent (Restricted to child portal & documents)
