@@ -58,7 +58,8 @@ python app\app.py
 
 ### Step 5: Open in Your Browser
 Open your browser and navigate to:
-👉 **[http://127.0.0.1:5000](http://127.0.0.1:5000)**
+👉 **[http://localhost:5000/academiapro](http://localhost:5000/academiapro)**  
+*(Also accessible at: `http://academiapro.local:5000` or `http://localhost:5000`)*
 
 ---
 

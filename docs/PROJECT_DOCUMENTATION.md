@@ -504,7 +504,7 @@ python app\app.py
 
 ### Step 7: Access the System in Browser
 Open your browser and navigate to:
-👉 **`http://127.0.0.1:5000`**
+👉 **`http://localhost:5000/academiapro`** *(or `http://academiapro.local:5000`)*
 
 ---
 

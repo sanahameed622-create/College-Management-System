@@ -248,11 +248,17 @@ class DatabaseEngine:
             if rows:
                 u = rows[0]
                 if u.get("password_hash") == clean_pass or clean_pass in ["admin", "demo", "demo123", "admin123", "password123", "student123", "college123", current_master_pw, "sana123"]:
+                    role = u["role_name"]
+                    uid = u["user_id"]
+                    if role == "Student":
+                        st = self.query("SELECT student_id FROM student WHERE LOWER(email) = LOWER(?) OR LOWER(roll_number) = LOWER(REPLACE(?, '_', '-')) LIMIT 1", (u["email"], u["username"]))
+                        if st:
+                            uid = st[0]["student_id"]
                     return {
-                        "user_id": u["user_id"],
+                        "user_id": uid,
                         "username": u["username"],
                         "full_name": u["full_name"],
-                        "role_name": u["role_name"],
+                        "role_name": role,
                         "email": u["email"]
                     }
         except Exception:
@@ -815,10 +821,15 @@ class DatabaseEngine:
         FROM student s
         JOIN program p ON s.program_id = p.program_id
         JOIN department d ON p.dept_id = d.dept_id
-        WHERE LOWER(s.roll_number) = LOWER(?) OR s.cnic = ? OR CAST(s.student_id AS TEXT) = ?
+        WHERE LOWER(s.roll_number) = LOWER(?) 
+           OR LOWER(s.roll_number) = LOWER(REPLACE(?, '_', '-'))
+           OR LOWER(s.email) = LOWER(?)
+           OR s.cnic = ? 
+           OR CAST(s.student_id AS TEXT) = ?
+           OR s.email = (SELECT email FROM user_account WHERE LOWER(username) = LOWER(?))
         LIMIT 1;
         """
-        rows = self.query(sql, (clean_id, clean_id, clean_id))
+        rows = self.query(sql, (clean_id, clean_id, clean_id, clean_id, clean_id, clean_id))
         if not rows:
             return None
 

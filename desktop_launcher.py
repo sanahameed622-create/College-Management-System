@@ -12,7 +12,8 @@ import subprocess
 import webbrowser
 
 APP_PORT = 5000
-APP_URL = f"http://127.0.0.1:{APP_PORT}"
+APP_URL = f"http://localhost:{APP_PORT}/academiapro"
+APP_DOMAIN_URL = f"http://academiapro.local:{APP_PORT}"
 
 def is_server_running(host="127.0.0.1", port=APP_PORT):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -36,7 +37,9 @@ def start_flask_server():
     from app import app
     local_ip = get_local_ip()
     print(f"[*] Starting AcademiaPro Engine on {APP_URL}...")
-    print(f"[*] Mobile Phone / LAN Access URL: http://{local_ip}:{APP_PORT}")
+    print(f"[*] Project Easy URL        : http://localhost:{APP_PORT}/academiapro")
+    print(f"[*] Branded Local Domain    : http://academiapro.local:{APP_PORT}")
+    print(f"[*] Mobile Phone / LAN Access: http://{local_ip}:{APP_PORT}/academiapro")
     app.run(host="0.0.0.0", port=APP_PORT, debug=False, use_reloader=False)
 
 def launch_native_window():

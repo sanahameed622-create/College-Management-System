@@ -232,6 +232,7 @@ def require_authentication_and_security_shield():
 # AUTHENTICATION & ACCESS CONTROL
 # ==========================================
 @app.route("/login", methods=["GET", "POST"])
+@app.route("/academiapro/login", methods=["GET", "POST"])
 def login():
     if session.get("logged_in"):
         return redirect(url_for("dashboard"))
@@ -292,6 +293,12 @@ def login():
                 return redirect(url_for("student_desk", roll_number=user.get("username")))
             elif user.get("role_name") == "Teacher":
                 return redirect(url_for("academics"))
+            elif user.get("role_name") == "Accountant":
+                return redirect(url_for("finance"))
+            elif user.get("role_name") == "Librarian":
+                return redirect(url_for("library"))
+            elif user.get("role_name") == "StoreKeeper":
+                return redirect(url_for("inventory"))
             elif user.get("role_name") == "Parent":
                 return redirect(url_for("student_desk"))
             return redirect(url_for("dashboard"))
@@ -563,6 +570,8 @@ def change_password():
 # 1. DASHBOARD & OVERVIEW
 # ==========================================
 @app.route("/")
+@app.route("/academiapro")
+@app.route("/academiapro/")
 def dashboard():
     kpis = db.get_kpis()
     tier_filter = request.args.get("tier", "all")
@@ -649,9 +658,12 @@ def admissions():
 def student_id_card(student_id):
     user_role = session.get("user_role", "Admin")
     logged_uid = session.get("user_id")
-    if user_role == "Student" and logged_uid != student_id:
-        flash("Access Denied: You are only authorized to view your own Student ID Card.", "danger")
-        return redirect(url_for("student_desk"))
+    if user_role == "Student":
+        real_st = db.get_student_portal_data(session.get("username", ""))
+        real_sid = real_st.get("student", {}).get("student_id") if real_st else logged_uid
+        if real_sid != student_id and logged_uid != student_id:
+            flash("Access Denied: You are only authorized to view your own Student ID Card.", "danger")
+            return redirect(url_for("student_desk"))
 
     card_data = db.get_student_id_card_data(student_id)
     if not card_data:
@@ -668,9 +680,13 @@ def fee_challan(invoice_id):
         flash("Fee invoice / challan record not found.", "warning")
         return redirect(url_for("finance"))
 
-    if user_role == "Student" and challan_data.get("student", {}).get("student_id") != logged_uid:
-        flash("Access Denied: You are only authorized to view your own Fee Challan.", "danger")
-        return redirect(url_for("student_desk"))
+    if user_role == "Student":
+        real_st = db.get_student_portal_data(session.get("username", ""))
+        real_sid = real_st.get("student", {}).get("student_id") if real_st else logged_uid
+        target_sid = challan_data.get("invoice", {}).get("student_id") or challan_data.get("student", {}).get("student_id")
+        if target_sid != real_sid and target_sid != logged_uid:
+            flash("Access Denied: You are only authorized to view your own Fee Challan.", "danger")
+            return redirect(url_for("student_desk"))
 
     return render_template("fee_challan.html", data=challan_data)
 
@@ -678,9 +694,12 @@ def fee_challan(invoice_id):
 def roll_number_slip(student_id):
     user_role = session.get("user_role", "Admin")
     logged_uid = session.get("user_id")
-    if user_role == "Student" and logged_uid != student_id:
-        flash("Access Denied: You are only authorized to view your own Roll Number Slip.", "danger")
-        return redirect(url_for("student_desk"))
+    if user_role == "Student":
+        real_st = db.get_student_portal_data(session.get("username", ""))
+        real_sid = real_st.get("student", {}).get("student_id") if real_st else logged_uid
+        if real_sid != student_id and logged_uid != student_id:
+            flash("Access Denied: You are only authorized to view your own Roll Number Slip.", "danger")
+            return redirect(url_for("student_desk"))
 
     slip_data = db.get_roll_number_slip_data(student_id)
     if not slip_data:

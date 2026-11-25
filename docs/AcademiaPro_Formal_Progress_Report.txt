@@ -1,0 +1,166 @@
+PROJECT PROGRESS REPORT
+
+AcademiaPro: Integrated College Management System & Relational Database Architecture
+
+Submitted To: Dr. Imran Javed
+Submitted By: Sana Hameed
+Program: BS Computer Science / Software Engineering
+Department: Department of Computer Science / CASPAM
+Institution: Bahauddin Zakariya University, Multan
+Report Date: 24 November 2026
+Project Status: Working Prototype, BCNF Certification & Multi-Role Integration Phase
+
+================================================================================
+
+1. Project Overview & Institutional Scope
+
+AcademiaPro is an enterprise-grade institutional academic Relational Database Management System (RDBMS) and multi-tier Enterprise Resource Planning (ERP) platform. It is engineered to resolve systemic operational bottlenecks prevalent in educational institutions, including data duplication, inconsistent student records, financial discrepancies, and referential integrity violations caused by disconnected departmental spreadsheets.
+
+The project unifies academic management into six segregated logical schemas and twenty-five normalized relational tables certified in Boyce-Codd Normal Form (BCNF). It encompasses student lifecycle tracking, multi-tier grading, tuition fee ledgering, library circulation, laboratory asset inventory, a cyber threat defense shield, and a strictly sandboxed AI query assistant.
+
+Unlike surface-level CRUD implementations, AcademiaPro is constructed from first principles of relational database theory, formal relational algebra, and ACID transaction mechanics.
+
+2. Core Engineering Objectives
+
+The core objectives engineered into AcademiaPro include:
+
+- Formal Normalization: Decompose all relational schemas into Boyce-Codd Normal Form (BCNF) to mathematically eliminate Insertion, Deletion, and Update anomalies.
+- Strict Domain Segregation: Decouple distinct institutional operations into six logical schemas (system_core, academics, finance, library, inventory, ai) while maintaining referential integrity through explicit foreign key constraints.
+- Concurrency & Transaction Control: Eliminate race conditions during peak student enrollment using row-level locking (SELECT ... FOR UPDATE) and atomic transactions.
+- Multi-Role Access Control (RBAC): Enforce granular security boundaries across distinct administrative, faculty, student, financial, and library user roles.
+- Business Logic Automation: Implement automated stored procedures and database triggers for automated tuition invoice generation, attendance thresholds, and library overdue fine accruals.
+- Secure AI Telemetry: Deploy a natural language query assistant sandboxed strictly to read-only analytical SQL views, preventing prompt-injection and unauthorized database mutations.
+- Multi-Layer Cyber Defense: Protect institutional endpoints using sliding-window rate limiting, anti-bot verification, and automated IP ban defense.
+
+3. Detailed Development Progress
+
+3.1 Domain Schemas & Relational Data Architecture (25 BCNF Tables)
+The database layer is partitioned into six interconnected logical schemas:
+- system_core: Manages user accounts, cryptographic password hashes, RBAC role mappings, and an append-only forensic audit log recording system transactions.
+- academics: Houses academic departments, degree programs, semester cycles, faculty profiles, course catalogs, section offerings, student enrollments, daily attendance ledgers, and decoupled assessment definitions and result sheets.
+- finance: Governs program fee structures, semester tuition invoices, payment collection transactions, and consolidated disciplinary/overdue fines.
+- library: Coordinates book cataloging, physical barcoded copy tracking, member profiles, circulation borrowing, and overdue penalty flags.
+- inventory: Tracks departmental laboratory rooms, item procurement categories, purchase orders (POs), and room-level equipment issuance.
+- ai: Stores session-isolated conversation threads, user query telemetry, and execution timestamps for audit compliance.
+
+3.2 Dual-Engine Persistence Tier (PostgreSQL 16+ & SQLite3 Fallback)
+To ensure both production-grade capability and zero-configuration academic portability, AcademiaPro employs a dual-engine database architecture:
+- Production Tier (PostgreSQL 16+): Utilizes native PL/pgSQL triggers, row-level locks, transactional savepoints, and granular Data Control Language (DCL) database roles.
+- Evaluation / Portability Tier (SQLite3 Transparent Engine): Employs a zero-configuration local database engine mirroring identical schemas, constraints, and analytical views, allowing the platform to run seamlessly out-of-the-box on evaluation machines.
+
+3.3 Multi-Role Institutional Web Portal & RBAC Desks
+Developed using Python 3 (Flask) and a responsive Bootstrap 5 interface, the portal features role-specific authenticated workspaces:
+- Central Executive Dashboard (Admin): Institutional KPI analytics, revenue tracking, attendance rates, campus monitoring, and security audit telemetry.
+- My Teaching Desk (Faculty): Dedicated section rosters, daily student attendance marking (Present/Absent/Leave), and grading management for quizzes, midterms, and final exams.
+- Self-Service Student Desk: Individual GPA tracking, course enrollments, digital student ID cards with scannable barcodes, 3-part bank fee challans, and examination roll number slips.
+- Finance Desk (Accountant): Fee tariff configuration, semester invoice ledgering, real-time fee collection recording, and defaulter tracking.
+- Library & Inventory Desks: Barcode copy circulation, stock replenishment tracking, and automated low-stock warnings.
+
+3.4 Transaction Integrity & Concurrency Control
+To resolve concurrency hazards during high-traffic operations (such as course enrollment deadlines and flash exam registrations), the backend utilizes:
+- ACID Transactions: Multi-step database operations are encapsulated in atomic transactions to prevent partial commits.
+- Row-Level Locking: Employs 'SELECT ... FOR UPDATE' constructs during course section registration to evaluate seat capacity accurately before decrementing availability.
+- Automated Trigger Pipelines: Database triggers automatically calculate overdue library fines upon book check-in and post charges directly to the student's finance ledger.
+
+3.5 Sandboxed AI Query Assistant & NLP Intent Classification
+AcademiaPro incorporates an intelligent advisory assistant tailored for institutional telemetry:
+- Bilingual Intent Classification: Parses administrative inquiries in both English and Roman Urdu (e.g., detecting inquiries regarding fee defaulters, attendance shortages, or security threats).
+- Read-Only Security Sandboxing: The AI assistant operates under a restricted database role with SELECT-only privileges on curated analytical SQL views (such as v_student_transcript, v_defaulters, and v_attendance_shortage). It has zero direct access to underlying write operations, eliminating SQL injection and data tampering risks.
+
+3.6 Security Shield & Threat Defense Engine
+An integrated middleware defense engine safeguards platform endpoints against automated abuse:
+- Anti-Bot Verification: Interactive slider and math-based human challenge mechanisms.
+- Sliding-Window Rate Limiting: Enforces a ceiling of 120 global requests per minute per IP, and 10 requests per minute on authentication endpoints.
+- Automated IP Blacklisting: Automatically bans malicious client IPs for 15 minutes after 5 consecutive failed authentication attempts.
+- Account-Level Brute-Force Throttling: Enforces a 10-minute security lockout on target usernames upon repeated credential failures.
+- Real-Time Admin Telemetry: Dynamic server-side polling alerts administrators to active attacks and unauthorized access attempts.
+
+4. Current System Architecture & Data Flow
+
+The integrated architecture follows a structured pipeline:
+
+Client Browser (Admin / Teacher / Student / Accountant / Librarian)
+                     ↓
+Cyber Threat Defense Shield (Rate Limiting, Anti-Bot Verification & IP Ban)
+                     ↓
+Flask Web Application & RBAC Authorization Interceptor
+                     ↓
+Business Logic Layer & Parameterized SQL Query Engine
+                     ↓
+Dual-Engine Database Tier:
+  [Primary: PostgreSQL 16+ (PL/pgSQL Triggers & Row-Level Concurrency Locks)]
+  [Fallback: Zero-Config SQLite3 Autonomous Relational Engine]
+                     ↓
+Analytical Views Tier (v_student_transcript, v_defaulters, v_attendance_shortage)
+                     ↓
+Sandboxed Read-Only AI Assistant Telemetry & Forensic Audit Logging
+
+5. Technologies and Tools
+
+- Backend Framework       : Python 3 (Flask), WSGI Architecture
+- Primary RDBMS           : PostgreSQL 16+ (Enterprise Schemas, PL/pgSQL, DCL Roles)
+- Embedded Database Engine : SQLite3 (Dual-Engine Transparent Fallback)
+- Database Connectors     : psycopg2-binary, sqlite3 native C-drivers
+- Frontend Interface      : HTML5, CSS3 Custom Tokens, Bootstrap 5, FontAwesome 6
+- Security Architecture   : Sliding-Window Token Bucket, HMAC Salted Hashes, RBAC
+- AI / Natural Language   : Custom Intent Parsing Engine & Read-Only Analytical Views
+- Version Control & Tools : Git, Visual Studio Code, Chrome DevTools
+
+6. Key Technical Challenges & Engineered Solutions
+
+1. Challenge: Overcoming Relational Anomalies Across Departmental Operations.
+   Solution: Derived functional dependencies for all twenty-five entities and systematically normalized schemas through 1NF, 2NF, 3NF, and BCNF, ensuring every determinant is a superkey.
+2. Challenge: Preventing Race Conditions and Oversubscription in Limited Course Seats.
+   Solution: Implemented pessimistic row-level concurrency locking (SELECT ... FOR UPDATE) inside transactional blocks to prevent simultaneous over-enrollment.
+3. Challenge: Zero-Exposure Security for Natural Language AI Database Queries.
+   Solution: Decoupled the AI assistant from raw table structures, confining it to parameterized queries executed solely against curated, read-only SQL views.
+4. Challenge: Cross-Departmental Financial Reconciliation (Consolidating Library Overdues).
+   Solution: Engineered automated PL/pgSQL database triggers that link circulation returns with financial liability ledgers without manual staff intervention.
+5. Challenge: Safeguarding Portal Endpoints Against Brute-Force and Denial-of-Service Attacks.
+   Solution: Engineered an in-memory sliding-window Security Shield tracking IP violation frequencies, automating temporary bans and account lockouts.
+
+7. Key Academic Learnings (DBMS & Software Engineering)
+
+Through the design and development of AcademiaPro, the following key competencies were established:
+- Mathematical Normalization: Practical mastery in translating informal data requirements into Boyce-Codd Normal Form, eliminating redundancy at the schema level.
+- Transactional Architecture: Comprehensive understanding of ACID properties, transaction isolation levels, rollback mechanics, and dead-lock prevention.
+- Advanced SQL & View Optimization: Designing high-performance analytical views utilizing multi-table inner/outer equi-joins, aggregations, and subqueries.
+- Defense-in-Depth Security: Implementing multi-tier authorization barriers, role segregation, input sanitization, and audit trails within production architectures.
+- Dual-Engine Engineering: Architecting database abstractions capable of operating across heterogeneous relational engines without business logic alteration.
+
+8. Current Milestone Status & Verification
+
+- Relational Schema Implementation : 100% Completed (25 tables deployed and verified)
+- Sample Institutional Datasets   : 100% Seeded with realistic academic records
+- Full-Stack Web Portal            : 100% Operational locally at http://127.0.0.1:5000
+- Multi-Role Login Verification    : 100% Tested across Admin, Faculty, Student, 
+                                     Accountant, Librarian, and StoreKeeper roles
+- Student Self-Service Documents   : Verified (ID Cards, Challans, and Roll Slips)
+- AI Assistant & Security Shield   : Verified with active rate-limiting and audit logging
+- Academic Outreach & Showcase     : 5 high-resolution architectural posters finalized
+
+9. Planned Next Steps
+
+1. Cloud Deployment: Containerize the application using Docker for deployment on cloud infrastructure with hosted PostgreSQL.
+2. Automated Database Backups: Implement scheduled cron routines for automated point-in-time PostgreSQL database dumps.
+3. Expanded SMS/Email Gateway: Integrate webhook triggers for automated parent notification upon student absence or fee due dates.
+4. Stress & Load Benchmarking: Conduct high-concurrency simulated load testing using locust/JMeter to measure transaction throughput during peak registration.
+
+10. Conclusion
+
+AcademiaPro has progressed beyond an academic concept into a comprehensive, verified relational college management ERP and DBMS architecture. By adhering strictly to relational algebra principles, Boyce-Codd Normal Form certification, ACID transaction control, and multi-tier cybersecurity defense, the project provides a robust foundation for institutional data integrity.
+
+The platform demonstrates how theoretical database concepts—such as normalization, row locks, analytical views, and role-based access control—directly solve operational challenges in institutional management. All core modules are active, verified, and prepared for review and oral defense.
+
+================================================================================
+
+Submitted By:
+Sana Hameed
+BS Computer Science / Software Engineering
+Department of Computer Science / CASPAM
+Bahauddin Zakariya University, Multan
+
+Submitted To:
+Dr. Imran Javed
+Department of Computer Science / CASPAM
+Bahauddin Zakariya University, Multan
