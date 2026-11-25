@@ -46,7 +46,7 @@ class SinglePageCanvas(canvas.Canvas):
             # Footer text
             self.setFont("Helvetica-Bold", 7.5)
             self.setFillColor(SLATE_MUTED)
-            self.drawString(25, 16, "Verification: Tested locally on http://localhost:5000/academiapro • 25 Normalized Tables (BCNF)")
+            self.drawString(25, 16, "Live Vercel URL: https://academiapro-erp.vercel.app • 25 Normalized Tables (BCNF)")
             self.drawRightString(570, 16, "Student Signature: _______________________")
             
             super().showPage()
@@ -272,7 +272,7 @@ def generate_pdf(output_path):
         [Paragraph("Database:", styles['TableBodyBold']), Paragraph("PostgreSQL 16+ & SQLite3 (Dual-Engine)", styles['TableBody'])],
         [Paragraph("Frontend:", styles['TableBodyBold']), Paragraph("HTML5, Custom CSS3 Tokens, Bootstrap 5", styles['TableBody'])],
         [Paragraph("Security:", styles['TableBodyBold']), Paragraph("RBAC, Forensic Logs, Sliding-Window Shield", styles['TableBody'])],
-        [Paragraph("Current Status:", styles['TableBodyBold']), Paragraph("<b>ERP Active • Chatbot Ready • 100% Tested</b>", styles['TableBody'])],
+        [Paragraph("Current Status:", styles['TableBodyBold']), Paragraph("<b>Live on Vercel • ERP Active • 100% Tested</b>", styles['TableBody'])],
     ]
     t_stack = Table(table_stack_data, colWidths=[70, col_w - 70])
     t_stack.setStyle(TableStyle([
