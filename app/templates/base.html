@@ -424,6 +424,28 @@
             background: rgba(245, 158, 11, 0.2);
             color: #ffffff;
         }
+
+        /* Mobile & Tablet Responsive Optimizations */
+        @media (max-width: 991.98px) {
+            .topbar-header {
+                padding: 10px 12px;
+            }
+            .brand-title-text {
+                font-size: 16px;
+            }
+            .workspace-content {
+                padding: 14px 10px;
+                min-height: auto;
+            }
+            .user-capsule {
+                padding: 2px 6px;
+            }
+            .icon-btn-pill {
+                width: 34px;
+                height: 34px;
+                font-size: 13px;
+            }
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -432,14 +454,20 @@
     <!-- TOPBAR NAVIGATION BAR -->
     <header class="topbar-header d-flex align-items-center justify-content-between">
         
-        <!-- Left Brand Logo -->
-        <a href="{{ url_for('dashboard') }}" class="brand-logo-wrap">
-            <i class="fa-solid fa-graduation-cap brand-cap-icon"></i>
-            <div>
-                <div class="brand-title-text">AcademiaPro</div>
-                <div class="brand-subtitle-text">College Management System</div>
-            </div>
-        </a>
+        <!-- Left Brand Logo & Mobile Navigation Trigger -->
+        <div class="d-flex align-items-center gap-2">
+            <!-- Mobile Drawer Hamburger (Visible on screens < 992px) -->
+            <button class="btn btn-sm btn-outline-warning d-lg-none py-1 px-2 border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebarOffcanvas" aria-controls="mobileSidebarOffcanvas" title="Toggle Navigation Menu">
+                <i class="fa-solid fa-bars fs-5 text-warning"></i>
+            </button>
+            <a href="{{ url_for('dashboard') }}" class="brand-logo-wrap">
+                <i class="fa-solid fa-graduation-cap brand-cap-icon"></i>
+                <div>
+                    <div class="brand-title-text">AcademiaPro</div>
+                    <div class="brand-subtitle-text d-none d-sm-block">College Management System</div>
+                </div>
+            </a>
+        </div>
 
         <!-- Center Search Input Pill -->
         <div class="search-pill-container d-none d-md-block">
@@ -519,8 +547,8 @@
     <div class="container-fluid p-0">
         <div class="row g-0">
             
-            <!-- LEFT SIDEBAR -->
-            <div class="col-md-3 col-lg-2 sidebar-navy">
+            <!-- LEFT SIDEBAR (DESKTOP DOCKED) -->
+            <div class="col-lg-2 d-none d-lg-flex sidebar-navy">
                 <div>
                     <ul class="nav flex-column mb-auto">
                         {% if logged_role != 'Teacher' and logged_role != 'Student' %}
@@ -662,8 +690,8 @@
                 </div>
             </div>
 
-            <!-- MAIN WORKSPACE -->
-            <div class="col-md-9 col-lg-10 workspace-content">
+            <!-- MAIN WORKSPACE (FULL-WIDTH ON MOBILE, 10-COL ON DESKTOP) -->
+            <div class="col-12 col-lg-10 workspace-content">
                 
                 <!-- Flash Messages -->
                 {% with messages = get_flashed_messages(with_categories=true) %}
@@ -692,6 +720,145 @@
 
             </div>
 
+        </div>
+    </div>
+
+    <!-- MOBILE RESPONSIVE OFFCANVAS SIDEBAR (Slide-out navigation for mobile/tablet screens) -->
+    <div class="offcanvas offcanvas-start text-white d-lg-none" tabindex="-1" id="mobileSidebarOffcanvas" aria-labelledby="mobileSidebarOffcanvasLabel" style="background: #050c1c; border-right: 1.5px solid rgba(245, 158, 11, 0.45); width: 285px; z-index: 1060;">
+        <div class="offcanvas-header border-bottom border-secondary p-3">
+            <div class="d-flex align-items-center gap-2">
+                <i class="fa-solid fa-graduation-cap text-warning fs-4"></i>
+                <div>
+                    <div class="fw-bold text-white small">AcademiaPro</div>
+                    <div class="text-white-50" style="font-size: 10px;">College Navigation Menu</div>
+                </div>
+            </div>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body p-3 d-flex flex-column justify-content-between">
+            <div>
+                <ul class="nav flex-column mb-auto">
+                    {% if logged_role != 'Teacher' and logged_role != 'Student' %}
+                    <li class="nav-item">
+                        <a href="{{ url_for('dashboard') }}" class="nav-gold-link {% if request.path == '/' %}active{% endif %}">
+                            <i class="fa-solid fa-house"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% if logged_role == 'Teacher' %}
+                    <li class="nav-item">
+                        <a href="{{ url_for('academics') }}" class="nav-gold-link {% if request.path == '/academics' %}active{% endif %}">
+                            <i class="fa-solid fa-chalkboard-user" style="color: #f59e0b;"></i>
+                            <span>My Teaching Desk</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    <li class="nav-item">
+                        <a href="{{ url_for('ai_assistant') }}" class="nav-gold-link {% if request.path == '/ai-assistant' %}active{% endif %}" style="position: relative;">
+                            <i class="fa-solid fa-robot" style="color: #f59e0b;"></i>
+                            <span>AI Query Assistant</span>
+                            <span class="badge rounded-pill ms-auto" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 9.5px; padding: 2px 7px;">24/7</span>
+                        </a>
+                    </li>
+                    
+                    {% if logged_role != 'Student' and logged_role != 'Teacher' %}
+                    <li class="nav-item">
+                        <a href="{{ url_for('admissions') }}" class="nav-gold-link {% if request.path == '/admissions' %}active{% endif %}">
+                            <i class="fa-solid fa-user-graduate"></i>
+                            <span>Students</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('academics', tab='faculty') }}" class="nav-gold-link {% if request.path == '/academics' and request.args.get('tab') == 'faculty' %}active{% endif %}">
+                            <i class="fa-solid fa-chalkboard-user"></i>
+                            <span>Faculty</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('academics', tab='students') }}" class="nav-gold-link {% if request.path == '/academics' and request.args.get('tab') != 'faculty' %}active{% endif %}">
+                            <i class="fa-solid fa-book-open"></i>
+                            <span>Academic Records</span>
+                        </a>
+                    </li>
+                    {% elif logged_role == 'Student' %}
+                    <li class="nav-item">
+                        <a href="{{ url_for('student_desk', roll_number=session.get('username','')) }}" class="nav-gold-link active">
+                            <i class="fa-solid fa-book-open"></i>
+                            <span>My Academic Records</span>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <li class="nav-item">
+                        <a href="{{ url_for('attendance') }}" class="nav-gold-link {% if request.path == '/attendance' %}active{% endif %}">
+                            <i class="fa-regular fa-calendar-check"></i>
+                            <span>Attendance</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="{{ url_for('student_desk') }}" target="_blank" class="nav-gold-link {% if request.path == '/student-desk' %}active{% endif %}">
+                            <i class="fa-solid fa-file-signature"></i>
+                            <span>Examinations</span>
+                        </a>
+                    </li>
+
+                    {% if logged_role != 'Student' and logged_role != 'Teacher' %}
+                    <li class="nav-item">
+                        <a href="{{ url_for('finance') }}" class="nav-gold-link {% if request.path == '/finance' %}active{% endif %}">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                            <span>Finance &amp; Challans</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('library') }}" class="nav-gold-link {% if request.path == '/library' %}active{% endif %}">
+                            <i class="fa-solid fa-book-bookmark"></i>
+                            <span>Library Catalog</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('inventory') }}" class="nav-gold-link {% if request.path == '/inventory' %}active{% endif %}">
+                            <i class="fa-solid fa-boxes-stacked"></i>
+                            <span>Inventory Management</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('security_audit') }}" class="nav-gold-link {% if request.path == '/security-audit' %}active{% endif %}">
+                            <i class="fa-solid fa-shield-halved text-warning"></i>
+                            <span>Security &amp; Audit Logs</span>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <!-- Mobile Notifications Link -->
+                    <li class="nav-item">
+                        <a href="javascript:void(0)" class="nav-gold-link d-flex justify-content-between align-items-center" data-bs-toggle="offcanvas" data-bs-target="#notificationsOffcanvas" onclick="const m=bootstrap.Offcanvas.getInstance('#mobileSidebarOffcanvas'); if(m) m.hide();">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fa-regular fa-bell {% if security_alerts_count > 0 %}text-danger fa-shake{% else %}text-warning{% endif %}"></i>
+                                <span>Notifications</span>
+                            </div>
+                            <span class="badge {% if security_alerts_count > 0 %}bg-danger{% else %}bg-secondary{% endif %} rounded-pill px-2 py-1" style="font-size: 10px;">{{ notification_count or 0 }}</span>
+                        </a>
+                    </li>
+
+                    {% if logged_role != 'Teacher' and logged_role != 'Student' %}
+                    <li class="nav-item">
+                        <a href="{{ url_for('settings') }}" class="nav-gold-link {% if request.path == '/settings' %}active{% endif %}">
+                            <i class="fa-solid fa-gear"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="sidebar-engraving mt-3 pt-3">
+                <i class="fa-solid fa-building-columns"></i>
+                <div class="sidebar-engraving-title">Better Education</div>
+                <div class="sidebar-engraving-sub">Brighter Future</div>
+            </div>
         </div>
     </div>
 

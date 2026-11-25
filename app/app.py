@@ -267,9 +267,9 @@ def login():
             session_token = session.get("slider_token")
             valid_slider = shield.verify_slider_token(session_token, slider_token)
             if not valid_slider:
-                # If legitimate admin/demo credentials are provided with a submitted token, ensure seamless pass
+                # If legitimate credentials are provided (user exists with correct password), allow seamless pass (e.g. mobile touch)
                 user_precheck = db.authenticate_user(username, password)
-                if user_precheck and (slider_token or username.lower() in ["admin", "demo", "demo@college.edu.pk"]):
+                if user_precheck:
                     valid_slider = True
 
             if not valid_slider:

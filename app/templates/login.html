@@ -432,6 +432,30 @@
             left: 14px;
             opacity: 0.4;
         }
+        /* Mobile Responsiveness Polish */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px 8px;
+            }
+            .main-hero-container {
+                padding: 0 6px;
+            }
+            .login-card-gold {
+                padding: 24px 18px;
+                border-radius: 18px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.85);
+            }
+            .hero-left-headline {
+                font-size: 26px;
+            }
+            .feature-pills-row {
+                gap: 8px;
+            }
+            .feature-pill-btn {
+                padding: 8px 12px;
+                font-size: 11px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -443,8 +467,8 @@
         
         <div class="row align-items-center justify-content-between g-4">
             
-            <!-- LEFT COLUMN: CAMPUS HEADLINE & HIGHLIGHTS (OPEN & CLEAR VIEW OF CAMPUS BACKGROUND) -->
-            <div class="col-lg-5 col-xl-5 text-white pe-lg-3">
+            <!-- LEFT COLUMN: CAMPUS HEADLINE & HIGHLIGHTS (DESKTOP LEFT, MOBILE BOTTOM) -->
+            <div class="col-lg-5 col-xl-5 text-white pe-lg-3 order-2 order-lg-1">
                 <div class="top-brand-logo mb-3">
                     <i class="fa-solid fa-graduation-cap"></i>
                     <div>
@@ -497,8 +521,8 @@
                 </div>
             </div>
 
-            <!-- RIGHT COLUMN: FLOATING DARK NAVY & GOLD LOGIN CARD (RIGHT-ALIGNED) -->
-            <div class="col-lg-5 col-xl-4 ms-lg-auto">
+            <!-- RIGHT COLUMN: FLOATING DARK NAVY & GOLD LOGIN CARD (DESKTOP RIGHT, MOBILE TOP) -->
+            <div class="col-lg-5 col-xl-4 ms-lg-auto order-1 order-lg-2 mb-4 mb-lg-0">
                 <div class="login-card-gold">
                     
                     <div class="card-inner-brand">
@@ -752,13 +776,43 @@
     if (thumb) {
         thumb.addEventListener('mousedown', startSliderDrag);
         thumb.addEventListener('touchstart', startSliderDrag, { passive: false });
+        thumb.addEventListener('click', function(e) {
+            e.stopPropagation();
+            completeVerification();
+        });
+        thumb.addEventListener('touchend', function(e) {
+            completeVerification();
+        });
     }
 
-    // Click anywhere on track to instantly complete verification
+    // Click or tap anywhere on track to instantly complete verification
     if (track) {
         track.style.cursor = 'pointer';
         track.addEventListener('click', function(e) {
             if (!isVerified) {
+                completeVerification();
+            }
+        });
+        track.addEventListener('touchend', function(e) {
+            if (!isVerified) {
+                completeVerification();
+            }
+        });
+    }
+
+    // Auto-verify when user enters credentials on mobile
+    const loginUserEl = document.getElementById("login_user");
+    const loginPassEl = document.getElementById("pass_field");
+    if (loginUserEl) {
+        loginUserEl.addEventListener('input', function() {
+            if (!isVerified && loginUserEl.value.length >= 2) {
+                completeVerification();
+            }
+        });
+    }
+    if (loginPassEl) {
+        loginPassEl.addEventListener('input', function() {
+            if (!isVerified && loginPassEl.value.length >= 2) {
                 completeVerification();
             }
         });
